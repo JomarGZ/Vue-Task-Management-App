@@ -60,6 +60,7 @@ onBeforeUnmount(() => {
                     :disabled="storeUpdateProfile.loading"
                     class="w-full bg-blue-500 text-white py-2 mt-3 rounded-md hover:bg-blue-600 transition duration-300"
                 >
+                    <IconSpinner v-show="storeUpdateProfile.loading"/>
                     Save Personal Info
                 </button>
             </form>
@@ -81,6 +82,7 @@ onBeforeUnmount(() => {
                     v-model="storeUpdatePassword.form.current_password"
                     type="password" 
                     id="current_password"
+                    :disabled="storeUpdatePassword.loading"
                     class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     :class="{'border-red-500': storeUpdatePassword.errors.current_password}"
                     />
@@ -94,6 +96,7 @@ onBeforeUnmount(() => {
                     <input 
                     type="password" 
                     id="password"
+                    :disabled="storeUpdatePassword.loading"
                     v-model="storeUpdatePassword.form.password"
                     class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     :class="{'border-red-500': storeUpdatePassword.errors.password}"
@@ -108,6 +111,7 @@ onBeforeUnmount(() => {
                     <input 
                     v-model="storeUpdatePassword.form.password_confirmation"  
                     type="password" 
+                    :disabled="storeUpdatePassword.loading"
                     id="password_confirmation"
                     class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -115,8 +119,10 @@ onBeforeUnmount(() => {
                 
                 <button 
                     type="submit"
+                    :disabled="storeUpdatePassword.loading"
                     class="w-full bg-green-500 mt-3 text-white py-2 rounded-md hover:bg-green-600 transition duration-300"
                 >
+                    <IconSpinner v-show="storeUpdatePassword.loading"/>
                     Change Password
                 </button>
             </form>
