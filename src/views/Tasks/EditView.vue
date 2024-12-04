@@ -1,22 +1,28 @@
 <script setup>
-import { onBeforeUnmount, onMounted} from 'vue'
+import { onBeforeUnmount, onMounted, watchEffect } from 'vue'
 import { useTasks } from '@/stores/tasks';
+import { useRoute } from 'vue-router';
 
 const store = useTasks();
-
+const route = useRoute();
 onMounted(() => {
   store.fetchStatuses();
   store.fetchCategories();
 })
 onBeforeUnmount(store.resetForm);
+
+watchEffect(async () => {
+    store.getTask({ id: route.params.id }, true);
+});
+console.log("trigger1", store.form)
 </script>
 <template>
     <div class="fixed top-0 left-0 w-full h-full bg-opacity-50 flex justify-center items-center">
       <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md mt-14 h-96 overflow-y-auto  ">
         <h2 class="text-2xl font-bold mb-6">Add Task</h2>
-        <form @submit.prevent="store.storeTask" novalidate>
+        <form @submit.prevent="store.updateTask({ id: route.params.id })" novalidate>
           <div class="mb-4">
-            <label for="title" class="block text-gray-700 font-bold mb-2">Titles<span class="text-red-500">*</span></label>
+            <label for="title" class="block text-gray-700 font-bold mb-2">Title</label>
             <input
               type="text"
               id="title"
@@ -27,7 +33,7 @@ onBeforeUnmount(store.resetForm);
             <ValidationError :errors="store.errors" field="title"/>
           </div>
           <div class="mb-4">
-            <label for="description" class="block text-gray-700 font-bold mb-2">Description<span class="text-red-500">*</span></label>
+            <label for="description" class="block text-gray-700 font-bold mb-2">Description</label>
             <textarea
               id="description"
               v-model="store.form.description"
@@ -48,7 +54,7 @@ onBeforeUnmount(store.resetForm);
           />
         </div>
           <div class="mb-4">
-            <label for="category" class="block text-gray-700 font-bold mb-2">Category<span class="text-red-500">*</span></label>
+            <label for="category" class="block text-gray-700 font-bold mb-2">Category</label>
             <select
               id="category"
               v-model="store.form.category_id"
@@ -61,19 +67,19 @@ onBeforeUnmount(store.resetForm);
             <ValidationError :errors="store.errors" field="category_id"/>
           </div>
           <div class="flex justify-end">
-            <button
-              type="button"
+            <RouterLink
+              :to="{ name: 'tasks.index' }"
               class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg mr-2"
             >
               Cancel
-            </button>
+            </RouterLink>
             <button
               type="submit"
               :disabled="store.loading"
               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
             >
               <IconSpinner v-show="store.loading"/>
-              Add Task
+              Update Task
             </button>
           </div>
         </form>
