@@ -4,6 +4,7 @@ import { useRegister } from '@/stores/register';
 
 const store = useRegister();
 onBeforeUnmount(store.resetForm);
+
 </script>
 <template>
     <div class="flex justify-center items-center h-screen bg-gray-100 ">
