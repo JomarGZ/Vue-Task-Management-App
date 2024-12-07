@@ -1,17 +1,19 @@
+import { useFormatters } from "@/composables/useFormatters";
 import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, reactive, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 export const useTasks = defineStore("tasks", () => {
     const router = useRouter();
+    const route = useRoute();
+    const formatter = useFormatters();
     const taskData = ref({});
     const statuses = reactive({});
-    const tasks = reactive({});
+    const priorityLevels = ref(null);
+    const tasks = ref({});
     const loading = ref(false);
     const errors = reactive({});
     const categories = reactive({});
-
-    // const task = reactive({});
 
     const form = reactive({
         title: "",
@@ -23,23 +25,27 @@ export const useTasks = defineStore("tasks", () => {
 
     });
 
-    const pagination = reactive({
+    const pagination = ref({
         current_page: 1,
-        last_page: 0,
+        last_page: 1,
         per_page: 10,
         total: 0,
     });
 
+    const routeParams = computed(() => ({
+        page: route.query.page ? Number(route.query.page) : 1,
+        search: route.query.search || '',
+        filter: {},
+        per_page: route.query.per_page ? Number(route.query.per_page) : 10
+    }))
 
-    async function fetchStatuses () {
-        return window.axios.get('tasks-statuses')
-            .then((response) => {
-                statuses.value = response.data.statuses;
-            })
-            .catch((error) => {
-                console.log("errors",error)
-            });
+    if (route.query.status) {
+        routeParams.value.filter.status = route.query.status
     }
+    if (route.query.priority) {
+        routeParams.value.filter.priority = route.query.priority
+    }
+
 
 
     async function getTask(task, editMode = false) {
@@ -49,7 +55,7 @@ export const useTasks = defineStore("tasks", () => {
                 form.title = data.title;
                 form.description = data.description;
                 form.status = data.status;
-                form.deadline_at = data.deadline_at;
+                form.deadline_at = formatter.formatDateOnly(data.deadline_at);
                 form.category_id = data.category?.id;
                 form.completed_at = data.completed_at;
             } else {
@@ -58,28 +64,57 @@ export const useTasks = defineStore("tasks", () => {
         })
     }
 
-    function getTasks(page = 1) {
-        return window.axios.get(`tasks?page=${page}`)
-            .then(response => {
-                console.log(response)
-                tasks.value = response.data;
+    async function getTasks(params = {}) {
+    
+        
+        try {
 
-                pagination.current_page = response.data.meta.current_page
-                pagination.last_page = response.data.meta.last_page
-                pagination.per_page = response.data.meta.per_page
-                pagination.total = response.data.meta.total
+            const queryParams = {
+                ...routeParams.value,
+                ...params
+            }
+
+            router.replace({
+                query: {
+                    page: queryParams.page,
+                    search: queryParams.search || undefined,
+                    status: queryParams.filter.status || undefined,
+                    priority: queryParams.filter.priority || undefined,
+                    per_page: queryParams.per_page
+                }
             })
-            .catch((error) => console.error('error on getting the tasks data:', error));
+
+            const response = await window.axios.get('tasks', { params: queryParams});
+            console.log("data:", response.data)
+
+            tasks.value = response.data;
+            pagination.value = {
+                current_page: response.data.meta.current_page,
+                last_page: response.data.meta.last_page,
+                per_page: response.data.meta.per_page,
+                total: response.data.meta.total
+            }
+        } catch(error) {
+            console.error('Error fetching tasks:', error);
+        }
+    }
+   
+    function changePage(page) {
+        getTasks({ page });
     }
 
-    function goToPage(page) {
-        if (page > 0 && page <= pagination.last_page) {
-            router.push({ 
-                name: 'tasks.index', 
-                query: { page: page } 
-              })
-            getTasks(page);
-        }
+    function searchTasks(searchTerm) {
+        getTasks({
+            search: searchTerm,
+            page: 1
+        });
+    }
+
+    function applyFilter(filters) {
+        getTasks({
+            filter: filters,
+            page: 1
+        });
     }
 
     function resetForm(){
@@ -91,6 +126,10 @@ export const useTasks = defineStore("tasks", () => {
         form.completed_at = "";
         
         errors.value = {};
+    }
+
+    function resetTaskData() {
+        taskData.value = {};
     }
 
     async function storeTask () {
@@ -148,12 +187,49 @@ export const useTasks = defineStore("tasks", () => {
             .finally(() => (loading.value = false));
     }
     
-    async function updateStatus (task) {
-        return window.axios.put(`tasks/${task}/status/update`, statusInput)
+    async function updateStatus (status) {
+        return window.axios.put(`tasks/${taskData.value.id}/status/update`, {status: status})
+            .then(response => {
+                updateStartedAt(response.data.data.started_at);
+            })
+            .catch((error) => console.log("error:", error))
+    }
+
+    function updateStartedAt(startedAt) {
+        taskData.value.started_at = startedAt;
+    }
+
+    
+    async function fetchStatuses () {
+        return window.axios.get('tasks-statuses')
+            .then((response) => {
+                statuses.value = response.data.statuses;
+            })
+            .catch((error) => {
+                console.log("errors",error)
+            });
+    }
+    async function fetchPriorityLevels () {
+        return window.axios.get('tasks-priority-levels')
+            .then((response) => {
+                priorityLevels.value = response.data.priority_levels;
+            })
+            .catch((error) => {
+                console.error("there is an error on fetching the priority levels:", error)
+            });
+    }
+
+
+    async function updatePriorityLevel (level) {
+        return window.axios.put(`tasks/${taskData.value.id}/priority/update`, { priority: level })
             .then(response => {
                 console.log(response);
             })
+            .catch(error => {
+                console.error('There is an error on updating the task priority level', error)
+            })
     }
+
 
     async function fetchCategories () {
         return window.axios.get('categories')
@@ -167,12 +243,18 @@ export const useTasks = defineStore("tasks", () => {
         updateTask,
         storeTask,
         deleteTask,
-        goToPage,
+        changePage,
         updateStatus,
         fetchCategories,
+        fetchPriorityLevels,
+        updatePriorityLevel,
         getTask,
         getTasks,
         resetForm,
+        resetTaskData,
+        applyFilter,
+        searchTasks,
+        priorityLevels,
         taskData,
         categories,
         pagination,

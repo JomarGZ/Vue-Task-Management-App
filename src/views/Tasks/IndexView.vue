@@ -1,7 +1,8 @@
 
 <script setup>
 import { useTasks } from '@/stores/tasks';
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+
 
 const store = useTasks();
 
@@ -68,18 +69,6 @@ const totalPages = computed(() =>
   Math.ceil(filteredTasks.value.length / tasksPerPage)
 )
 
-// Pagination methods
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
 </script>
 <template>
   <div class="container mx-auto p-6 bg-gray-50 min-h-screen">
@@ -191,7 +180,7 @@ const prevPage = () => {
       <!-- Task List -->
       <div class="space-y-4">
         <div 
-          v-for="task in store?.tasks?.value?.data" 
+          v-for="task in store?.tasks?.data" 
           :key="task.id" 
           class="bg-white border rounded-lg p-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
         >
@@ -242,8 +231,9 @@ const prevPage = () => {
       <!-- Pagination -->
       <div class="flex justify-between items-center mt-6">
         <button 
-          @click="store.goToPage(store.pagination.current_page - 1)" 
-          class="px-4 py-2 border rounded-md disabled:opacity-50"
+          @click="store.changePage(store.pagination.current_page - 1)"
+          :disabled="! store?.tasks?.links?.prev"  
+          :class="`px-4 py-2 border rounded-md ${! store?.tasks?.links?.prev ? 'disabled:opacity-50' : 'hover:bg-blue-400'}`"
         >
           Previous
         </button>
@@ -251,8 +241,9 @@ const prevPage = () => {
           Page {{ store.pagination.current_page }} of {{ store.pagination.last_page}}
         </span>
         <button 
-          @click="store.goToPage(store.pagination.current_page + 1)" 
-          class="px-4 py-2 border rounded-md disabled:opacity-50"
+          @click="store.changePage(store.pagination.current_page + 1)"
+          :disabled="! store?.tasks?.links?.next" 
+          :class="`px-4 py-2 border rounded-md ${! store?.tasks?.links?.next ? 'disabled:opacity-50' : 'hover:bg-blue-400'}`"
         >
           Next
         </button>

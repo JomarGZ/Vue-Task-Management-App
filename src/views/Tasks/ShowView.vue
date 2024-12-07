@@ -1,25 +1,24 @@
 <script setup>
-import { ref, reactive, watchEffect} from 'vue';
+import { ref, reactive, watchEffect, onMounted, onBeforeUnmount} from 'vue';
 import { useTasks } from '@/stores/tasks'; // Replace with the actual store path
 import { useRoute } from 'vue-router';
+import { useFormatters } from '@/composables/useFormatters';
 
 
 const store = useTasks();
 const route = useRoute();
+const formatter = useFormatters();
 watchEffect(async () => {
     store.getTask({ id: route.params.id });
 });
 
-// Define mainTask and subtasks as reactive state
-const mainTask = reactive({
-    title: 'Develop Vue.js Task Management Application',
-    description: 'Create a comprehensive task management system with advanced features and intuitive UI',
-    status: 'In Progress',
-    category: 'Web Development',
-    deadline: new Date('2024-02-15'),
-    priority: 'High',
+onMounted(() => {
+  store.fetchPriorityLevels();
+  store.fetchStatuses();
 });
 
+
+onBeforeUnmount(store.resetTaskData)
 const subtasks = reactive([
     {
     id: 1,
@@ -47,14 +46,6 @@ const subtasks = reactive([
 const newSubtaskTitle = ref('');
 const nextSubtaskId = ref(4);
 
-// Methods
-const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    });
-};
 
 const getStatusClass = (status) => {
     const statusClasses = {
@@ -97,39 +88,99 @@ const addSubtask = () => {
 <template>
     <div class="max-w-xl mx-auto mt-10 bg-white shadow-lg rounded-lg overflow-hidden">
       <!-- Main Task Details -->
-      <div class="bg-gray-100 p-6 border-b">
-        <div class="flex justify-between items-center">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-800">{{ store?.taskData?.title }}</h1>
-            <p class="text-gray-600 mt-2">{{ store?.taskData?.description }}</p>
+        <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg rounded-b-none p-6">
+          <div class="flex justify-between items-center"> 
+              <h1 class="text-2xl font-bold text-gray-800 mb-4">
+                {{ store?.taskData?.title }}
+              </h1>
+              <p class="bg-gray-200 text-gray-800 px-2 py-1 rounded-lg">{{ store?.taskData?.category?.name }}</p>
           </div>
-          <div class="text-right">
-            <div 
-              :class="[
-                'px-3 py-1 rounded-full text-sm font-semibold',
-                getStatusClass(mainTask.status)
-              ]"
-            >
-              {{ store?.taskData?.status }}
+          
+          
+          <p class="text-gray-600 mb-6">
+            {{ store?.taskData?.description }}
+          </p>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <!-- Status -->
+            <div class="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <div class="w-full">
+                <p class="text-xs text-gray-500">Status</p>
+                <select 
+                  class="w-full border rounded px-2 py-1 text-sm"
+                  v-model="store.taskData.status"
+                  @change="store.updateStatus($event.target.value)"
+                >
+                  <option 
+                    v-for="(status, index) in store?.statuses?.value" 
+                    :key="index" 
+                    :value="status"
+                  >
+                    {{ status }}
+                  </option>
+                </select>
+              </div>
+            </div>
+               <!-- Priority -->
+               <div class="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 22V8"></path>
+                <path d="M16 3H2v7h14z"></path>
+                <path d="M7 11v10"></path>
+                <path d="M22 11H2"></path>
+              </svg>
+              <div class="w-full">
+                <p class="text-xs text-gray-500">Priority</p>
+                <select 
+                  class="w-full border rounded px-2 py-1 text-sm"
+                  v-model="store.taskData.priority"
+                  @change="store.updatePriorityLevel($event.target.value)"
+                >
+                  <option 
+                    v-for="(level, index) in store?.priorityLevels" 
+                    :key="index" 
+                    :value="level"
+                    >
+                      {{ level }}
+                    </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            
+         
+
+            <!-- Start Date -->
+            <div class="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <div>
+                <p class="text-xs text-gray-500">Started</p>
+                <p class="text-sm">{{ store?.taskData?.started_at ? formatter.formatDateWithTime(store?.taskData?.started_at) : '---' }}</p>
+              </div>
+            </div>
+
+            <!-- Deadline -->
+            <div class="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <div>
+                <p class="text-xs text-gray-500">Deadline</p>
+                <p class="text-sm">{{ store?.taskData?.deadline_at ? formatter.formatDateWithTime(store?.taskData?.deadline_at) : '---' }}</p>
+              </div>
             </div>
           </div>
         </div>
-        
-        <div class="mt-4 grid grid-cols-3 gap-4 text-sm">
-          <div>
-            <span class="text-gray-500">Category:</span>
-            <p class="font-medium">{{ store?.taskData?.category?.name }}</p>
-          </div>
-          <div>
-            <span class="text-gray-500">Deadline:</span>
-            <p class="font-medium">{{ store?.taskData?.deadline_at ||  '---'}}</p>
-          </div>
-          <div>
-            <span class="text-gray-500">Priority:</span>
-            <p class="font-medium">{{ store?.taskData?.priority }}</p>
-          </div>
-        </div>
-      </div>
   
       <!-- Subtasks Section -->
       <div class="p-4">

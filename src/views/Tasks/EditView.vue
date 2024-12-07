@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, watchEffect } from 'vue'
 import { useTasks } from '@/stores/tasks';
 import { useRoute } from 'vue-router';
+import { useFormatters } from '@/composables/useFormatters';
 
 const store = useTasks();
 const route = useRoute();
@@ -14,7 +15,6 @@ onBeforeUnmount(store.resetForm);
 watchEffect(async () => {
     store.getTask({ id: route.params.id }, true);
 });
-console.log("trigger1", store.form)
 </script>
 <template>
     <div class="fixed top-0 left-0 w-full h-full bg-opacity-50 flex justify-center items-center">
