@@ -7,7 +7,7 @@ onBeforeUnmount(store.resetForm);
 
 </script>
 <template>
-        <div class="space-y-3">
+        <div class="space-y-7">
             <h1 class="text-5xl font-extrabold text-gray-900 leading-tight">
                 Join <br/>
                 <span class="text-blue-600">Sprint Sync Today</span>
@@ -43,7 +43,7 @@ onBeforeUnmount(store.resetForm);
                 </button>
             </form>
             <div>
-                <p class="text-gray-600">Already have an account? <a href="#" class="text-blue-600 hover:underline">Sign In</a></p>
+                <p class="text-gray-600">Already have an account? <RouterLink :to="{name: 'login'}" class="text-blue-600 hover:underline">Sign In</RouterLink></p>
             </div>
         </div>
         

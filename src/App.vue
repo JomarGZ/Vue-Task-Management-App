@@ -10,7 +10,7 @@ import { useAuth } from "@/stores/auth";
 <template>
   <body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex flex-col">
     <header>
-      <nav class="bg-white shadow-sm p-4">
+      <nav class="bg-white shadow-sm mx-auto px-24 py-5">
           <div class="container mx-auto flex justify-between items-center">
               <div class="text-2xl font-bold text-blue-600">Sprint Sync</div>
               <div class="space-x-4">
@@ -21,7 +21,7 @@ import { useAuth } from "@/stores/auth";
           </div>
       </nav>
     </header>
-    <main class="flex-grow container mx-auto px-4 py-3 grid md:grid-cols-2 gap-12 items-center">
+    <main class="flex-grow container mx-auto px-24 py-10 grid md:grid-cols-2 gap-12 items-center">
       <RouterView />
     </main>
     <footer class="bg-white py-6 border-t">

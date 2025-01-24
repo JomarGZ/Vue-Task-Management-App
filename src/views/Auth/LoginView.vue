@@ -8,7 +8,7 @@ onBeforeUnmount(store.resetForm);
 
 </script>
 <template>
-    <div class="space-y-3">
+    <div class="space-y-7">
         <h1 class="text-5xl font-extrabold text-gray-900 leading-tight">
             Welcome <br/>
             <span class="text-blue-600">Back, Engineer!</span>
