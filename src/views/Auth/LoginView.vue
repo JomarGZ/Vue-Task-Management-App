@@ -51,7 +51,7 @@ onBeforeUnmount(store.resetForm);
                 class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg w-full"
             >
                 <IconSpinner v-show="store.loading"/>
-                Register
+                Login
             </button>
         </form>
         </div>

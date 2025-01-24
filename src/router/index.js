@@ -19,6 +19,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/',
+      name: 'welcome',
+      beforeEnter: guest,
+      component: () => import('@/views/HomeView.vue'),
+    },
+    {
       path: '/register',
       name: 'register',
       beforeEnter: guest,
@@ -60,6 +66,42 @@ const router = createRouter({
       name: 'tasks.show',
       beforeEnter: auth,
       component: () => import('@/views/Tasks/ShowView.vue'),
+    },
+    {
+      path: '/members',
+      name: 'members.index',
+      beforeEnter: auth,
+      component: () => import('@/views/Members/IndexView.vue'),
+    },
+    {
+      path: '/members/create',
+      name: 'members.create',
+      beforeEnter: auth,
+      component: () => import('@/views/Members/CreateView.vue'),
+    },
+    {
+      path: '/members/:id',
+      name: 'members.show',
+      beforeEnter: auth,
+      component: () => import('@/views/Members/ShowView.vue'),
+    },
+    {
+      path: '/projects',
+      name: 'projects.index',
+      beforeEnter: auth,
+      component: () => import('@/views/Projects/IndexView.vue'),
+    },
+    {
+      path: '/projects/create',
+      name: 'projects.create',
+      beforeEnter: auth,
+      component: () => import('@/views/Projects/CreateView.vue'),
+    },
+    {
+      path: '/projects/:id',
+      name: 'projects.show',
+      beforeEnter: auth,
+      component: () => import('@/views/Projects/ShowView.vue'),
     },
   ],
 })

@@ -86,7 +86,7 @@ const addSubtask = () => {
 
 </script>
 <template>
-    <div class="max-w-xl mx-auto mt-10 bg-white shadow-lg rounded-lg overflow-hidden">
+    <div>
       <!-- Main Task Details -->
         <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg rounded-b-none p-6">
           <div class="flex justify-between items-center"> 

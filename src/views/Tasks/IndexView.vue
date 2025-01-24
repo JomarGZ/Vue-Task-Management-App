@@ -71,7 +71,7 @@ const totalPages = computed(() =>
 
 </script>
 <template>
-  <div class="container mx-auto p-6 bg-gray-50 min-h-screen">
+  <div>
     <div class="container mx-auto px-4 py-8">
     <!-- Status Count Cards -->
     <div class="grid grid-cols-4 gap-4 mb-6">
