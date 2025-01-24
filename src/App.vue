@@ -2,54 +2,32 @@
 <script setup>
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useAuth } from "@/stores/Auth";
+import { useAuth } from "@/stores/auth";
 
-const auth = useAuth();
-// State management for login and mobile menu
-const isLoggedIn = ref(false)
-const mobileMenuOpen = ref(false)
 
-// Toggle mobile menu
-const toggleMobileMenu = () => {
-  mobileMenuOpen.value = !mobileMenuOpen.value
-}
 
-// Logout method (placeholder)
-const logout = () => {
-  // Implement actual logout logic
-  isLoggedIn.value = false
-}
 </script>
 <template>
-  <header>
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex justify-between items-center">
-            <!-- Logo -->
-            <div class="flex items-center">
-                <div class="w-10 h-10 bg-blue-500 rounded-full"></div>
-                <span class="ml-3 text-xl font-semibold">TaskCollab</span>
-            </div>
-            
-            <!-- Navigation Links -->
-            <div class="hidden md:flex space-x-8">
-                <RouterLink to="" class="text-gray-600 hover:text-gray-900">Dashboard</RouterLink>  <!--- For admin only -->
-                <RouterLink to="" class="text-gray-600 hover:text-gray-900">My Workspace</RouterLink>
-                <RouterLink to="" class="text-gray-600 hover:text-gray-900">Workmates</RouterLink>
-                <RouterLink to="" class="text-gray-600 hover:text-gray-900">Projects</RouterLink>
-                <RouterLink :to="{name: 'tasks.index'}" class="text-gray-600 hover:text-gray-900">Tasks</RouterLink>
-            </div>
-            
-            <!-- Auth Buttons -->
-            <div class="flex items-center space-x-4">
-                <RouterLink :to="{name: 'login'}" class="text-gray-600 hover:text-gray-900">Sign in</RouterLink>
-                <RouterLink :to="{name: 'register'}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    Get started today
-                </RouterLink>
-            </div>
+  <body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex flex-col">
+    <header>
+      <nav class="bg-white shadow-sm p-4">
+          <div class="container mx-auto flex justify-between items-center">
+              <div class="text-2xl font-bold text-blue-600">Sprint Sync</div>
+              <div class="space-x-4">
+                  <RouterLink href="#" class="text-gray-700 hover:text-blue-600">Features</RouterLink>
+                  <RouterLink href="#" class="text-gray-700 hover:text-blue-600">Pricing</RouterLink>
+                  <RouterLink href="#" class="text-gray-700 hover:text-blue-600">About</RouterLink>
+              </div>
+          </div>
+      </nav>
+    </header>
+    <main class="flex-grow container mx-auto px-4 py-3 grid md:grid-cols-2 gap-12 items-center">
+      <RouterView />
+    </main>
+    <footer class="bg-white py-6 border-t">
+        <div class="container mx-auto text-center text-gray-600">
+            © 2025 Sprint Sync. All rights reserved.
         </div>
-    </nav>
-  </header>
-  <main class="container mx-auto p-6 bg-gray-50 min-h-screen">
-    <RouterView />
-  </main>
+    </footer>
+  </body>
 </template>
