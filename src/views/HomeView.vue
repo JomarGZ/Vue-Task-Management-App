@@ -6,7 +6,7 @@ import { RouterLink } from 'vue-router';
 <template>
         <div class="space-y-7">
             <h1 class="text-5xl font-extrabold text-gray-900 leading-tight">
-                Empower Your <br/>
+                Empowerrr Your <br/>
                 <span class="text-blue-600">Engineering Workflow</span>
             </h1>
             <p class="text-xl text-gray-600">
