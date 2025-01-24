@@ -2,7 +2,7 @@
 <script setup>
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useAuth } from "@/stores/Auth";
+import { useAuth } from "@/stores/auth";
 
 const auth = useAuth();
 // State management for login and mobile menu
