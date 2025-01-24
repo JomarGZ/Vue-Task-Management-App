@@ -32,7 +32,7 @@ export const useLogin = defineStore("login", () => {
         auth.login(response.data.access_token);
       })
       .catch((error) => {
-        if (error.response.status === 422) {
+        if (error.response?.status === 422) {
           errors.value = error.response.data.errors;
         }
       })
