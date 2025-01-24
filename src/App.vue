@@ -1,8 +1,6 @@
 
 <script setup>
-import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { useAuth } from "@/stores/auth";
 
 
 
@@ -14,9 +12,9 @@ import { useAuth } from "@/stores/auth";
           <div class="container mx-auto flex justify-between items-center">
               <div class="text-2xl font-bold text-blue-600">Sprint Sync</div>
               <div class="space-x-4">
-                  <RouterLink href="#" class="text-gray-700 hover:text-blue-600">Features</RouterLink>
-                  <RouterLink href="#" class="text-gray-700 hover:text-blue-600">Pricing</RouterLink>
-                  <RouterLink href="#" class="text-gray-700 hover:text-blue-600">About</RouterLink>
+                  <RouterLink to="#" class="text-gray-700 hover:text-blue-600">Features</RouterLink>
+                  <RouterLink to="#" class="text-gray-700 hover:text-blue-600">Pricing</RouterLink>
+                  <RouterLink to="#" class="text-gray-700 hover:text-blue-600">About</RouterLink>
               </div>
           </div>
       </nav>
