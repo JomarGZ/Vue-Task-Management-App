@@ -16,14 +16,16 @@ onBeforeUnmount(store.resetForm);
         <p class="text-xl text-gray-600">
             Sign in to access your team's tasks, track progress, and collaborate seamlessly.
         </p>
-        <form class="space-y-4 max-w-md">
+        <form @submit.prevent="store.handleSubmit()" class="space-y-4 max-w-md">
             <div>
                 <label class="block text-gray-700 mb-2">Email</label>
-                <input type="email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your work email" required>
+                <input v-model="store.form.email" type="email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your work email" required>
+                <ValidationError :errors="store.errors" field="email"/>
             </div>
             <div>
                 <label class="block text-gray-700 mb-2">Password</label>
-                <input type="password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" required>
+                <input v-model="store.form.password" type="password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" required>
+                <ValidationError :errors="store.errors" field="password"/>
             </div>
             <div class="flex justify-between items-center">
                 <label class="flex items-center">
