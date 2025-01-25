@@ -1,4 +1,5 @@
 import GuestLayout from '@/views/Layouts/GuestLayout.vue';
+import OrganizationLayout from '@/views/Layouts/OrganizationLayout.vue';
 import { createRouter, createWebHistory } from 'vue-router'
  
 function auth(to, from, next) {
@@ -40,6 +41,19 @@ const router = createRouter({
           name: 'login',
           component: () => import('@/views/Auth/LoginView.vue'),
         }
+      ]
+    },
+    {
+      path: '/',
+      name: 'organization',
+      component: OrganizationLayout,
+      beforeEnter: auth,
+      children: [
+        {
+          path: '/organization/dashboard',
+          name: 'organization.dashboard',
+          component: () => import('@/views/Dashboards/OrganizationDashboard.vue'),
+        },
       ]
     },
     {
