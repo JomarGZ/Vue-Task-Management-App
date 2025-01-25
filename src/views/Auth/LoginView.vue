@@ -34,8 +34,16 @@ onBeforeUnmount(store.resetForm);
                 </label>
                 <a href="#" class="text-blue-600 hover:underline">Forgot password?</a>
             </div>
-            <button type="submit" class="w-full bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition">
-                Sign In
+            <button
+                type="submit"
+                :disabled="store.loading"
+                :class="{
+                    'w-full text-white px-8 py-3 rounded-lg transition flex items-center justify-center space-x-2 gap-3': true,
+                    'bg-blue-600 hover:bg-blue-700': ! store.loading,
+                    'bg-blue-300': store.loading
+            }">
+                <IconSpinner v-show="store.loading" class="animate-spin h-5 w-5"/>
+                <span>Sign In</span>
             </button>
         </form>
         <div>

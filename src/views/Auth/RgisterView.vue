@@ -1,7 +1,6 @@
 <script setup>
 import { onBeforeUnmount } from 'vue';
 import { useRegister } from '@/stores/register';
-import ValidationError from '@/components/ValidationError.vue';
 const store = useRegister();
 onBeforeUnmount(store.resetForm);
 </script>
@@ -9,7 +8,7 @@ onBeforeUnmount(store.resetForm);
         <div class="space-y-7">
             <h1 class="text-5xl font-extrabold text-gray-900 leading-tight">
                 Join <br/>
-                <span class="text-blue-600">Sprint Sync Today</span>
+                <span class="text-blue-600">SprintSync Today</span>
             </h1>
             <p class="text-xl text-gray-600">
                 Create your account and transform how your engineering team collaborates and delivers.
@@ -41,7 +40,13 @@ onBeforeUnmount(store.resetForm);
                         <span class="text-gray-600">I agree to the Terms of Service and Privacy Policy</span>
                     </label>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition">
+                <button type="submit"     
+                :class="{
+                    'w-full text-white px-8 py-3 rounded-lg transition flex items-center justify-center space-x-2 gap-3': true,
+                    'bg-blue-600 hover:bg-blue-700': ! store.loading,
+                    'bg-blue-300': store.loading
+                }">
+                <IconSpinner v-show="store.loading" class="animate-spin h-5 w-5"/>
                     Create Account
                 </button>
             </form>
