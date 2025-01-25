@@ -1,3 +1,4 @@
+import GuestLayout from '@/views/Layouts/GuestLayout.vue';
 import { createRouter, createWebHistory } from 'vue-router'
  
 function auth(to, from, next) {
@@ -20,23 +21,27 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'welcome',
+      name: 'guest',
+      component: GuestLayout,
       beforeEnter: guest,
-      component: () => import('@/views/HomeView.vue'),
+      children: [
+        {
+          path: '/',
+          name: 'welcome',
+          component: () => import('@/views/HomeView.vue'),
+        },
+        {
+          path: '/register',
+          name: 'register',
+          component: () => import('@/views/Auth/RgisterView.vue'),
+        },
+        {
+          path: '/login',
+          name: 'login',
+          component: () => import('@/views/Auth/LoginView.vue'),
+        }
+      ]
     },
-    {
-      path: '/register',
-      name: 'register',
-      beforeEnter: guest,
-      component: () => import('@/views/Auth/RgisterView.vue'),
-    },
-    {
-      path: '/login',
-      name: 'login',
-      beforeEnter: guest,
-      component: () => import('@/views/Auth/LoginView.vue'),
-    },
-   
     {
       path: '/profile',
       name: 'profile.index',
