@@ -2,7 +2,6 @@
 import { onBeforeUnmount } from 'vue';
 import { useRegister } from '@/stores/register';
 import ValidationError from '@/components/ValidationError.vue';
-
 const store = useRegister();
 onBeforeUnmount(store.resetForm);
 </script>

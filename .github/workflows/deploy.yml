@@ -21,11 +21,6 @@ jobs:
     - name: Install NPM Dependencies 
       run: npm install
 
-    - name: Check npm and node versions
-      run: |
-        node -v
-        npm -v
-
     - name: Build NPM Assets (Vue.js)
       run: npm run build
 

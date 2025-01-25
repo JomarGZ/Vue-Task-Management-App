@@ -27,7 +27,7 @@ export const useRegister = defineStore("register", () => {
     loading.value = true;
     errors.value = {};
 
-    return window.axios.post("auth/register", form)
+    return window.axios.post("v1/auth/register", form)
       .then((response) => {
         auth.login(response.data.data.access_token);
       })
