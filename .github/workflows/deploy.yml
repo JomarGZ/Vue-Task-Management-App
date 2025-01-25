@@ -18,7 +18,7 @@ jobs:
       with:
         node-version: 22
 
-    - name: Install NPM Dependencies
+    - name: Install NPM Dependenciescc
       run: npm install
 
     - name: Build NPM Assets (Vue.js)
