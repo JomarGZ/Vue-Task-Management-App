@@ -49,7 +49,7 @@ export const useTasks = defineStore("tasks", () => {
 
 
     async function getTask(task, editMode = false) {
-        window.axios.get(`tasks/${task.id}`).then(response => {
+        window.axios.get(`v1/tasks/${task.id}`).then(response => {
             const data = response.data.data;
             if (editMode) {
                 form.title = data.title;
@@ -84,7 +84,7 @@ export const useTasks = defineStore("tasks", () => {
                 }
             })
 
-            const response = await window.axios.get('tasks', { params: queryParams});
+            const response = await window.axios.get('v1/tasks', { params: queryParams});
             console.log("data:", response.data)
 
             tasks.value = response.data;
@@ -137,7 +137,7 @@ export const useTasks = defineStore("tasks", () => {
         errors.value = {};
         loading.value = true;
 
-        return window.axios.post("tasks", form)
+        return window.axios.post("v1/tasks", form)
             .then(() => {
                 router.push({ name : 'tasks.index' })
             })
@@ -156,7 +156,7 @@ export const useTasks = defineStore("tasks", () => {
         errors.value = {};
         loading.value = true;
 
-        return window.axios.put(`tasks/${task.id}`, form)
+        return window.axios.put(`v1/tasks/${task.id}`, form)
             .then(() => {
                 router.push({ name : 'tasks.index' })
             })
@@ -177,7 +177,7 @@ export const useTasks = defineStore("tasks", () => {
             return;
         }
         loading.value = true;
-        window.axios.delete(`tasks/${task.id}`)
+        window.axios.delete(`v1/tasks/${task.id}`)
             .then(() => {
                 getTasks();
             })
@@ -188,7 +188,7 @@ export const useTasks = defineStore("tasks", () => {
     }
     
     async function updateStatus (status) {
-        return window.axios.put(`tasks/${taskData.value.id}/status/update`, {status: status})
+        return window.axios.put(`v1/tasks/${taskData.value.id}/status/update`, {status: status})
             .then(response => {
                 updateStartedAt(response.data.data.started_at);
             })
@@ -201,7 +201,7 @@ export const useTasks = defineStore("tasks", () => {
 
     
     async function fetchStatuses () {
-        return window.axios.get('tasks-statuses')
+        return window.axios.get('v1/tasks-statuses')
             .then((response) => {
                 statuses.value = response.data.statuses;
             })
@@ -210,7 +210,7 @@ export const useTasks = defineStore("tasks", () => {
             });
     }
     async function fetchPriorityLevels () {
-        return window.axios.get('tasks-priority-levels')
+        return window.axios.get('v1/tasks-priority-levels')
             .then((response) => {
                 priorityLevels.value = response.data.priority_levels;
             })
@@ -221,7 +221,7 @@ export const useTasks = defineStore("tasks", () => {
 
 
     async function updatePriorityLevel (level) {
-        return window.axios.put(`tasks/${taskData.value.id}/priority/update`, { priority: level })
+        return window.axios.put(`v1/tasks/${taskData.value.id}/priority/update`, { priority: level })
             .then(response => {
                 console.log(response);
             })
@@ -232,7 +232,7 @@ export const useTasks = defineStore("tasks", () => {
 
 
     async function fetchCategories () {
-        return window.axios.get('categories')
+        return window.axios.get('v1/categories')
             .then(response => {
                 categories.value = response.data;
             })

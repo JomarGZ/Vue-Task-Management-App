@@ -27,7 +27,7 @@ export const useLogin = defineStore("login", () => {
     errors.value = {};
  
     return window.axios
-      .post("auth/login", form)
+      .post("v1/auth/login", form)
       .then((response) => {
         auth.login(response.data.data.access_token);
       })
