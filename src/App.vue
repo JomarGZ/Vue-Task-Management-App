@@ -1,9 +1,9 @@
 
 <script setup>
 import { RouterLink } from 'vue-router'
+import { useAuth } from '@/stores/auth';
 
-
-
+const auth = useAuth();
 </script>
 <template>
   <body class="bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen flex flex-col">
@@ -14,7 +14,7 @@ import { RouterLink } from 'vue-router'
               <div class="space-x-4">
                   <RouterLink to="#" class="text-gray-700 hover:text-blue-600">Features</RouterLink>
                   <RouterLink to="#" class="text-gray-700 hover:text-blue-600">Pricing</RouterLink>
-                  <RouterLink to="#" class="text-gray-700 hover:text-blue-600">About</RouterLink>
+                  <button @click="auth.logout" class="text-gray-700 hover:text-blue-600">Logout</button>
               </div>
           </div>
       </nav>

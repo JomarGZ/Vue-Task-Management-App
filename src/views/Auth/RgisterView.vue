@@ -1,10 +1,10 @@
 <script setup>
 import { onBeforeUnmount } from 'vue';
 import { useRegister } from '@/stores/register';
+import ValidationError from '@/components/ValidationError.vue';
 
 const store = useRegister();
 onBeforeUnmount(store.resetForm);
-
 </script>
 <template>
         <div class="space-y-7">
@@ -15,22 +15,26 @@ onBeforeUnmount(store.resetForm);
             <p class="text-xl text-gray-600">
                 Create your account and transform how your engineering team collaborates and delivers.
             </p>
-            <form class="space-y-4 max-w-md">
+            <form @submit.prevent="store.handleSubmit()" class="space-y-4 max-w-md">
                 <div>
                     <label class="block text-gray-700 mb-2">Full Name</label>
-                    <input type="text" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your full name" required>
+                    <input v-model="store.form.name" type="text" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your full name" required>
+                    <ValidationError :errors="store.errors" field="name"/>
                 </div>
                 <div>
                     <label class="block text-gray-700 mb-2">Work Email</label>
-                    <input type="email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your work email" required>
+                    <input v-model="store.form.email" type="email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your work email" required>
+                    <ValidationError :errors="store.errors" field="email"/>
                 </div>
                 <div>
                     <label class="block text-gray-700 mb-2">Password</label>
-                    <input type="password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Create a strong password" required>
+                    <input v-model="store.form.password" type="password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Create a strong password" required>
+                    <ValidationError :errors="store.errors" field="password"/>
                 </div>
                 <div>
                     <label class="block text-gray-700 mb-2">Confirm Password</label>
-                    <input type="password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Repeat your password" required>
+                    <input v-model="store.form.password_confirmation" type="password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Repeat your password" required>
+                    <ValidationError :errors="store.errors" field="password_confirmation"/>
                 </div>
                 <div>
                     <label class="flex items-center">
