@@ -13,7 +13,7 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Synchronize Files To Server
+    - name: Synchronize Files To Serverss
       uses: appleboy/ssh-action@master
       with:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
