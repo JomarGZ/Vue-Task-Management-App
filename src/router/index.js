@@ -12,7 +12,7 @@ function auth(to, from, next) {
 
 function guest(to, from, next) {
   if (localStorage.getItem("access_token")) {
-    return next({ name: "tasks.index" });
+    return next({ name: "organization.dashboard" });
   }
  
   next();

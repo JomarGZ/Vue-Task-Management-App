@@ -85,7 +85,6 @@ export const useTasks = defineStore("tasks", () => {
             })
 
             const response = await window.axios.get('v1/tasks', { params: queryParams});
-            console.log("data:", response.data)
 
             tasks.value = response.data;
             pagination.value = {
