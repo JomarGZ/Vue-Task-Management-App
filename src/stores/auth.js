@@ -18,10 +18,10 @@ export const useAuth = defineStore("auth", () => {
   function login(accessToken) {
     setAccessToken(accessToken);
  
-    router.push({ name: "tasks.index" });
+    router.push({ name: "organization.dashboard" });
   }
  
-  function destroyTokenAndRedirectTo(routeName = "login") {
+  function destroyTokenAndRedirectTo(routeName = "welcome") {
     setAccessToken(null);
     router.push({ name: routeName });
   }
