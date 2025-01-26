@@ -1,5 +1,4 @@
 <script setup>
-import Pagination from '@/components/Pagination.vue';
 import { useMemberStore } from '@/stores/memberStore';
 import { onMounted, watch } from 'vue';
 import { RouterLink } from 'vue-router';
@@ -101,8 +100,7 @@ onMounted(store.getMembers);
                 </tbody>
             </table>
         </div>
-
         <!-- Pagination -->
-        <Pagination :pagination="store.pagination"/>
+        <PaginationComponent :pagination="store.pagination"/>
     </div>
 </template>
