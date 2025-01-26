@@ -108,12 +108,28 @@ export const useMemberStore = defineStore("memberStore", () => {
             })
     }
 
+    const deleteMember = (member) => {
+      if(loading.value) return;
+
+      loading.value = true;
+      return window.axios
+        .delete(`v1/tenant/members/${member.id}`)
+        .then((response => {
+            getMembers()
+        }))
+        .catch(error => {
+          console.error('Error on deleting the member', error)
+        })
+        .finally(() => loading.value = false)
+    }
+
     return {
         resetForm,
         handleSubmit,
         getMembers,
         changePage,
         orderBy,
+        deleteMember,
         debounceSearch,
         pagination,
         searchInput,

@@ -78,13 +78,13 @@ onMounted(store.getMembers);
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                             <button class="text-blue-600 hover:text-blue-900" title="Edit">
-                                <i class="fas fa-edit"></i>
+                                <IconSGV name="edit-svg"/>
                             </button>
-                            <button class="text-red-600 hover:text-red-900" title="Delete">
-                                <i class="fas fa-trash"></i>
+                            <button @click="store.deleteMember(member)" class="text-red-600 hover:text-red-900" title="Delete">
+                                <IconSGV name="trash-svg"/>
                             </button>
                             <button class="text-purple-600 hover:text-purple-900" title="Impersonate">
-                                <i class="fas fa-user-secret"></i>
+                                <IconSGV name="user-svg"/>
                             </button>
                         </td>
                     </tr>
