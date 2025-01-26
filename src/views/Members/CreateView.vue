@@ -63,7 +63,7 @@ onBeforeUnmount(store.resetForm)
 
                 <!-- Role & Access Section -->
                 <div class="space-y-4 pt-4 border-t">
-                    <h2 class="text-lg font-medium text-gray-900">Role & Access</h2>
+                    <!-- <h2 class="text-lg font-medium text-gray-900">Role & Access</h2> -->
 
                     <!-- Role -->
                     <div>

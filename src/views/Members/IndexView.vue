@@ -18,7 +18,6 @@ onMounted(store.getMembers);
         <!-- Header -->
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Team Members</h1>
-            <RouterLink :to="{name: 'members.create'}">Add Member</RouterLink>
         </div>
 
         <!-- Search and Filter Section -->
@@ -26,6 +25,12 @@ onMounted(store.getMembers);
             <div class="flex-1 min-w-[200px]">
                 <input v-model="store.searchInput" type="text" placeholder="Search members..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
+            <RouterLink
+                :to="{ name: 'members.create' }"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+            >
+                Add Member
+            </RouterLink>
             <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option value="">All Roles</option>
                 <option value="developer">Developer</option>
@@ -77,9 +82,6 @@ onMounted(store.getMembers);
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <button class="text-blue-600 hover:text-blue-900" title="Edit">
-                                <IconSGV name="edit-svg"/>
-                            </button>
                             <button @click="store.deleteMember(member)" class="text-red-600 hover:text-red-900" title="Delete">
                                 <IconSGV name="trash-svg"/>
                             </button>
