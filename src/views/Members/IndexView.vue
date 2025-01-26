@@ -82,7 +82,15 @@ onMounted(store.getMembers);
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <button @click="store.deleteMember(member)" class="text-red-600 hover:text-red-900" title="Delete">
+                            <button 
+                                @click="store.deleteMember(member)" 
+                                :class="{
+                                    'text-red-600 hover:text-red-900':! store.loading,
+                                    'text-red-400': store.loading,
+                                }" 
+                                title="Delete"
+                                :disabled="store.loading"
+                            >
                                 <IconSGV name="trash-svg"/>
                             </button>
                             <button class="text-purple-600 hover:text-purple-900" title="Impersonate">
