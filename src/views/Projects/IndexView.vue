@@ -123,10 +123,10 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                             <button class="text-blue-600 hover:text-blue-900" title="Edit">
-                                <i class="fas fa-edit"></i>
+                                <IconSVG name="edit-svg"/>
                             </button>
                             <button class="text-red-600 hover:text-red-900" title="Delete">
-                                <i class="fas fa-trash"></i>
+                                <IconSVG name="trash-svg"/>
                             </button>
                         </td>
                     </tr>

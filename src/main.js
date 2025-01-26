@@ -19,6 +19,6 @@ app.use(router)
 app.use(VueSweetalert2)
 app.component("ValidationError", ValidationError)
 app.component("IconSpinner", IconSpinner)
-app.component("IconSGV", Icon)
+app.component("IconSVG", Icon)
 
 app.mount('#app')
