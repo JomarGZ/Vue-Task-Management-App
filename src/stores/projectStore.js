@@ -66,11 +66,11 @@ export const useProjectStore = defineStore("project", () => {
           })
           .then(() => getProjects())
       }
-    const getProject = async (project) => {
+    const getProject = async (id) => {
         return window.axios
-            .get(`v1/projects/${project.id}`)
+            .get(`v1/projects/${id}`)
             .then(response => {
-                project.value = response.data.data;
+                project.value = response?.data?.data;
             })
             .catch(error => {
                 console.error('Error on fetching project:', error);

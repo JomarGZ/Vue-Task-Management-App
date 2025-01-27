@@ -2,7 +2,10 @@
 import { useProjectStore } from '@/stores/projectStore';
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+const store = useProjectStore();
+const route = useRoute();
 
+onMounted(() => store.getProject(route.params.id))
 </script>
 <template>
         <div class="max-w-7xl mx-auto">
@@ -10,7 +13,7 @@ import { useRoute } from 'vue-router';
         <div class="mb-6 flex justify-between items-center">
             <div>
                 <div class="flex items-center gap-3">
-                    <h1 class="text-2xl font-bold text-gray-800">Website Redesign Project</h1>
+                    <h1 class="text-2xl font-bold text-gray-800">{{ store?.project?.name }}</h1>
                     <span class="px-2 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">Active</span>
                 </div>
                 <p class="mt-1 text-gray-600">Client: Acme Corporation</p>
@@ -36,9 +39,7 @@ import { useRoute } from 'vue-router';
                     <h2 class="text-lg font-medium text-gray-900 mb-4">Project Overview</h2>
                     <div class="space-y-4">
                         <p class="text-gray-700">
-                            Complete redesign of the corporate website with focus on improved user experience,
-                            mobile responsiveness, and modern design aesthetics. Including new content management
-                            system implementation and performance optimization.
+                           {{ store?.project?.description }}
                         </p>
                         
                         <!-- Key Details Grid -->
