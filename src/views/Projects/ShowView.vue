@@ -125,44 +125,252 @@ watchEffect(async () => {
 
                 <!-- Timeline Card -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Recent Activity</h2>
-                    <div class="flow-root">
-                        <ul class="-mb-8">
-                            <li class="relative pb-8">
-                                <div class="relative flex space-x-3">
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
+                        <h2 class="text-2xl font-semibold text-gray-800">Project Tasks</h2>
+                       
+                    </div>
+                       <!-- Search and Filter Bar -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <!-- Search -->
+                            <div class="relative flex-1">
+                                <input type="text" 
+                                    placeholder="Search tasks..." 
+                                    class="w-full pl-10 pr-4 py-2.5 bg-white rounded-lg border-0 focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm"
+                                >
+                                <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            
+                            <!-- Filters -->
+                            <div class="flex gap-3">
+                                <select class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="pending">Pending</option>
+                                </select>
+                                <select class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
+                                    <option value="">All Dates</option>
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month">This Month</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <RouterLink :to="{name: 'tasks.show'}" class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
                                     <div>
-                                        <span class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                                            <i class="fas fa-check text-white text-sm"></i>
-                                        </span>
-                                    </div>
-                                    <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                        <div>
-                                            <p class="text-sm text-gray-500">Homepage design approved by client</p>
-                                        </div>
-                                        <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                                            <time datetime="2024-03-15">Mar 15</time>
-                                        </div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
                                     </div>
                                 </div>
-                            </li>
-                            <li class="relative pb-8">
-                                <div class="relative flex space-x-3">
-                                    <div>
-                                        <span class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
-                                            <i class="fas fa-tasks text-white text-sm"></i>
-                                        </span>
-                                    </div>
-                                    <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                        <div>
-                                            <p class="text-sm text-gray-500">Frontend development phase started</p>
-                                        </div>
-                                        <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                                            <time datetime="2024-03-10">Mar 10</time>
-                                        </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
+                            </RouterLink>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </span>
+                                    <div>
+                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <div class="mt-1">
+                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -267,6 +475,126 @@ watchEffect(async () => {
                         </div>
                     </div>
                 </div>
+                <div class="max-w-sm mx-auto bg-white rounded-lg shadow-lg border border-gray-200">
+    <!-- Header -->
+                <div class="border-b border-gray-200 bg-gray-50 p-4 rounded-t-lg">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-800">Comments</h3>
+                        <span class="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-full">12</span>
+                    </div>
+                </div>
+
+                <!-- Comments Thread -->
+                <div class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+                    <!-- Comment 1 -->
+                    <div class="p-4 bg-white">
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3">
+                                <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="User avatar">
+                                <div class="flex-1 space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-900">Sarah Johnson</span>
+                                        <span class="text-xs text-gray-500">Product Manager</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">Yesterday at 2:34 PM</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Referenced Task -->
+                            <div class="ml-11 p-2 bg-gray-50 rounded-md text-xs text-gray-600 border-l-2 border-blue-500">
+                                Re: <span class="font-medium">Homepage Redesign - Navigation Updates</span>
+                            </div>
+
+                            <!-- Comment Content -->
+                            <div class="ml-11">
+                                <p class="text-sm text-gray-700">The navigation layout looks much better now. Can we make sure all the dropdown menus have consistent spacing?</p>
+                                <div class="mt-3 flex items-center gap-4">
+                                    <button class="text-xs text-gray-600 hover:text-gray-900">Reply</button>
+                                    <button class="text-xs text-gray-600 hover:text-gray-900">Edit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comment 2 with thread -->
+                    <div class="p-4 bg-white">
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3">
+                                <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="User avatar">
+                                <div class="flex-1 space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-900">Alex Chen</span>
+                                        <span class="text-xs text-gray-500">Developer</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500">Yesterday at 3:15 PM</span>
+                                </div>
+                            </div>
+
+                            <!-- Comment Content -->
+                            <div class="ml-11">
+                                <p class="text-sm text-gray-700">I've updated the spacing to 16px across all dropdown menus. Also fixed the hover states for better consistency.</p>
+                                
+                                <!-- Code Snippet -->
+                                <div class="mt-2 p-2 bg-gray-800 rounded-md">
+                                    <code class="text-xs text-gray-200">
+                                        .dropdown-menu { padding: 16px; }
+                                    </code>
+                                </div>
+
+                                <div class="mt-3 flex items-center gap-4">
+                                    <button class="text-xs text-gray-600 hover:text-gray-900">Reply</button>
+                                    <button class="text-xs text-gray-600 hover:text-gray-900">Edit</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nested Reply -->
+                        <div class="mt-4 ml-11 pl-4 border-l-2 border-gray-100">
+                            <div class="flex items-start gap-3">
+                                <img src="https://i.pravatar.cc/32" class="w-6 h-6 rounded-full" alt="User avatar">
+                                <div class="flex-1 space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-900">Sarah Johnson</span>
+                                        <span class="text-xs text-gray-500">Just now</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700">Perfect, thank you! This looks much better now.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Comment -->
+                    <div class="p-4 bg-gray-50">
+                        <div class="flex gap-3">
+                            <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Your avatar">
+                            <div class="flex-1 space-y-3">
+                                <textarea 
+                                    rows="3" 
+                                    class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                                    placeholder="Add your comment..."
+                                ></textarea>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <button class="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                            </svg>
+                                        </button>
+                                        <button class="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <button class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                                        Comment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
     </div>
