@@ -1,11 +1,12 @@
 <script setup>
 import { useProjectStore } from '@/stores/projectStore';
-import { onMounted } from 'vue';
+import { watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 const store = useProjectStore();
 const route = useRoute();
-
-onMounted(() => store.getProject(route.params.id))
+watchEffect(async () => {
+    store.getProject({id: route?.params?.id})
+});
 </script>
 <template>
         <div class="max-w-7xl mx-auto">
@@ -19,10 +20,10 @@ onMounted(() => store.getProject(route.params.id))
                 <p class="mt-1 text-gray-600">Client: Acme Corporation</p>
             </div>
             <div class="flex gap-3">
-                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
+                <RouterLink :to="{ name: 'projects.index'}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
                     <i class="fas fa-edit"></i>
-                    Edit Project
-                </button>
+                    Back
+                </RouterLink>
                 <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center gap-2">
                     <i class="fas fa-trash"></i>
                     Delete

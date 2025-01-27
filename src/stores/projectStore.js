@@ -9,9 +9,9 @@ export const useProjectStore = defineStore("project", () => {
     const projects = ref(null);
     const router = useRouter();
     const route = useRoute();
-    const project = ref(null);
+    const project = ref({});
     const searchInput = ref(route.query.search || '');
-    const {showToast, showConfirmDialog} = useSweetAlert();
+    const {showToast} = useSweetAlert();
     const loading = ref(false);
     const form = reactive({
         name: '',
@@ -66,17 +66,23 @@ export const useProjectStore = defineStore("project", () => {
           })
           .then(() => getProjects())
       }
-    const getProject = async (id) => {
+    const getProject = async (projectData, editMode = false) => {
         return window.axios
-            .get(`v1/projects/${id}`)
+            .get(`v1/projects/${projectData?.id}`)
             .then(response => {
-                project.value = response?.data?.data;
+                const data = response?.data?.data;
+                console.log(data);
+                if (editMode) {
+                    form.name = data.name;
+                    form.description = data.description;
+                } else {
+                    project.value = data;
+                }
             })
             .catch(error => {
                 console.error('Error on fetching project:', error);
             });
     }
-
     const getProjects = () => {
         return window.axios
             .get("v1/projects", {params: route.query})
@@ -119,12 +125,33 @@ export const useProjectStore = defineStore("project", () => {
             })
             .finally(() => loading.value = false);
     }
+    const updateProject = async (projectData) => {
+        if (loading.value) return;
+        loading.value = true;
+        errors.value = {};
+        return window.axios
+            .put(`v1/projects/${projectData?.id}`, form)
+            .then(response => {
+                resetForm()
+                showToast("Project Updated successfully");
+                router.push({name: 'projects.index'});
+            })
+            .catch(error => {
+                if (error?.response?.status === 422) {
+                    errors.value = error?.response?.data?.errors;
+                } else {
+                    console.error('Error on updating project', error)
+                }
+            })
+            .finally(() => loading.value = false)
+    }
     return {
         getProjects,
         handleSubmit,
         resetForm,
         changePage,
         getProject,
+        updateProject,
         orderBy,
         project,
         debounceSearch,

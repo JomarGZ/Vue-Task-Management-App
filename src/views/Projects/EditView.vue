@@ -1,9 +1,16 @@
 <script setup>
 import { useProjectStore } from '@/stores/projectStore';
-import { onBeforeUnmount } from 'vue';
+import { onBeforeUnmount, watchEffect } from 'vue';
+import { useRoute } from 'vue-router';
 
 const store = useProjectStore();
-onBeforeUnmount(store.resetForm);
+const route = useRoute();
+watchEffect(async () => {
+    store.getProject({id: route?.params?.id}, true)
+})
+onBeforeUnmount(() => {
+    store.resetForm
+});
 </script>
 <template>
      <div class="max-w-3xl mx-auto">
@@ -14,7 +21,7 @@ onBeforeUnmount(store.resetForm);
         </div>
         <!-- Form -->
         <div class="bg-white rounded-lg shadow p-6">
-            <form @submit.prevent="store.handleSubmit()" class="space-y-6">
+            <form @submit.prevent="store.updateProject({id: route?.params?.id})" class="space-y-6">
                 <!-- Basic Information -->
                 <div class="space-y-4">
                     <h2 class="text-lg font-medium text-gray-900">Basic Information</h2>
@@ -152,7 +159,7 @@ onBeforeUnmount(store.resetForm);
                             'bg-blue-300': store.loading,
                         }">
                         <IconSpinner v-if="store.loading"/>
-                        Create Project
+                        Update Project
                     </button>
                 </div>
             </form>
