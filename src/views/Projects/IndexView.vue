@@ -1,9 +1,14 @@
 <script setup>
 import { useProjectStore } from '@/stores/projectStore';
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 
 const store = useProjectStore();
-
+watch(
+  () => store.searchInput,
+  (newSearch) => {
+    store.debounceSearch(newSearch)
+  },
+)
 onMounted(store.getProjects)
 </script>
 <template>
@@ -16,12 +21,11 @@ onMounted(store.getProjects)
                 Create Project
             </RouterLink>
         </div>
-
         <!-- Search and Filter Section -->
         <div class="mb-6 flex flex-wrap gap-4">
             <div class="flex-1 min-w-[200px]">
                 <div class="relative">
-                    <input type="text" placeholder="Search projects..." 
+                    <input v-model="store.searchInput" type="text" placeholder="Search projects..." 
                         class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <div class="absolute left-3 top-2.5 text-gray-400">
                         <i class="fas fa-search"></i>
@@ -47,7 +51,7 @@ onMounted(store.getProjects)
             <table class="min-w-full">
                 <thead>
                     <tr class="bg-gray-50">
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Name</th>
+                        <th @click="store.orderBy('name')" class="cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
@@ -66,7 +70,7 @@ onMounted(store.getProjects)
                                     <i class="fas fa-mobile-alt text-purple-600"></i>
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Mobile App Development</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ project.name }}</div>
                                     <div class="text-sm text-gray-500">Client: TechStart</div>
                                 </div>
                             </div>
@@ -90,22 +94,19 @@ onMounted(store.getProjects)
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             Mar 15, 2025
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm flex items-center font-medium space-x-2">
                             <button class="text-blue-600 hover:text-blue-900" title="Edit">
                                 <IconSVG name="edit-svg"/>
                             </button>
-                            <button class="text-red-600 hover:text-red-900" title="Delete">
-                                <IconSVG name="trash-svg"/>
-                            </button>
-                            <button class="text-green-600 hover:text-green-900" title="View project">
+                            <RouterLink :to="{ name: 'projects.show', params: {id: '1'}}" class="text-green-600 hover:text-green-900" title="View project">
                                 <IconSVG name="eye-svg"/>
-                            </button>
+                            </RouterLink>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <!-- Pagination -->
-        <PaginationComponent :pagination="store.pagination"/>
+        <PaginationComponent :pagination="store.pagination" :onPageChange="store.changePage"/>
     </div>
 </template>
