@@ -1,3 +1,9 @@
+<script setup>
+import { useProjectStore } from '@/stores/projectStore';
+import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+
+</script>
 <template>
         <div class="max-w-7xl mx-auto">
         <!-- Header with Actions -->

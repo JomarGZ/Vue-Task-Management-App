@@ -11,6 +11,7 @@ import router from './router'
 import './assets/style.css';
 import Icon from "./components/icons/Icon.vue";
 import VueSweetalert2 from "vue-sweetalert2";
+import Pagination from "./components/Pagination.vue";
 
 const app = createApp(App)
 
@@ -18,7 +19,8 @@ app.use(createPinia())
 app.use(router)
 app.use(VueSweetalert2)
 app.component("ValidationError", ValidationError)
+app.component("PaginationComponent", Pagination)
 app.component("IconSpinner", IconSpinner)
-app.component("IconSGV", Icon)
+app.component("IconSVG", Icon)
 
 app.mount('#app')

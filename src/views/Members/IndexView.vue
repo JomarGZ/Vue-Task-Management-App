@@ -1,5 +1,4 @@
 <script setup>
-import Pagination from '@/components/Pagination.vue';
 import { useMemberStore } from '@/stores/memberStore';
 import { onMounted, watch } from 'vue';
 import { RouterLink } from 'vue-router';
@@ -91,18 +90,17 @@ onMounted(store.getMembers);
                                 title="Delete"
                                 :disabled="store.loading"
                             >
-                                <IconSGV name="trash-svg"/>
+                                <IconSVG name="trash-svg"/>
                             </button>
                             <button class="text-purple-600 hover:text-purple-900" title="Impersonate">
-                                <IconSGV name="user-svg"/>
+                                <IconSVG name="user-svg"/>
                             </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
         <!-- Pagination -->
-        <Pagination :pagination="store.pagination"/>
+        <PaginationComponent :pagination="store.pagination" :onPageChange="store.changePage"/>
     </div>
 </template>

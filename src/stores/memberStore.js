@@ -44,7 +44,7 @@ export const useMemberStore = defineStore("memberStore", () => {
   const orderBy = (column = 'created_at') => {
       const toggleDirection = route.query.direction === 'desc' ? 'asc' : 'desc'
       updateQueryAndFetchPosts({ column, direction: toggleDirection })
-    }
+  }
   const changePage = (pageUrl) => {
       console.log(pageUrl)
       if (!pageUrl) return
