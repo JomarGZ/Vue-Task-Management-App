@@ -9,6 +9,7 @@ export const useProjectStore = defineStore("project", () => {
     const projects = ref(null);
     const router = useRouter();
     const route = useRoute();
+    const project = ref(null);
     const searchInput = ref(route.query.search || '');
     const {showToast, showConfirmDialog} = useSweetAlert();
     const loading = ref(false);
@@ -65,7 +66,17 @@ export const useProjectStore = defineStore("project", () => {
           })
           .then(() => getProjects())
       }
-  
+    const getProject = async (project) => {
+        return window.axios
+            .get(`v1/projects/${project.id}`)
+            .then(response => {
+                project.value = response.data.data;
+            })
+            .catch(error => {
+                console.error('Error on fetching project:', error);
+            });
+    }
+
     const getProjects = () => {
         return window.axios
             .get("v1/projects", {params: route.query})
@@ -113,8 +124,10 @@ export const useProjectStore = defineStore("project", () => {
         handleSubmit,
         resetForm,
         changePage,
-        debounceSearch,
+        getProject,
         orderBy,
+        project,
+        debounceSearch,
         searchInput,
         loading,
         projects,
