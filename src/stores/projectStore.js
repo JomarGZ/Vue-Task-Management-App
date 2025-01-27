@@ -71,7 +71,6 @@ export const useProjectStore = defineStore("project", () => {
             .get(`v1/projects/${projectData?.id}`)
             .then(response => {
                 const data = response?.data?.data;
-                console.log(data);
                 if (editMode) {
                     form.name = data.name;
                     form.description = data.description;
