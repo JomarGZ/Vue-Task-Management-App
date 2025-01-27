@@ -1,9 +1,8 @@
 <script setup>
-import { useMemberStore } from '@/stores/memberStore';
-
-
-defineProps(['pagination'])
-const { changePage } = useMemberStore();
+defineProps({
+  pagination: Object,
+  onPageChange: Function
+})
 </script>
 <template>
   <div class="p-4 flex justify-between items-center">
@@ -14,7 +13,7 @@ const { changePage } = useMemberStore();
       <button
         v-for="(page, index) in pagination.links"
         :key="index"
-        @click="changePage(page.url)"
+        @click="onPageChange(page.url)"
         v-html="page.label"
         :disabled="! page.url"
         :class="{ 

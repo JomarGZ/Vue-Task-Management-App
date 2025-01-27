@@ -1,3 +1,10 @@
+<script setup>
+import { useProjectStore } from '@/stores/projectStore';
+import { onBeforeUnmount } from 'vue';
+
+const store = useProjectStore();
+onBeforeUnmount(store.resetForm);
+</script>
 <template>
      <div class="max-w-3xl mx-auto">
         <!-- Header -->
@@ -8,7 +15,7 @@
 
         <!-- Form -->
         <div class="bg-white rounded-lg shadow p-6">
-            <form class="space-y-6">
+            <form @submit.prevent="store.handleSubmit()" class="space-y-6">
                 <!-- Basic Information -->
                 <div class="space-y-4">
                     <h2 class="text-lg font-medium text-gray-900">Basic Information</h2>
@@ -16,50 +23,49 @@
                     <!-- Project Name -->
                     <div>
                         <label for="project_name" class="block text-sm font-medium text-gray-700">Project Name *</label>
-                        <input type="text" id="project_name" name="project_name" required
+                        <input v-model="store.form.name" type="text" id="project_name" name="project_name"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <ValidationError :errors="store.errors" field="name"/>    
                     </div>
 
                     <!-- Client -->
-                    <div>
+                    <!-- <div>
                         <label for="client" class="block text-sm font-medium text-gray-700">Client Name *</label>
-                        <input type="text" id="client" name="client" required
+                        <input type="text" id="client" name="client"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
+                    </div> -->
 
                     <!-- Description -->
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700">Project Description</label>
-                        <textarea id="description" name="description" rows="4"
+                        <textarea v-model="store.form.description" id="description" name="description" rows="4"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Describe the project objectives and scope..."></textarea>
+                        <ValidationError :errors="store.errors" field="description"/>    
                     </div>
                 </div>
 
                 <!-- Project Details -->
-                <div class="space-y-4 pt-6 border-t">
+                <!-- <div class="space-y-4 pt-6 border-t">
                     <h2 class="text-lg font-medium text-gray-900">Project Details</h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Start Date -->
                         <div>
                             <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date *</label>
-                            <input type="date" id="start_date" name="start_date" required
+                            <input type="date" id="start_date" name="start_date"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
-                        <!-- End Date -->
                         <div>
                             <label for="end_date" class="block text-sm font-medium text-gray-700">End Date *</label>
-                            <input type="date" id="end_date" name="end_date" required
+                            <input type="date" id="end_date" name="end_date"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         </div>
                     </div>
 
-                    <!-- Priority -->
                     <div>
                         <label for="priority" class="block text-sm font-medium text-gray-700">Priority *</label>
-                        <select id="priority" name="priority" required
+                        <select id="priority" name="priority"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select priority</option>
                             <option value="high">High</option>
@@ -68,7 +74,6 @@
                         </select>
                     </div>
 
-                    <!-- Budget -->
                     <div>
                         <label for="budget" class="block text-sm font-medium text-gray-700">Budget</label>
                         <div class="mt-1 relative rounded-md shadow-sm">
@@ -82,14 +87,12 @@
                     </div>
                 </div>
 
-                <!-- Team & Resources -->
                 <div class="space-y-4 pt-6 border-t">
                     <h2 class="text-lg font-medium text-gray-900">Team & Resources</h2>
 
-                    <!-- Project Manager -->
                     <div>
                         <label for="project_manager" class="block text-sm font-medium text-gray-700">Project Manager *</label>
-                        <select id="project_manager" name="project_manager" required
+                        <select id="project_manager" name="project_manager"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select project manager</option>
                             <option value="1">John Doe</option>
@@ -98,7 +101,6 @@
                         </select>
                     </div>
 
-                    <!-- Team Members -->
                     <div>
                         <label for="team_members" class="block text-sm font-medium text-gray-700">Team Members</label>
                         <select id="team_members" name="team_members" multiple
@@ -112,11 +114,8 @@
                     </div>
                 </div>
 
-                <!-- Additional Settings -->
                 <div class="space-y-4 pt-6 border-t">
                     <h2 class="text-lg font-medium text-gray-900">Additional Settings</h2>
-
-                    <!-- Status -->
                     <div class="flex items-center space-x-4">
                         <label class="block text-sm font-medium text-gray-700">Initial Status</label>
                         <div class="flex items-center space-x-4">
@@ -133,22 +132,27 @@
                         </div>
                     </div>
 
-                    <!-- Notifications -->
                     <div class="flex items-center">
                         <input type="checkbox" id="notifications" name="notifications" checked
                             class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                         <label for="notifications" class="ml-2 text-sm text-gray-700">Send notifications to team members</label>
                     </div>
-                </div>
+                </div> -->
 
-                <!-- Form Actions -->
                 <div class="flex items-center justify-end space-x-4 pt-6 border-t">
                     <RouterLink :to="{name: 'projects.index'}"
                         class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Cancel
                     </RouterLink>
-                    <button type="submit" 
-                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <button
+                        :disabled="store.loading" 
+                        type="submit" 
+                        :class="{
+                            'px-4 py-2 border border-transparent flex items-center gap-2 justify-center rounded-md shadow-sm text-sm font-medium text-white focus:outline-none': true,
+                            'bg-blue-600 hover:bg-blue-700':! store.loading,
+                            'bg-blue-300': store.loading,
+                        }">
+                        <IconSpinner v-if="store.loading"/>
                         Create Project
                     </button>
                 </div>

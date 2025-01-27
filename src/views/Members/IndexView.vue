@@ -101,6 +101,6 @@ onMounted(store.getMembers);
             </table>
         </div>
         <!-- Pagination -->
-        <PaginationComponent :pagination="store.pagination"/>
+        <PaginationComponent :pagination="store.pagination" :onPageChange="store.changePage"/>
     </div>
 </template>
