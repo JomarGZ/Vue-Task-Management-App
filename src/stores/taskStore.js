@@ -125,7 +125,6 @@ export const useTaskStore = defineStore("tasks", () => {
 
         return window.axios.post(`v1/projects/${project.id}/tasks`, form)
             .then((response) => {
-                console.log(response)
                 const data = response.data.data;
                 showToast("Task added successfully")
                 router.push({ name : 'tasks.show', params: {projectId: data.project.id, taskId: data.id} })
