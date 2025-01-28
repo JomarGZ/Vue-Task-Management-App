@@ -127,7 +127,10 @@ watchEffect(async () => {
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
                         <h2 class="text-2xl font-semibold text-gray-800">Project Tasks</h2>
-                       
+                        <RouterLink class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
+                            <IconSVG name="plus-svg"/>
+                            Add Task
+                        </RouterLink>
                     </div>
                        <!-- Search and Filter Bar -->
                     <div class="bg-gray-50 rounded-lg p-4 mb-6">

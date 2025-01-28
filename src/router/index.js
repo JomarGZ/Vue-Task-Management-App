@@ -60,7 +60,7 @@ const router = createRouter({
           component: () => import('@/views/Auth/ProfileView.vue'),
         },
         {
-          path: '/tasks/create',
+          path: '/projects/:id/tasks/create',
           name: 'tasks.create',
           component: () => import('@/views/Tasks/CreateView.vue'),
         },

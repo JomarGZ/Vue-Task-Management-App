@@ -1,212 +1,154 @@
 <script setup>
-import { ref, reactive, watchEffect, onMounted, onBeforeUnmount} from 'vue';
-import { useTasks } from '@/stores/tasks'; // Replace with the actual store path
-import { useRoute } from 'vue-router';
-import { useFormatters } from '@/composables/useFormatters';
-
-
-const store = useTasks();
-const route = useRoute();
-const formatter = useFormatters();
-watchEffect(async () => {
-    store.getTask({ id: route.params.id });
-});
-
-onMounted(() => {
-  store.fetchPriorityLevels();
-  store.fetchStatuses();
-});
-
-
-onBeforeUnmount(store.resetTaskData)
-
 </script>
 <template>
-    <div>
-      <!-- Main Task Details -->
-        <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg rounded-b-none p-6">
-          <div class="flex justify-between items-center"> 
-              <h1 class="text-2xl font-bold text-gray-800 mb-4">
-                {{ store?.taskData?.title }}
-              </h1>
-              <p class="bg-gray-200 text-gray-800 px-2 py-1 rounded-lg">{{ store?.taskData?.category?.name }}</p>
-          </div>
-          
-          
-          <p class="text-gray-600 mb-6">
-            {{ store?.taskData?.description }}
-          </p>
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <!-- Status -->
-            <div class="flex items-center space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              <div class="w-full">
-                <p class="text-xs text-gray-500">Status</p>
-                <select 
-                  class="w-full border rounded px-2 py-1 text-sm"
-                  v-model="store.taskData.status"
-                  @change="store.updateStatus($event.target.value)"
-                >
-                  <option 
-                    v-for="(status, index) in store?.statuses?.value" 
-                    :key="index" 
-                    :value="status"
-                  >
-                    {{ status }}
-                  </option>
-                </select>
-              </div>
-            </div>
-               <!-- Priority -->
-               <div class="flex items-center space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M12 22V8"></path>
-                <path d="M16 3H2v7h14z"></path>
-                <path d="M7 11v10"></path>
-                <path d="M22 11H2"></path>
-              </svg>
-              <div class="w-full">
-                <p class="text-xs text-gray-500">Priority</p>
-                <select 
-                  class="w-full border rounded px-2 py-1 text-sm"
-                  v-model="store.taskData.priority"
-                  @change="store.updatePriorityLevel($event.target.value)"
-                >
-                  <option 
-                    v-for="(level, index) in store?.priorityLevels" 
-                    :key="index" 
-                    :value="level"
-                    >
-                      {{ level }}
-                    </option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            
-         
+        <!-- Breadcrumb -->
+        <nav class="mb-8 text-sm">
+            <ol class="flex items-center space-x-2">
+                <li><a href="#" class="text-blue-600 hover:text-blue-800">Projects</a></li>
+                <li class="text-gray-500">/</li>
+                <li><a href="#" class="text-blue-600 hover:text-blue-800">Frontend Redesign</a></li>
+                <li class="text-gray-500">/</li>
+                <li class="text-gray-500">TASK-123</li>
+            </ol>
+        </nav>
 
-            <!-- Start Date -->
-            <div class="flex items-center space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              <div>
-                <p class="text-xs text-gray-500">Started</p>
-                <p class="text-sm">{{ store?.taskData?.started_at ? formatter.formatDateWithTime(store?.taskData?.started_at) : '---' }}</p>
-              </div>
+        <!-- Task Header -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Implement New Dashboard Layout</h1>
+                    <p class="text-gray-500 mt-1">TASK-123</p>
+                </div>
+                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">In Progress</span>
             </div>
 
-            <!-- Deadline -->
-            <div class="flex items-center space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              <div>
-                <p class="text-xs text-gray-500">Deadline</p>
-                <p class="text-sm">{{ store?.taskData?.deadline_at ? formatter.formatDateWithTime(store?.taskData?.deadline_at) : '---' }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-      <!-- Subtasks Section -->
-      <div class="p-4">
-        <h2 class="text-xl font-semibold mb-4 text-gray-700">Subtasks</h2>
-        
-        <div v-if="subtasks.length === 0" class="text-center text-gray-500 py-4">
-          No subtasks created yet.
-        </div>
-  
-        <div 
-          v-for="subtask in subtasks" 
-          :key="subtask.id" 
-          :class="[
-            'flex items-center justify-between p-4 border-b transition-colors duration-200',
-            subtask.completed ? 'bg-green-50' : 'bg-white'
-          ]"
-        >
-          <div class="flex items-center space-x-4 w-full">
-            <!-- Checkbox -->
-            <input
-              type="checkbox"
-              :checked="subtask.completed"
-              @change="toggleSubtaskCompletion(subtask)"
-              class="form-checkbox h-5 w-5 text-green-600"
-            />
-  
-            <!-- Subtask Title and Details -->
-            <div class="flex-grow">
-              <div class="flex justify-between items-center">
-                <span 
-                  :class="[
-                    subtask.completed ? 'line-through text-gray-500' : 'text-gray-800',
-                    'font-medium'
-                  ]"
-                >
-                  {{ subtask.title }}
+            <!-- Project Info -->
+            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
+                    </svg>
+                    Project: Frontend Redesign
                 </span>
-                <span 
-                  :class="[
-                    'px-2 py-1 rounded-full text-xs',
-                    getStatusClass(subtask.status)
-                  ]"
-                >
-                  {{ subtask.status }}
-                </span>
-              </div>
-              <p class="text-sm text-gray-500 mt-1">{{ subtask.description }}</p>
+                <span>Created: Jan 25, 2025</span>
+                <span>Due: Feb 15, 2025</span>
             </div>
-  
-            <!-- Action Buttons -->
-            <div class="flex space-x-2">
-              <button 
-                @click="editSubtask(subtask)"
-                class="text-blue-600 hover:bg-blue-100 p-2 rounded"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                  <path d="m15 5 4 4" />
-                </svg>
-              </button>
-  
-              <button 
-                @click="deleteSubtask(subtask.id)"
-                class="text-red-600 hover:bg-red-100 p-2 rounded"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 6h18" />
-                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                </svg>
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
-  
-      <!-- Add Subtask Input -->
-      <div class="p-4 bg-gray-100 flex">
-        <input 
-          v-model="newSubtaskTitle" 
-          @keyup.enter="addSubtask"
-          placeholder="Add a new subtask"
-          class="flex-grow p-2 border rounded-l"
-        />
-        <button 
-          @click="addSubtask"
-          class="bg-blue-500 text-white p-2 rounded-r hover:bg-blue-600"
-        >
-          Add Subtask
-        </button>
-      </div>
-    </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-3 gap-6">
+            <!-- Left Column -->
+            <div class="col-span-2 space-y-6">
+                <!-- Description -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Description</h2>
+                    <p class="text-gray-700">Implement the new dashboard layout according to the design specifications. This includes responsive layouts, dark mode support, and new widget components.</p>
+                </div>
+
+                <!-- Links -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Related Links</h2>
+                    <div class="space-y-3">
+                        <a href="#" class="block text-blue-600 hover:text-blue-800">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                                </svg>
+                                Pull Request #456
+                            </div>
+                        </a>
+                        <a href="#" class="block text-blue-600 hover:text-blue-800">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+                                </svg>
+                                Documentation
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Comments -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Comments</h2>
+                    <!-- Comment List -->
+                    <div class="space-y-6">
+                        <div class="flex space-x-3">
+                            <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full" alt="User avatar">
+                            <div class="flex-1">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-medium text-gray-900">Sarah Chen</span>
+                                        <span class="text-sm text-gray-500">2 hours ago</span>
+                                    </div>
+                                    <p class="text-gray-700">Design specs have been updated. Please check the latest Figma file.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- New Comment Form -->
+                    <div class="mt-6">
+                        <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="Add a comment..."></textarea>
+                        <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Add Comment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Status -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Status</h2>
+                    <select class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option>To Do</option>
+                        <option selected>In Progress</option>
+                        <option>In Review</option>
+                        <option>Done</option>
+                    </select>
+                </div>
+
+                <!-- Assignments -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Assignments</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Developer</label>
+                            <div class="flex items-center space-x-2">
+                                <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Developer avatar">
+                                <span class="text-gray-900">John Doe</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">QA Engineer</label>
+                            <div class="flex items-center space-x-2">
+                                <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="QA avatar">
+                                <span class="text-gray-900">Alice Smith</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metadata -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h2 class="text-lg font-semibold mb-4">Details</h2>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <span class="text-gray-500">Priority:</span>
+                            <span class="ml-2 text-gray-900">High</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Story Points:</span>
+                            <span class="ml-2 text-gray-900">5</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Sprint:</span>
+                            <span class="ml-2 text-gray-900">Sprint 23</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
   </template>
