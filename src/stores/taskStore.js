@@ -2,7 +2,7 @@ import { useFormatters } from "@/composables/useFormatters";
 import { useSweetAlert } from "@/composables/useSweetAlert2";
 import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
-import { computed, reactive, ref } from "vue";
+import { reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 export const useTaskStore = defineStore("tasks", () => {
@@ -243,8 +243,6 @@ export const useTaskStore = defineStore("tasks", () => {
         getTasks,
         resetForm,
         resetTaskData,
-        applyFilter,
-        searchTasks,
         debounceSearch,
         priorityLevels,
         searchInput,
