@@ -1,3 +1,16 @@
+<script setup>
+import { useProjectStore } from '@/stores/projectStore';
+import { useTaskStore } from '@/stores/taskStore';
+import { onBeforeUnmount, watchEffect } from 'vue';
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const projectStore = useProjectStore();
+const taskStore = useTaskStore();
+watchEffect(() => {
+projectStore.getProject({id: route?.params?.projectId});
+});
+onBeforeUnmount(taskStore.resetForm)
+</script>
 <template>
     <div class="mx-auto space-y-6">
         <!-- Project Details Card -->
@@ -6,8 +19,8 @@
                 <!-- Project Header -->
                 <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-800">Website Redesign Project</h3>
-                        <p class="text-gray-600 mt-1">Complete overhaul of company website with modern design</p>
+                        <h3 class="text-lg font-semibold text-gray-800">{{ projectStore?.project?.name }}</h3>
+                        <p class="text-gray-600 mt-1">{{ projectStore?.project?.description }}</p>
                     </div>
                     <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Q1 2025</span>
                 </div>
@@ -55,32 +68,34 @@
         <!-- Task Creation Form (Same as before with updated title) -->
         <div class="bg-white rounded-xl shadow-sm p-8">
             <h3 class="text-lg font-semibold text-gray-800 mb-6">Add New Task to Website Redesign Project</h3>
-            <form class="space-y-6">
+            <form @submit.prevent="taskStore.storeTask({id: projectStore?.project?.id})" class="space-y-6">
                 <!-- Rest of the form remains the same -->
                 <!-- Task Title -->
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div class="col-span-2">
                         <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
-                        <input type="text" id="title" name="title" required
+                        <input v-model="taskStore.form.title" type="text" id="title" name="title"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <ValidationError :errors="taskStore.errors" field="title"/>
                     </div>
 
                     <!-- Description -->
                     <div class="col-span-2">
                         <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea id="description" name="description" rows="4"
+                        <textarea v-model="taskStore.form.description" id="description" name="description" rows="4"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <ValidationError :errors="taskStore.errors" field="description"/>
                     </div>
 
                     <!-- Due Date -->
-                    <div>
+                    <!-- <div>
                         <label for="dueDate" class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
                         <input type="date" id="dueDate" name="dueDate"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
+                    </div> -->
 
                     <!-- Priority -->
-                    <div>
+                    <!-- <div>
                         <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                         <select id="priority" name="priority"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -88,10 +103,10 @@
                             <option value="medium">Medium</option>
                             <option value="high">High</option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <!-- Assignee -->
-                    <div class="col-span-2">
+                    <!-- <div class="col-span-2">
                         <label for="assignee" class="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
                         <select id="assignee" name="assignee"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -100,10 +115,10 @@
                             <option value="mike">Mike Johnson (UI Designer)</option>
                             <option value="sarah">Sarah Wilson (Backend Developer)</option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <!-- Tags -->
-                    <div class="col-span-2">
+                    <!-- <div class="col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
                         <div class="flex flex-wrap gap-2">
                             <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Frontend</span>
@@ -113,10 +128,10 @@
                                 + Add Tag
                             </button>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Attachments -->
-                    <div class="col-span-2">
+                    <!-- <div class="col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Attachments</label>
                         <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
                             <div class="space-y-1 text-center">
@@ -131,15 +146,24 @@
                                 <p class="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-4 pt-4">
-                    <RouterLink :to="{name: 'projects.show', params: {id: '2'}}" type="button" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+                    <RouterLink :to="{name: 'projects.show', params: {projectId: projectStore?.project?.id}}" type="button" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
                         Cancel
                     </RouterLink>
-                    <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">
+                    <button 
+                        :disabled="taskStore.loading" 
+                        type="submit" 
+                        :class="{
+                        'px-6 py-3 flex items-center justify-center gap-2 text-white rounded-lg font-medium': true,
+                        'hover:bg-indigo-700 bg-indigo-600':! taskStore.loading,
+                        'bg-indigo-300': taskStore.loading 
+                        }"
+                    >
+                        <IconSpinner v-if="taskStore.loading"/>
                         Create Task
                     </button>
                 </div>

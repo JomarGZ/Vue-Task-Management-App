@@ -1,4 +1,5 @@
 import { useFormatters } from "@/composables/useFormatters";
+import { useSweetAlert } from "@/composables/useSweetAlert2";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -14,14 +15,14 @@ export const useTaskStore = defineStore("tasks", () => {
     const loading = ref(false);
     const errors = reactive({});
     const categories = reactive({});
-
+    const { showToast } = useSweetAlert();
     const form = reactive({
         title: "",
         description: "",
         category_id: "",
         deadline_at: "",
         completed_at: "",
-        status: "",
+        status: "not started",
 
     });
 
@@ -135,14 +136,17 @@ export const useTaskStore = defineStore("tasks", () => {
         taskData.value = {};
     }
 
-    async function storeTask () {
+    async function storeTask (project) {
         if (loading.value) return;
         errors.value = {};
         loading.value = true;
 
-        return window.axios.post("v1/tasks", form)
-            .then(() => {
-                router.push({ name : 'tasks.index' })
+        return window.axios.post(`v1/projects/${project.id}/tasks`, form)
+            .then((response) => {
+                console.log(response)
+                const data = response.data.data;
+                showToast("Task added successfully")
+                router.push({ name : 'tasks.show', params: {projectId: data.project.id, taskId: data.id} })
             })
             .catch(error => {
                 if (error.response?.status === 422) {
