@@ -1,11 +1,16 @@
 <script setup>
 import { useProjectStore } from '@/stores/projectStore';
-import { watchEffect } from 'vue';
+import { useTaskStore } from '@/stores/taskStore';
+import { onMounted, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
-const store = useProjectStore();
+const projectStore = useProjectStore();
+const taskStore = useTaskStore();
 const route = useRoute();
 watchEffect(async () => {
-    store.getProject({id: route?.params?.id})
+    projectStore.getProject({id: route?.params?.projectId})
+});
+onMounted(() => {
+    taskStore.getTasks();
 });
 </script>
 <template>
@@ -14,7 +19,7 @@ watchEffect(async () => {
         <div class="mb-6 flex justify-between items-center">
             <div>
                 <div class="flex items-center gap-3">
-                    <h1 class="text-2xl font-bold text-gray-800">{{ store?.project?.name }}</h1>
+                    <h1 class="text-2xl font-bold text-gray-800">{{ projectStore?.project?.name }}</h1>
                     <span class="px-2 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">Active</span>
                 </div>
                 <p class="mt-1 text-gray-600">Client: Acme Corporation</p>
@@ -40,7 +45,7 @@ watchEffect(async () => {
                     <h2 class="text-lg font-medium text-gray-900 mb-4">Project Overview</h2>
                     <div class="space-y-4">
                         <p class="text-gray-700">
-                           {{ store?.project?.description }}
+                           {{ projectStore?.project?.description }}
                         </p>
                         
                         <!-- Key Details Grid -->
@@ -164,8 +169,8 @@ watchEffect(async () => {
                         </div>
                     </div>
                     <div class="space-y-4">
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <RouterLink :to="{name: 'tasks.show'}" class="flex items-center justify-between">
+                        <div v-for="task in taskStore?.tasks" :key="task.id" class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                            <RouterLink :to="{name: 'tasks.show', params: {taskId: task.id, projectId: projectStore?.project?.id}}" class="flex items-center justify-between">
                                 <div class="flex items-center space-x-4">
                                     <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
                                         <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -173,8 +178,8 @@ watchEffect(async () => {
                                         </svg>
                                     </span>
                                     <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
+                                        <h3 class="text-sm font-medium text-gray-900">{{ task.title }}</h3>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">{{ task.status }}</span>
                                     </div>
                                 </div>
                                 <div class="text-right">
@@ -185,196 +190,8 @@ watchEffect(async () => {
                                 </div>
                             </RouterLink>
                         </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
-                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">Homepage design approved by client</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800"> Completed </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
-                                    <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
+                    <PaginationComponent :pagination="taskStore.pagination" size="sm" :onPageChange="taskStore.changePage"/>
                 </div>
             </div>
 
@@ -479,7 +296,6 @@ watchEffect(async () => {
                     </div>
                 </div>
                 <div class="max-w-sm mx-auto bg-white rounded-lg shadow-lg border border-gray-200">
-    <!-- Header -->
                 <div class="border-b border-gray-200 bg-gray-50 p-4 rounded-t-lg">
                     <div class="flex items-center justify-between">
                         <h3 class="font-semibold text-gray-800">Comments</h3>

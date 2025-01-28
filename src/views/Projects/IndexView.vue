@@ -95,10 +95,10 @@ onMounted(store.getProjects)
                             Mar 15, 2025
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm flex items-center font-medium space-x-2">
-                            <RouterLink :to="{ name: 'projects.edit', params: {id: project.id}}" class="text-blue-600 hover:text-blue-900" title="Edit">
+                            <RouterLink :to="{ name: 'projects.edit', params: {projectId: project.id}}" class="text-blue-600 hover:text-blue-900" title="Edit">
                                 <IconSVG name="edit-svg"/>
                             </RouterLink>
-                            <RouterLink :to="{ name: 'projects.show', params: {id: project.id}}" class="text-green-600 hover:text-green-900" title="View project">
+                            <RouterLink :to="{ name: 'projects.show', params: {projectId: project.id}}" class="text-green-600 hover:text-green-900" title="View project">
                                 <IconSVG name="eye-svg"/>
                             </RouterLink>
                         </td>

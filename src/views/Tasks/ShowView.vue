@@ -1,12 +1,24 @@
 <script setup>
+import { useProjectStore } from '@/stores/projectStore';
+import { useTaskStore } from '@/stores/taskStore';
+import { onMounted, watchEffect } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const projectStore = useProjectStore();
+const taskStore = useTaskStore();
+watchEffect(() => {
+    projectStore.getProject({id: route?.params?.projectId});
+    taskStore.getTask({id: route?.params?.taskId});
+})
 </script>
 <template>
         <!-- Breadcrumb -->
         <nav class="mb-8 text-sm">
             <ol class="flex items-center space-x-2">
-                <li><a href="#" class="text-blue-600 hover:text-blue-800">Projects</a></li>
+                <li><RouterLink :to="{name: 'projects.index'}" class="text-blue-600 hover:text-blue-800">Projects</RouterLink></li>
                 <li class="text-gray-500">/</li>
-                <li><a href="#" class="text-blue-600 hover:text-blue-800">Frontend Redesign</a></li>
+                <li><RouterLink :to="{name: 'projects.show', params: {projectId: projectStore?.project?.id}}" class="text-blue-600 hover:text-blue-800">{{ projectStore?.project?.name }}</RouterLink></li>
                 <li class="text-gray-500">/</li>
                 <li class="text-gray-500">TASK-123</li>
             </ol>
@@ -16,10 +28,10 @@
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div class="flex items-start justify-between mb-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Implement New Dashboard Layout</h1>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ taskStore?.taskData?.title }}</h1>
                     <p class="text-gray-500 mt-1">TASK-123</p>
                 </div>
-                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">In Progress</span>
+                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">{{ taskStore?.taskData?.status }}</span>
             </div>
 
             <!-- Project Info -->
@@ -28,10 +40,10 @@
                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
                     </svg>
-                    Project: Frontend Redesign
+                    {{ projectStore?.project?.name }}
                 </span>
-                <span>Created: Jan 25, 2025</span>
-                <span>Due: Feb 15, 2025</span>
+                <span>Created: {{ taskStore?.taskData?.created_at || '--.--' }}</span>
+                <span>Due: {{ taskStore?.taskData?.deadline_at || '--.--' }}</span>
             </div>
         </div>
 
@@ -42,7 +54,7 @@
                 <!-- Description -->
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <h2 class="text-lg font-semibold mb-4">Description</h2>
-                    <p class="text-gray-700">Implement the new dashboard layout according to the design specifications. This includes responsive layouts, dark mode support, and new widget components.</p>
+                    <p class="text-gray-700">{{ taskStore?.taskData?.description }}</p>
                 </div>
 
                 <!-- Links -->
@@ -137,7 +149,7 @@
                     <div class="space-y-3 text-sm">
                         <div>
                             <span class="text-gray-500">Priority:</span>
-                            <span class="ml-2 text-gray-900">High</span>
+                            <span class="ml-2 text-gray-900">{{ taskStore?.taskData?.priority_level }}</span>
                         </div>
                         <div>
                             <span class="text-gray-500">Story Points:</span>

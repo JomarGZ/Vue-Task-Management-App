@@ -1,9 +1,9 @@
 import { useFormatters } from "@/composables/useFormatters";
 import { defineStore } from "pinia";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-export const useTasks = defineStore("tasks", () => {
+export const useTaskStore = defineStore("tasks", () => {
     const router = useRouter();
     const route = useRoute();
     const formatter = useFormatters();
@@ -25,12 +25,14 @@ export const useTasks = defineStore("tasks", () => {
 
     });
 
-    const pagination = ref({
+    const pagination = reactive({
         current_page: 1,
-        last_page: 1,
-        per_page: 10,
+        last_page: 0,
+        links: {},
+        from: 0,
+        to: 0,
         total: 0,
-    });
+      })
 
     const routeParams = computed(() => ({
         page: route.query.page ? Number(route.query.page) : 1,
@@ -63,44 +65,46 @@ export const useTasks = defineStore("tasks", () => {
             }
         })
     }
-
-    async function getTasks(params = {}) {
-    
-        
-        try {
-
-            const queryParams = {
-                ...routeParams.value,
-                ...params
-            }
-
-            router.replace({
-                query: {
-                    page: queryParams.page,
-                    search: queryParams.search || undefined,
-                    status: queryParams.filter.status || undefined,
-                    priority: queryParams.filter.priority || undefined,
-                    per_page: queryParams.per_page
-                }
-            })
-
-            const response = await window.axios.get('v1/tasks', { params: queryParams});
-
-            tasks.value = response.data;
-            pagination.value = {
-                current_page: response.data.meta.current_page,
-                last_page: response.data.meta.last_page,
-                per_page: response.data.meta.per_page,
-                total: response.data.meta.total
-            }
-        } catch(error) {
-            console.error('Error fetching tasks:', error);
+    const changePage = (pageUrl) => {
+        if (!pageUrl) return
+  
+        const params = new URLSearchParams(new URL(pageUrl).search)
+        const page = params.get('page')
+  
+        if (page) {
+            updateQueryAndFetchPosts({ page: page })
         }
     }
-   
-    function changePage(page) {
-        getTasks({ page });
+    const updateQueryAndFetchPosts = (params = {}) => {
+        router
+          .push({
+            query: {
+              ...route.query,
+              ...params,
+            },
+          })
+          .then(() => getTasks())
+      }
+    async function getTasks() {
+        return window.axios
+            .get(`v1/projects/${route.params.projectId}/tasks`, {params: route.query})
+            .then(response => {
+                const tasksData = response?.data;
+                if (tasksData) {
+                    tasks.value = tasksData.data;
+                    pagination.current_page = tasksData.meta.current_page || 1
+                    pagination.links = tasksData.meta?.links || {}
+                    pagination.last_page = tasksData.meta?.last_page || 0
+                    pagination.total = tasksData.meta?.total || 0
+                    pagination.from = tasksData.meta?.from || 0
+                    pagination.to = tasksData.meta?.to || 0
+                }
+            })
+            .catch(error => {
+                console.error("Error on fetching project tasks", error);
+            })
     }
+   
 
     function searchTasks(searchTerm) {
         getTasks({

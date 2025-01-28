@@ -70,12 +70,7 @@ const router = createRouter({
           component: () => import('@/views/Tasks/IndexView.vue'),
         },
         {
-          path: '/tasks/:id/edit',
-          name: 'tasks.edit',
-          component: () => import('@/views/Tasks/EditView.vue'),
-        },
-        {
-          path: '/tasks/:id',
+          path: 'projects/:projectId/tasks/:taskId',
           name: 'tasks.show',
           component: () => import('@/views/Tasks/ShowView.vue'),
         },
@@ -105,12 +100,12 @@ const router = createRouter({
           component: () => import('@/views/Projects/CreateView.vue'),
         },
         {
-          path: '/projects/:id',
+          path: '/projects/:projectId',
           name: 'projects.show',
           component: () => import('@/views/Projects/ShowView.vue'),
         },
         {
-          path: '/projects/:id/edit',
+          path: '/projects/:projectId/edit',
           name: 'projects.edit',
           component: () => import('@/views/Projects/EditView.vue'),
         },
