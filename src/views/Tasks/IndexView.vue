@@ -1,6 +1,6 @@
 
 <script setup>
-import { useTasks } from '@/stores/tasks';
+import { useTasks } from '@/stores/taskStore';
 import { ref, computed, watch, onMounted } from 'vue'
 
 

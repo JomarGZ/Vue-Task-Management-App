@@ -1,51 +1,51 @@
 import { useFormatters } from "@/composables/useFormatters";
+import { useSweetAlert } from "@/composables/useSweetAlert2";
+import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-export const useTasks = defineStore("tasks", () => {
+export const useTaskStore = defineStore("tasks", () => {
     const router = useRouter();
     const route = useRoute();
     const formatter = useFormatters();
     const taskData = ref({});
     const statuses = reactive({});
     const priorityLevels = ref(null);
+    const searchInput = ref(route.query.search || '');
     const tasks = ref({});
     const loading = ref(false);
     const errors = reactive({});
     const categories = reactive({});
-
+    const { showToast } = useSweetAlert();
     const form = reactive({
         title: "",
         description: "",
         category_id: "",
         deadline_at: "",
         completed_at: "",
-        status: "",
+        status: "not started",
 
     });
 
-    const pagination = ref({
+    const pagination = reactive({
         current_page: 1,
-        last_page: 1,
-        per_page: 10,
+        last_page: 0,
+        links: {},
+        from: 0,
+        to: 0,
         total: 0,
-    });
+      })
 
-    const routeParams = computed(() => ({
-        page: route.query.page ? Number(route.query.page) : 1,
-        search: route.query.search || '',
-        filter: {},
-        per_page: route.query.per_page ? Number(route.query.per_page) : 10
-    }))
-
-    if (route.query.status) {
-        routeParams.value.filter.status = route.query.status
-    }
-    if (route.query.priority) {
-        routeParams.value.filter.priority = route.query.priority
-    }
-
+     const debounceSearch = debounce((newSearch) => {
+           router
+           .replace({
+               query: newSearch ? { search: newSearch } : {},
+           })
+           .then(() => {
+               getTasks()
+           })
+       }, 300)
 
 
     async function getTask(task, editMode = false) {
@@ -63,59 +63,46 @@ export const useTasks = defineStore("tasks", () => {
             }
         })
     }
-
-    async function getTasks(params = {}) {
-    
-        
-        try {
-
-            const queryParams = {
-                ...routeParams.value,
-                ...params
-            }
-
-            router.replace({
-                query: {
-                    page: queryParams.page,
-                    search: queryParams.search || undefined,
-                    status: queryParams.filter.status || undefined,
-                    priority: queryParams.filter.priority || undefined,
-                    per_page: queryParams.per_page
-                }
-            })
-
-            const response = await window.axios.get('v1/tasks', { params: queryParams});
-
-            tasks.value = response.data;
-            pagination.value = {
-                current_page: response.data.meta.current_page,
-                last_page: response.data.meta.last_page,
-                per_page: response.data.meta.per_page,
-                total: response.data.meta.total
-            }
-        } catch(error) {
-            console.error('Error fetching tasks:', error);
+    const changePage = (pageUrl) => {
+        if (!pageUrl) return
+  
+        const params = new URLSearchParams(new URL(pageUrl).search)
+        const page = params.get('page')
+  
+        if (page) {
+            updateQueryAndFetchPosts({ page: page })
         }
     }
-   
-    function changePage(page) {
-        getTasks({ page });
+    const updateQueryAndFetchPosts = (params = {}) => {
+        router
+          .push({
+            query: {
+              ...route.query,
+              ...params,
+            },
+          })
+          .then(() => getTasks())
+      }
+    async function getTasks() {
+        return window.axios
+            .get(`v1/projects/${route.params.projectId}/tasks`, {params: route.query})
+            .then(response => {
+                const tasksData = response?.data;
+                if (tasksData) {
+                    tasks.value = tasksData.data;
+                    pagination.current_page = tasksData.meta.current_page || 1
+                    pagination.links = tasksData.meta?.links || {}
+                    pagination.last_page = tasksData.meta?.last_page || 0
+                    pagination.total = tasksData.meta?.total || 0
+                    pagination.from = tasksData.meta?.from || 0
+                    pagination.to = tasksData.meta?.to || 0
+                }
+            })
+            .catch(error => {
+                console.error("Error on fetching project tasks", error);
+            })
     }
-
-    function searchTasks(searchTerm) {
-        getTasks({
-            search: searchTerm,
-            page: 1
-        });
-    }
-
-    function applyFilter(filters) {
-        getTasks({
-            filter: filters,
-            page: 1
-        });
-    }
-
+ 
     function resetForm(){
         form.title = "";
         form.description = "";
@@ -131,18 +118,23 @@ export const useTasks = defineStore("tasks", () => {
         taskData.value = {};
     }
 
-    async function storeTask () {
+    async function storeTask (project) {
         if (loading.value) return;
         errors.value = {};
         loading.value = true;
 
-        return window.axios.post("v1/tasks", form)
-            .then(() => {
-                router.push({ name : 'tasks.index' })
+        return window.axios.post(`v1/projects/${project.id}/tasks`, form)
+            .then((response) => {
+                console.log(response)
+                const data = response.data.data;
+                showToast("Task added successfully")
+                router.push({ name : 'tasks.show', params: {projectId: data.project.id, taskId: data.id} })
             })
             .catch(error => {
                 if (error.response?.status === 422) {
                     errors.value = error.response.data.errors;
+                } else {
+                    console.error("Error on adding task:", error)
                 }
             })
             .finally(() => {
@@ -253,7 +245,9 @@ export const useTasks = defineStore("tasks", () => {
         resetTaskData,
         applyFilter,
         searchTasks,
+        debounceSearch,
         priorityLevels,
+        searchInput,
         taskData,
         categories,
         pagination,

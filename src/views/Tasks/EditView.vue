@@ -1,6 +1,6 @@
 <script setup>
 import { onBeforeUnmount, onMounted, watchEffect } from 'vue'
-import { useTasks } from '@/stores/tasks';
+import { useTasks } from '@/stores/taskStore';
 import { useRoute } from 'vue-router';
 import { useFormatters } from '@/composables/useFormatters';
 
