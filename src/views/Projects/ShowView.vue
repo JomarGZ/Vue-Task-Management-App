@@ -1,7 +1,7 @@
 <script setup>
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
-import { onMounted, watchEffect } from 'vue';
+import { onMounted, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 const projectStore = useProjectStore();
 const taskStore = useTaskStore();
@@ -9,6 +9,12 @@ const route = useRoute();
 watchEffect(async () => {
     projectStore.getProject({id: route?.params?.projectId})
 });
+watch(
+    () => taskStore.searchInput, 
+    (newSearch) => {
+        taskStore.debounceSearch(newSearch)    
+    }
+)
 onMounted(() => {
     taskStore.getTasks();
 });
@@ -132,7 +138,7 @@ onMounted(() => {
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
                         <h2 class="text-2xl font-semibold text-gray-800">Project Tasks</h2>
-                        <RouterLink :to="{name: 'tasks.create', params: {id: '1'}}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
+                        <RouterLink :to="{name: 'tasks.create', params: {projectId: '1'}}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
                             <IconSVG name="plus-svg"/>
                             Add Task
                         </RouterLink>
@@ -142,7 +148,9 @@ onMounted(() => {
                         <div class="flex flex-col sm:flex-row gap-4">
                             <!-- Search -->
                             <div class="relative flex-1">
-                                <input type="text" 
+                                <input
+                                    v-model="taskStore.searchInput" 
+                                    type="text" 
                                     placeholder="Search tasks..." 
                                     class="w-full pl-10 pr-4 py-2.5 bg-white rounded-lg border-0 focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm"
                                 >

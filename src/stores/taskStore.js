@@ -1,5 +1,6 @@
 import { useFormatters } from "@/composables/useFormatters";
 import { useSweetAlert } from "@/composables/useSweetAlert2";
+import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -11,6 +12,7 @@ export const useTaskStore = defineStore("tasks", () => {
     const taskData = ref({});
     const statuses = reactive({});
     const priorityLevels = ref(null);
+    const searchInput = ref(route.query.search || '');
     const tasks = ref({});
     const loading = ref(false);
     const errors = reactive({});
@@ -35,20 +37,15 @@ export const useTaskStore = defineStore("tasks", () => {
         total: 0,
       })
 
-    const routeParams = computed(() => ({
-        page: route.query.page ? Number(route.query.page) : 1,
-        search: route.query.search || '',
-        filter: {},
-        per_page: route.query.per_page ? Number(route.query.per_page) : 10
-    }))
-
-    if (route.query.status) {
-        routeParams.value.filter.status = route.query.status
-    }
-    if (route.query.priority) {
-        routeParams.value.filter.priority = route.query.priority
-    }
-
+     const debounceSearch = debounce((newSearch) => {
+           router
+           .replace({
+               query: newSearch ? { search: newSearch } : {},
+           })
+           .then(() => {
+               getTasks()
+           })
+       }, 300)
 
 
     async function getTask(task, editMode = false) {
@@ -151,6 +148,8 @@ export const useTaskStore = defineStore("tasks", () => {
             .catch(error => {
                 if (error.response?.status === 422) {
                     errors.value = error.response.data.errors;
+                } else {
+                    console.error("Error on adding task:", error)
                 }
             })
             .finally(() => {
@@ -261,7 +260,9 @@ export const useTaskStore = defineStore("tasks", () => {
         resetTaskData,
         applyFilter,
         searchTasks,
+        debounceSearch,
         priorityLevels,
+        searchInput,
         taskData,
         categories,
         pagination,
