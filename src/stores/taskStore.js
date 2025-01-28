@@ -102,22 +102,7 @@ export const useTaskStore = defineStore("tasks", () => {
                 console.error("Error on fetching project tasks", error);
             })
     }
-   
-
-    function searchTasks(searchTerm) {
-        getTasks({
-            search: searchTerm,
-            page: 1
-        });
-    }
-
-    function applyFilter(filters) {
-        getTasks({
-            filter: filters,
-            page: 1
-        });
-    }
-
+ 
     function resetForm(){
         form.title = "";
         form.description = "";
