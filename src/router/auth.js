@@ -3,6 +3,7 @@ import projectRoutes from '@/router/project';
 import taskRoutes from '@/router/task';
 import memberRoutes from '@/router/member';
 import teamRoutes from '@/router/team';
+import accountRoutes from '@/router/account';
 function auth(to, from, next) {
     if (!localStorage.getItem("access_token")) {
       return next({ name: "login" });
@@ -29,6 +30,7 @@ export default {
     ...projectRoutes,
     ...taskRoutes,
     ...memberRoutes,
-    ...teamRoutes
+    ...teamRoutes,
+    ...accountRoutes
     ]
   };
