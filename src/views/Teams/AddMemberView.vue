@@ -1,3 +1,5 @@
+<script setup>
+</script>
 <template>
      <nav class="mb-8 text-sm">
             <ol class="flex items-center space-x-2">

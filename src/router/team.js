@@ -5,7 +5,12 @@ export default [
         component: () => import('@/views/Teams/IndexView.vue'),
     },
     {
-        path: '/teams/member/add',
+        path: '/teams/:teamId',
+        name: 'teams.show',
+        component: () => import('@/views/Teams/ShowView.vue'),
+    },
+    {
+        path: '/teams/:teamId/member/add',
         name: 'teams.members.add',
         component: () => import('@/views/Teams/AddMemberView.vue'),
     },
