@@ -1,3 +1,4 @@
+import { useSweetAlert } from "@/composables/useSweetAlert2";
 import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
@@ -8,7 +9,11 @@ export const useTeamMemberStore = defineStore("teamMembrs", () => {
     const route = useRoute();
     const teams = ref({});
     const router = useRouter();
+    const {showToast} = useSweetAlert();
     const searchInput = ref(route.query.search || '');
+    const form = reactive({
+        member_id: ''
+    });
     const pagination = reactive({
             current_page: 1,
             last_page: 0,
@@ -94,6 +99,18 @@ export const useTeamMemberStore = defineStore("teamMembrs", () => {
                 console.error('Error on fetching teams: ', error);
             });
     }
+
+    const addMemberToTeam = async (team) => {
+        return window.axios
+            .post(`v1/teams/${team.id}/members`, form)
+            .then(response => {
+                showToast('Member added to team successfully');
+                router.push({name: 'teams.show', params: {teamId: team.id}});
+            })
+            .catch(error => {
+                console.error('Error on adding member to team: ', error);
+            });
+    }
     
     return {
         getTeamMembers,
@@ -101,7 +118,9 @@ export const useTeamMemberStore = defineStore("teamMembrs", () => {
         getTeams,
         changePage,
         onSelectTeam,
+        addMemberToTeam,
         teams,
+        form,
         debounceSearch,
         pagination,
         searchInput,

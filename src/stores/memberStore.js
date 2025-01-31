@@ -10,6 +10,7 @@ export const useMemberStore = defineStore("memberStore", () => {
   const loading = ref(false);
   const router = useRouter();
   const route = useRoute();
+  const memberList = ref(null);
   const members = ref(null);
   const searchInput = ref(route.query.search || '')
   const form = reactive({
@@ -109,6 +110,18 @@ export const useMemberStore = defineStore("memberStore", () => {
           })
   }
 
+  const getMemberListWithoutPagination = async () => {
+    return window.axios
+      .get("v1/tenant/members/list")
+      .then(response => {
+        memberList.value = response?.data?.data;
+      })
+      .catch(error => {
+        console.error('Error on fetching member list', error)
+      })
+      
+  }
+
   const deleteMember = async (member) => {
     if(loading.value) return;
 
@@ -140,7 +153,9 @@ export const useMemberStore = defineStore("memberStore", () => {
       changePage,
       orderBy,
       deleteMember,
+      getMemberListWithoutPagination,
       debounceSearch,
+      memberList,
       pagination,
       searchInput,
       errors,

@@ -1,6 +1,6 @@
 <script setup>
 import { useTeamMemberStore } from '@/stores/teamMemberStore';
-import { onMounted, ref, watch, watchEffect } from 'vue';
+import { onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const teamMemberStore = useTeamMemberStore();
@@ -30,22 +30,10 @@ onMounted(() => {
           <div class="flex items-center justify-between px-6 py-4">
             <div class="flex items-center space-x-4">
               <h2 class="text-xl font-semibold text-gray-800">Teams</h2>
-              <RouterLink :to="{ name: 'teams.members.add', params: {teamId: '1'}}" class="rounded-lg bg-indigo-600 px-4 py-2 flex gap-2 items-center justify-center font-medium text-white hover:bg-indigo-700">
+              <RouterLink :to="{ name: 'teams.members.add', params: {teamId: $route?.params?.teamId}}" class="rounded-lg bg-indigo-600 px-4 py-2 flex gap-2 items-center justify-center font-medium text-white hover:bg-indigo-700">
                   <IconSVG name="plus-svg"/>
                   Add Team Member
               </RouterLink>
-            </div>
-            <div class="flex items-center space-x-4">
-              <div class="relative">
-                <input type="text" placeholder="Search teams..." class="rounded-lg border border-gray-300 py-2 pr-4 pl-10 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
-                <IconSVG name="search-svg" class="absolute top-3 left-3 text-gray-400"/>
-              </div>
-              <button class="rounded-full p-2 hover:bg-gray-100">
-                <i class="fas fa-bell text-gray-600"></i>
-              </button>
-              <button class="rounded-full p-2 hover:bg-gray-100">
-                <i class="fas fa-cog text-gray-600"></i>
-              </button>
             </div>
           </div>
         </header>
@@ -68,7 +56,7 @@ onMounted(() => {
             </div>
 
             <!-- Team Stats -->
-            <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-4">
+            <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
               <div class="rounded-xl bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between">
                   <h3 class="text-gray-600">Total Members</h3>
@@ -79,19 +67,11 @@ onMounted(() => {
               </div>
               <div class="rounded-xl bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between">
-                  <h3 class="text-gray-600">Active Projects</h3>
+                  <h3 class="text-gray-600">Team Leads</h3>
                   <i class="fas fa-project-diagram text-indigo-600"></i>
                 </div>
                 <p class="mt-2 text-3xl font-bold">12</p>
                 <p class="mt-2 text-sm text-green-600"><i class="fas fa-arrow-up mr-1"></i> +2 this month</p>
-              </div>
-              <div class="rounded-xl bg-white p-6 shadow-sm">
-                <div class="flex items-center justify-between">
-                  <h3 class="text-gray-600">Completed Tasks</h3>
-                  <i class="fas fa-check-circle text-indigo-600"></i>
-                </div>
-                <p class="mt-2 text-3xl font-bold">284</p>
-                <p class="mt-2 text-sm text-green-600"><i class="fas fa-arrow-up mr-1"></i> +12% this week</p>
               </div>
               <div class="rounded-xl bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between">
@@ -125,16 +105,8 @@ onMounted(() => {
                           <!-- Filters -->
                           <div class="flex gap-3">
                               <select class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
-                                  <option value="">All Status</option>
-                                  <option value="active">Active</option>
-                                  <option value="completed">Completed</option>
-                                  <option value="pending">Pending</option>
-                              </select>
-                              <select class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
-                                  <option value="">All Dates</option>
-                                  <option value="today">Today</option>
-                                  <option value="week">This Week</option>
-                                  <option value="month">This Month</option>
+                                  <option value="">All Position</option>
+                                  <option value="active">Team Lead</option>
                               </select>
                           </div>
                       </div>
