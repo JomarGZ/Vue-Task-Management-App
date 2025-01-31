@@ -1,11 +1,13 @@
 <script setup>
+import ProjectTeamModal from '@/components/ProjectTeamModal.vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
-import { onMounted, watch, watchEffect } from 'vue';
+import { onMounted, ref, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 const projectStore = useProjectStore();
 const taskStore = useTaskStore();
 const route = useRoute();
+const isModalShow = ref(false);
 watchEffect(async () => {
     projectStore.getProject({id: route?.params?.projectId})
 });
@@ -207,7 +209,12 @@ onMounted(() => {
             <div class="space-y-6">
                 <!-- Team Card -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-lg font-medium text-gray-900 mb-4">Team</h2>
+                    <div class="flex justify-between items-center mb-5">
+                        <h2 class="text-lg font-medium text-gray-900">Team</h2>
+                        <ProjectTeamModal
+                            v-model:isModalShow="isModalShow"
+                        />
+                    </div>
                     <div class="space-y-4">
                         <!-- Project Manager -->
                         <div>
@@ -425,4 +432,6 @@ onMounted(() => {
             </div>
         </div>
     </div>
+    <ProjectTeamModal/>
+
 </template>
