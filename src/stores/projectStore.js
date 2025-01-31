@@ -33,7 +33,7 @@ export const useProjectStore = defineStore("project", () => {
         to: 0,
         total: 0,
       })
-      const changePage = (pageUrl) => {
+    const changePage = (pageUrl) => {
         if (!pageUrl) return
   
         const params = new URLSearchParams(new URL(pageUrl).search)
