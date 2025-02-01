@@ -144,6 +144,8 @@ export const useProjectStore = defineStore("project", () => {
             })
             .finally(() => loading.value = false)
     }
+
+    
     return {
         getProjects,
         handleSubmit,

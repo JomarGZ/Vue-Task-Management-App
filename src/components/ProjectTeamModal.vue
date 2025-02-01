@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import Modal from './Modal.vue';
+import { useProjectTeamStore } from '@/stores/projectTeamStore';
 defineProps({
     isModalShow: Boolean
 })
+const projectTeamStore = useProjectTeamStore();
+
 defineEmits(['update:isModalShow']);
+onMounted(async () => {
+    projectTeamStore.fetchMembers();
+})
 </script>
 
 <template>
@@ -21,7 +28,6 @@ defineEmits(['update:isModalShow']);
         >
             <Modal v-if="isModalShow">
                 <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-4">
-                    <!-- Modal header -->
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-gray-900">Add Project Team</h2>
                         <button @click="$emit('update:isModalShow', false)" class="text-gray-400 hover:text-gray-500">
@@ -29,65 +35,49 @@ defineEmits(['update:isModalShow']);
                         </button>
                     </div>
 
-                    <!-- Form -->
                     <form class="space-y-6">
-                        <!-- Project Manager Section -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Project Manager</label>
                             <select class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Select Project Manager</option>
-                                <option value="1">John Doe</option>
-                                <option value="2">Jane Smith</option>
-                                <option value="3">Mike Johnson</option>
+                                <option v-for="member in projectTeamStore?.teamMembers" :key="member.id" :value="member.id">{{ member.name }}</option>
                             </select>
                         </div>
 
-                        <!-- Team Members Section -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Team Members</label>
                             <div class="space-y-3">
-                                <!-- Selected members list -->
                                 <div class="flex flex-wrap gap-2 mb-3">
-                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
-                                        Sarah Connor
-                                        <button class="ml-2 text-blue-600 hover:text-blue-800">×</button>
+                                    <span v-for="member in projectTeamStore.selectedMembers" :key="member.id" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
+                                        {{ member.name }}
+                                        <button @click="projectTeamStore.removeMember(member)" type="button" class="ml-2 text-blue-600 hover:text-blue-800">×</button>
                                     </span>
-                                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
-                                        Alex Turner
-                                        <button class="ml-2 text-blue-600 hover:text-blue-800">×</button>
-                                    </span>
+                                    
                                 </div>
-
-                                <!-- Multi-select dropdown -->
-                                <select multiple class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 h-32 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="1">David Wilson</option>
-                                    <option value="2">Emma Thompson</option>
-                                    <option value="3">Chris Anderson</option>
-                                    <option value="4">Lisa Brown</option>
-                                    <option value="5">Mark Davis</option>
-                                </select>
+                                <div class="relative mb-6">
+                                    <input
+                                        type="text"
+                                        id="searchInput"
+                                        v-model="projectTeamStore.searchQuery"
+                                        placeholder="Search team members..."
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                    <div
+                                        v-if="projectTeamStore.filteredMembers.length > 0"
+                                        class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg"
+                                    >
+                                        <div
+                                        v-for="member in projectTeamStore.filteredMembers"
+                                        :key="member.id"
+                                        @click="projectTeamStore.selectMember(member)"
+                                        class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                                        >
+                                        {{ member.name }}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="mt-2 text-sm text-gray-500">Hold Ctrl (Cmd on Mac) to select multiple members</p>
                         </div>
-
-                        <!-- Role Assignment -->
-                        <!-- <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Team Member Roles</label>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3">
-                                    <input type="text" placeholder="Member name" class="flex-1 border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <input type="text" placeholder="Role" class="flex-1 border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <button type="button" class="text-blue-600 hover:text-blue-800">
-                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <button type="button" class="mt-2 text-sm text-blue-600 hover:text-blue-800">+ Add another role</button>
-                        </div> -->
-
-                        <!-- Modal footer -->
                         <div class="flex justify-end gap-3 pt-6">
                             <button @click="$emit('update:isModalShow', false)" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                 Cancel
