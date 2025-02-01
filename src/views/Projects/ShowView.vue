@@ -1,5 +1,5 @@
 <script setup>
-import ProjectTeamModal from '@/components/ProjectTeamModal.vue';
+import AssignProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
 import { onMounted, ref, watch, watchEffect } from 'vue';
@@ -211,9 +211,19 @@ onMounted(() => {
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex justify-between items-center mb-5">
                         <h2 class="text-lg font-medium text-gray-900">Team</h2>
-                        <ProjectTeamModal
-                            v-model:isModalShow="isModalShow"
-                        />
+                        <div class="flex items-center space-x-3">
+                            <button class="hover:text-gray-800 text-gray-500">
+                                <IconSVG name="edit-svg"/>
+                            </button>
+                            <button @click="isModalShow = true" class="hover:text-gray-800 text-gray-500">
+                                <IconSVG name="plus-svg"/>
+                            </button>
+                            <AssignProjectTeamModal
+                                v-if="isModalShow"
+                                @update:isModalShow="val => isModalShow = val"
+                                :project="projectStore?.project"
+                            />
+                        </div>
                     </div>
                     <div class="space-y-4">
                         <!-- Project Manager -->
@@ -420,6 +430,4 @@ onMounted(() => {
             </div>
         </div>
     </div>
-    <ProjectTeamModal/>
-
 </template>
