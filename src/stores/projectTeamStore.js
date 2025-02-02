@@ -22,6 +22,12 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         searchQuery.value = ''; 
         fetchMembers();
     };
+    const resetSelectedMembers = () => {
+        selectedMembers.value = [];
+    };
+    const resetFilteredOutMemberIds = () => {
+        filteredOutMemberIds.value = [];
+    };
 
     const removeMember = (index) => {
         if (isExistInSelectedMembers(index)) {
@@ -96,9 +102,11 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         filteredMembers,
         isExistInSelectedMembers,
         isExistInFilteredOutMemberIds,
+        resetFilteredOutMemberIds,
         handleAssignMembers,
         selectMember,
         removeMember,
+        resetSelectedMembers,
         resetForm,
         fetchMembers,
     };

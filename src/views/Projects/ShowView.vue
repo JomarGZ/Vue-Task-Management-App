@@ -11,14 +11,12 @@ const route = useRoute();
 const isModalShow = ref(false);
 const { getInitials } = useFormatters();
 watchEffect(async () => {
-    projectStore.getProject({id: route?.params?.projectId})
+    // Fetch project when route.params.projectId changes
+    projectStore.getProject({ id: route?.params?.projectId });
+
+    // Debounce search when taskStore.searchInput changes
+    taskStore.debounceSearch(taskStore.searchInput);
 });
-watch(
-    () => taskStore.searchInput, 
-    (newSearch) => {
-        taskStore.debounceSearch(newSearch)    
-    }
-)
 
 const refetchProject = () => {
     projectStore.getProject({id: route?.params?.projectId})
@@ -28,7 +26,13 @@ onMounted(() => {
 });
 </script>
 <template>
-        <div class="max-w-7xl mx-auto">
+    <nav class="mb-8 text-sm">
+        <ol class="flex items-center space-x-2">
+            <li><RouterLink :to="{ name: 'projects.index'}" class="text-blue-600 hover:text-blue-800">Projects</RouterLink></li>
+            <li class="text-gray-500">/</li>
+        </ol>
+    </nav>
+    <div class="max-w-7xl mx-auto">
         <!-- Header with Actions -->
         <div class="mb-6 flex justify-between items-center">
             <div>
@@ -39,9 +43,9 @@ onMounted(() => {
                 <p class="mt-1 text-gray-600">Client: Acme Corporation</p>
             </div>
             <div class="flex gap-3">
-                <RouterLink :to="{ name: 'projects.index'}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
+                <RouterLink :to="{ name: 'projects.edit', params: {projectId: projectStore?.project?.id}}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
                     <i class="fas fa-edit"></i>
-                    Back
+                    Edit
                 </RouterLink>
                 <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center gap-2">
                     <i class="fas fa-trash"></i>
@@ -210,7 +214,6 @@ onMounted(() => {
                     <PaginationComponent :pagination="taskStore.pagination" size="sm" :onPageChange="taskStore.changePage"/>
                 </div>
             </div>
-
             <!-- Right Column - Team & Resources -->
             <div class="space-y-6">
                 <!-- Team Card -->
@@ -236,7 +239,7 @@ onMounted(() => {
                             <div class="flex items-center space-x-3">
                                 <div class="flex-shrink-0">
                                     <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                        <span class="text-gray-600">JD</span>
+                                        <span class="text-gray-600">{{ getInitials(projectStore?.project?.project_manager?.name) }}</span>
                                     </div>
                                 </div>
                                 <div>
