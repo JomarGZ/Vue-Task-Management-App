@@ -236,7 +236,7 @@ onMounted(() => {
                         <!-- Project Manager -->
                         <div>
                             <h3 class="text-sm font-medium text-gray-500 mb-2">Project Manager</h3>
-                            <div class="flex items-center space-x-3">
+                            <div v-if="projectStore?.project?.project_manager" class="flex items-center space-x-3">
                                 <div class="flex-shrink-0">
                                     <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
                                         <span class="text-gray-600">{{ getInitials(projectStore?.project?.project_manager?.name) }}</span>
@@ -247,11 +247,17 @@ onMounted(() => {
                                     <p class="text-sm text-gray-500">{{ projectStore?.project?.project_manager?.email }}</p>
                                 </div>
                             </div>
+                            <div v-else class="flex items-center space-x-3 ml-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Not Assigned</p>
+                                </div>
+                            </div>
                         </div>
+                        
                         <!-- Team Members -->
                         <div>
                             <h3 class="text-sm font-medium text-gray-500 mb-2">Team Members</h3>
-                            <div class="space-y-3">
+                            <div v-if="projectStore?.project?.assigned_members?.length > 0" class="space-y-3">
                                 <div v-for="member in projectStore?.project?.assigned_members" :key="member.id" class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
                                         <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -262,6 +268,11 @@ onMounted(() => {
                                         <p class="text-sm font-medium text-gray-900">{{ member.name }}</p>
                                         <p class="text-xs text-gray-500">{{ member.role }}</p>
                                     </div>
+                                </div>
+                            </div>
+                            <div v-else class="flex items-center space-x-3 ml-2">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Not Assigned</p>
                                 </div>
                             </div>
                         </div>

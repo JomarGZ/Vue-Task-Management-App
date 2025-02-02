@@ -76,7 +76,7 @@ export const useProjectStore = defineStore("project", () => {
                 if (editMode) {
                     form.name = data?.name;
                     form.description = data?.description;
-                    form.project_manager = data?.project_manager?.id
+                    form.project_manager = data?.project_manager?.id || ''
                 } 
                 project.value = data;
             })
@@ -135,7 +135,7 @@ export const useProjectStore = defineStore("project", () => {
             .then(response => {
                 resetForm()
                 showToast("Project Updated successfully");
-                router.push({name: 'projects.index'});
+                router.push({name: 'projects.show', params: {projectId: projectData?.id}});
             })
             .catch(error => {
                 if (error?.response?.status === 422) {
