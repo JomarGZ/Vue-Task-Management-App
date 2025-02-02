@@ -1,3 +1,4 @@
+import { useSweetAlert } from "@/composables/useSweetAlert2";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
@@ -7,6 +8,8 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
     const searchQuery = ref('');
     const teamMembers = ref([]); 
     const filteredOutMemberIds = ref([]);
+    const {showToast} = useSweetAlert();
+
     const filteredMembers = computed(() => {
         if (!searchQuery.value) return [];
         return teamMembers.value.filter((member) =>
@@ -15,13 +18,41 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
     });
     const selectMember = (member) => {
         selectedMembers.value.push(member);
+        filteredOutMemberIds.value.push(member.id);
         searchQuery.value = ''; 
+        fetchMembers();
     };
 
     const removeMember = (index) => {
-        selectedMembers.value.splice(index, 1);
+        if (isExistInSelectedMembers(index)) {
+            removeSelectedMember(index);
+        }
+        removeIdFromFilteredOutMemberIds(index.id);
+        fetchMembers();
     };
-    console.log(filteredOutMemberIds.value);
+    const removeSelectedMember = (index) => {
+        const foundIdIndex = selectedMembers.value.findIndex((member) => member.id === index.id);
+        if (foundIdIndex !== -1) {
+            selectedMembers.value.splice(foundIdIndex, 1);
+        }
+    }
+    const isExistInFilteredOutMemberIds = (id) => {
+        const foundIdIndex = filteredOutMemberIds.value.findIndex((filteredId) => filteredId === id);
+        if (foundIdIndex !== -1) {
+            return true;
+        }
+        return false;
+    }
+    const isExistInSelectedMembers = (element) => {
+        return selectedMembers.value.some((member) => member.id === element.id);
+    }
+    const removeIdFromFilteredOutMemberIds = (id) => {
+        const foundIdIndex = filteredOutMemberIds.value.findIndex((filteredId) => filteredId === id);
+        if (foundIdIndex !== -1) {
+            filteredOutMemberIds.value.splice(foundIdIndex, 1);
+        }
+    }
+        
   
     const resetForm = () => {
         selectedMembers.value = [];
@@ -37,11 +68,22 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         }
     };
 
-    const handleAssignMembers = async () => {
+    const handleAssignMembers = async (closeModal) => {
         try {
-            const response = await window.axios.post(`v1/projects/1/assignment`)
+            const response = await window.axios.post(
+                `v1/projects/${project.value.id}/assignment`, 
+                {assign_team_members: selectedMembers.value.map(member => member.id)}
+            )
+            fetchMembers();
+            showToast('Member assigned successfully');
+            if (closeModal && typeof closeModal === 'function') {
+                closeModal();
+            }
+            
         } catch (error) {
             console.error('Error assigning members:', error);
+            showToast('Member assigned failed', 'error');
+
         }
     }
 
@@ -52,6 +94,8 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         searchQuery,
         teamMembers,
         filteredMembers,
+        isExistInSelectedMembers,
+        isExistInFilteredOutMemberIds,
         handleAssignMembers,
         selectMember,
         removeMember,

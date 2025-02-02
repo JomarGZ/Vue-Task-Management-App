@@ -1,5 +1,6 @@
 <script setup>
 import AssignProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
+import { useFormatters } from '@/composables/useFormatters';
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
 import { onMounted, ref, watch, watchEffect } from 'vue';
@@ -8,6 +9,7 @@ const projectStore = useProjectStore();
 const taskStore = useTaskStore();
 const route = useRoute();
 const isModalShow = ref(false);
+const { getInitials } = useFormatters();
 watchEffect(async () => {
     projectStore.getProject({id: route?.params?.projectId})
 });
@@ -17,6 +19,10 @@ watch(
         taskStore.debounceSearch(newSearch)    
     }
 )
+
+const refetchProject = () => {
+    projectStore.getProject({id: route?.params?.projectId})
+}
 onMounted(() => {
     taskStore.getTasks();
 });
@@ -212,9 +218,6 @@ onMounted(() => {
                     <div class="flex justify-between items-center mb-5">
                         <h2 class="text-lg font-medium text-gray-900">Team</h2>
                         <div class="flex items-center space-x-3">
-                            <button class="hover:text-gray-800 text-gray-500">
-                                <IconSVG name="edit-svg"/>
-                            </button>
                             <button @click="isModalShow = true" class="hover:text-gray-800 text-gray-500">
                                 <IconSVG name="plus-svg"/>
                             </button>
@@ -222,6 +225,7 @@ onMounted(() => {
                                 v-if="isModalShow"
                                 @update:isModalShow="val => isModalShow = val"
                                 :project="projectStore?.project"
+                                @data-added="refetchProject"
                             />
                         </div>
                     </div>
@@ -248,7 +252,7 @@ onMounted(() => {
                                 <div v-for="member in projectStore?.project?.assigned_members" :key="member.id" class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
                                         <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <span class="text-blue-600">SW</span>
+                                            <pre class="text-blue-600">{{ getInitials(member.name) }}</pre>
                                         </div>
                                     </div>
                                     <div>

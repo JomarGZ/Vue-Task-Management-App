@@ -1,22 +1,37 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import Modal from './Modal.vue';
 import { useProjectTeamStore } from '@/stores/projectTeamStore';
 const props = defineProps({
     isModalShow: Boolean,
     project: Object
 })
+const emit = defineEmits(['update:isModalShow', 'data-added']);
 
+const onCloseModalAfterSuccess = () => {
+    emit('update:isModalShow', false);
+    emit('data-added');
+}
 const projectTeamStore = useProjectTeamStore();
 projectTeamStore.project = props.project;
+
 props?.project?.assigned_members?.forEach(element => {
-    projectTeamStore.filteredOutMemberIds.push(element.id);
-    });
-props?.project?.project_manager?.id && projectTeamStore.filteredOutMemberIds.push(props?.project?.project_manager?.id);
-defineEmits(['update:isModalShow']);
+    if (! projectTeamStore.isExistInSelectedMembers(element)) {
+        projectTeamStore.selectedMembers.push(element);
+    }
+    if (! projectTeamStore.isExistInFilteredOutMemberIds(element.id)) {
+        projectTeamStore.filteredOutMemberIds.push(element.id);
+    }
+});
+
+if (! projectTeamStore.isExistInFilteredOutMemberIds(props?.project?.project_manager?.id)) {
+    projectTeamStore.filteredOutMemberIds.push(props?.project?.project_manager?.id)
+}
 onMounted(async () => {
-   
     projectTeamStore.fetchMembers(props?.projectManagerId);
+})
+onBeforeUnmount(() => {
+    projectTeamStore.resetForm();
 })
 </script>
 
@@ -38,7 +53,7 @@ onMounted(async () => {
                             <IconSVG name="x-svg"/>
                         </button>
                     </div>
-                    <form class="space-y-6">
+                    <form @submit.prevent="projectTeamStore.handleAssignMembers(onCloseModalAfterSuccess)" class="space-y-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Team Members</label>
                             <div class="space-y-3">
