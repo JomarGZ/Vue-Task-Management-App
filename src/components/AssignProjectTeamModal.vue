@@ -28,10 +28,12 @@ if (! projectTeamStore.isExistInFilteredOutMemberIds(props?.project?.project_man
     projectTeamStore.filteredOutMemberIds.push(props?.project?.project_manager?.id)
 }
 onMounted(async () => {
-    projectTeamStore.fetchMembers(props?.projectManagerId);
+    projectTeamStore.fetchMembers();
 })
 onBeforeUnmount(() => {
     projectTeamStore.resetForm();
+    projectTeamStore.resetFilteredOutMemberIds();
+    projectTeamStore.resetSelectedMembers();
 })
 </script>
 

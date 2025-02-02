@@ -1,7 +1,7 @@
 <script setup>
 import { useMemberStore } from '@/stores/memberStore';
 import { useTeamMemberStore } from '@/stores/teamMemberStore';
-import { onMounted } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 
 const memberStore = useMemberStore();
 const teamMemberStore = useTeamMemberStore();
@@ -11,11 +11,11 @@ onMounted(() => {
 </script>
 <template>
      <nav class="mb-8 text-sm">
-            <ol class="flex items-center space-x-2">
-                <li><RouterLink :to="{ name: 'teams.show', params: {teamId: $route?.params?.teamId}}" class="text-blue-600 hover:text-blue-800">Teams</RouterLink></li>
-                <li class="text-gray-500">/</li>
-            </ol>
-      </nav>
+          <ol class="flex items-center space-x-2">
+              <li><RouterLink :to="{ name: 'teams.show', params: {teamId: $route?.params?.teamId}}" class="text-blue-600 hover:text-blue-800">Teams</RouterLink></li>
+              <li class="text-gray-500">/</li>
+          </ol>
+    </nav>
     <div class="flex-1 p-8">
       <h2 class="text-3xl font-bold text-gray-800 mb-8">Distribute Members to Teams</h2>
       <!-- Form -->

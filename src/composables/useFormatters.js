@@ -8,6 +8,7 @@ export function useFormatters() {
         return date
     }
     const getInitials  = (word) => {
+        if (!word) return;
         const splitWords = word.trim().split(' ').filter(word => word.length > 0);
         if (splitWords.length > 1) {
             return splitWords.map(word => word[0].toUpperCase()).join("");

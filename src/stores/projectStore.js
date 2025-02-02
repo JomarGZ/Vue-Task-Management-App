@@ -74,11 +74,11 @@ export const useProjectStore = defineStore("project", () => {
             .then(response => {
                 const data = response?.data?.data;
                 if (editMode) {
-                    form.name = data.name;
-                    form.description = data.description;
-                } else {
-                    project.value = data;
-                }
+                    form.name = data?.name;
+                    form.description = data?.description;
+                    form.project_manager = data?.project_manager?.id
+                } 
+                project.value = data;
             })
             .catch(error => {
                 console.error('Error on fetching project:', error);

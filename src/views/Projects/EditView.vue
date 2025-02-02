@@ -7,11 +7,12 @@ import { useRoute } from 'vue-router';
 const store = useProjectStore();
 const projectTeamStore = useProjectTeamStore();
 const route = useRoute();
+
 watchEffect(async () => {
-    store.getProject({id: route?.params?.id}, true)
+    store.getProject({id: route?.params?.projectId}, true)
 })
 onBeforeUnmount(() => {
-    store.resetForm
+    store.resetForm()
 });
 onMounted(() => {
     projectTeamStore.fetchMembers();
@@ -26,7 +27,7 @@ onMounted(() => {
         </div>
         <!-- Form -->
         <div class="bg-white rounded-lg shadow p-6">
-            <form @submit.prevent="store.updateProject({id: route?.params?.id})" class="space-y-6">
+            <form @submit.prevent="store.updateProject({id: route?.params?.projectId})" class="space-y-6">
                 <!-- Basic Information -->
                 <div class="space-y-4">
                     <h2 class="text-lg font-medium text-gray-900">Basic Information</h2>
