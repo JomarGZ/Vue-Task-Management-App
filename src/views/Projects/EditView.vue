@@ -1,9 +1,11 @@
 <script setup>
 import { useProjectStore } from '@/stores/projectStore';
-import { onBeforeUnmount, watchEffect } from 'vue';
+import { useProjectTeamStore } from '@/stores/projectTeamStore';
+import { onBeforeUnmount, onMounted, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 
 const store = useProjectStore();
+const projectTeamStore = useProjectTeamStore();
 const route = useRoute();
 watchEffect(async () => {
     store.getProject({id: route?.params?.id}, true)
@@ -11,6 +13,9 @@ watchEffect(async () => {
 onBeforeUnmount(() => {
     store.resetForm
 });
+onMounted(() => {
+    projectTeamStore.fetchMembers();
+})
 </script>
 <template>
      <div class="max-w-3xl mx-auto">
@@ -48,6 +53,13 @@ onBeforeUnmount(() => {
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Describe the project objectives and scope..."></textarea>
                         <ValidationError :errors="store.errors" field="description"/>    
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Project Manager</label>
+                        <select v-model="store.form.project_manager" class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select Project Manager</option>
+                            <option v-for="member in projectTeamStore?.teamMembers" :key="member.id" :value="member.id">{{ member.name }}</option>
+                        </select>
                     </div>
                 </div>
 

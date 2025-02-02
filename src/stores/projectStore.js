@@ -15,12 +15,14 @@ export const useProjectStore = defineStore("project", () => {
     const loading = ref(false);
     const form = reactive({
         name: '',
-        description: ''
+        description: '',
+        project_manager: ''
     });
 
     const resetForm = () => {
         form.name = '';
         form.description = '';
+        form.project_manager = '';
 
         errors.value = {}
     }
@@ -144,6 +146,8 @@ export const useProjectStore = defineStore("project", () => {
             })
             .finally(() => loading.value = false)
     }
+
+    
     return {
         getProjects,
         handleSubmit,

@@ -1,5 +1,5 @@
 <script setup>
-import ProjectTeamModal from '@/components/ProjectTeamModal.vue';
+import ProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { onMounted, watch } from 'vue';
 

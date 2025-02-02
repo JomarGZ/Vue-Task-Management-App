@@ -1,5 +1,6 @@
 <script setup>
-import ProjectTeamModal from '@/components/ProjectTeamModal.vue';
+import AssignProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
+import { useFormatters } from '@/composables/useFormatters';
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
 import { onMounted, ref, watch, watchEffect } from 'vue';
@@ -8,6 +9,7 @@ const projectStore = useProjectStore();
 const taskStore = useTaskStore();
 const route = useRoute();
 const isModalShow = ref(false);
+const { getInitials } = useFormatters();
 watchEffect(async () => {
     projectStore.getProject({id: route?.params?.projectId})
 });
@@ -17,6 +19,10 @@ watch(
         taskStore.debounceSearch(newSearch)    
     }
 )
+
+const refetchProject = () => {
+    projectStore.getProject({id: route?.params?.projectId})
+}
 onMounted(() => {
     taskStore.getTasks();
 });
@@ -211,9 +217,17 @@ onMounted(() => {
                 <div class="bg-white rounded-lg shadow p-6">
                     <div class="flex justify-between items-center mb-5">
                         <h2 class="text-lg font-medium text-gray-900">Team</h2>
-                        <ProjectTeamModal
-                            v-model:isModalShow="isModalShow"
-                        />
+                        <div class="flex items-center space-x-3">
+                            <button @click="isModalShow = true" class="hover:text-gray-800 text-gray-500">
+                                <IconSVG name="plus-svg"/>
+                            </button>
+                            <AssignProjectTeamModal
+                                v-if="isModalShow"
+                                @update:isModalShow="val => isModalShow = val"
+                                :project="projectStore?.project"
+                                @data-added="refetchProject"
+                            />
+                        </div>
                     </div>
                     <div class="space-y-4">
                         <!-- Project Manager -->
@@ -226,36 +240,24 @@ onMounted(() => {
                                     </div>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">John Doe</p>
-                                    <p class="text-sm text-gray-500">john@example.com</p>
+                                    <p class="text-sm font-medium text-gray-900">{{ projectStore?.project?.project_manager?.name }}</p>
+                                    <p class="text-sm text-gray-500">{{ projectStore?.project?.project_manager?.email }}</p>
                                 </div>
                             </div>
                         </div>
-
                         <!-- Team Members -->
                         <div>
                             <h3 class="text-sm font-medium text-gray-500 mb-2">Team Members</h3>
                             <div class="space-y-3">
-                                <div class="flex items-center space-x-3">
+                                <div v-for="member in projectStore?.project?.assigned_members" :key="member.id" class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
                                         <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <span class="text-blue-600">SW</span>
+                                            <pre class="text-blue-600">{{ getInitials(member.name) }}</pre>
                                         </div>
                                     </div>
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">Sarah Wilson</p>
-                                        <p class="text-xs text-gray-500">Lead Developer</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                                            <span class="text-green-600">TB</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Tom Brown</p>
-                                        <p class="text-xs text-gray-500">UI Designer</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ member.name }}</p>
+                                        <p class="text-xs text-gray-500">{{ member.role }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -432,6 +434,4 @@ onMounted(() => {
             </div>
         </div>
     </div>
-    <ProjectTeamModal/>
-
 </template>
