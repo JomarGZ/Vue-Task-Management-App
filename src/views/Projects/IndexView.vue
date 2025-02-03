@@ -56,7 +56,6 @@ onMounted(store.getProjects)
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -71,19 +70,19 @@ onMounted(store.getProjects)
                                     <i class="fas fa-mobile-alt text-purple-600"></i>
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ project.name }}</div>
-                                    <div class="text-sm text-gray-500">Client: TechStart</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ project?.name }}</div>
+                                    <div class="text-sm text-gray-500">Client: {{ project?.client_name }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                On Hold
+                                {{ project?.status }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                Medium
+                                {{ project?.priority }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -91,9 +90,6 @@ onMounted(store.getProjects)
                                 <div class="bg-blue-600 h-2.5 rounded-full" style="width: 30%"></div>
                             </div>
                             <span class="text-sm text-gray-600">30%</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            Mar 15, 2025
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm flex items-center font-medium space-x-2">
                             <RouterLink :to="{ name: 'projects.edit', params: {projectId: project.id}}" class="text-blue-600 hover:text-blue-900" title="Edit">
