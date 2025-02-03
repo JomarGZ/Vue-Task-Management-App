@@ -24,8 +24,8 @@ props?.project?.assigned_members?.forEach(element => {
     }
 });
 
-if (! projectTeamStore.isExistInFilteredOutMemberIds(props?.project?.project_manager?.id)) {
-    projectTeamStore.filteredOutMemberIds.push(props?.project?.project_manager?.id)
+if (! projectTeamStore.isExistInFilteredOutMemberIds(props?.project?.manager?.id)) {
+    projectTeamStore.filteredOutMemberIds.push(props?.project?.manager?.id)
 }
 onMounted(async () => {
     projectTeamStore.fetchMembers();

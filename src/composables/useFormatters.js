@@ -1,3 +1,4 @@
+import { format, parseISO } from "date-fns";
 
 export function useFormatters() {
     const formatDateWithTime = (date) => {
@@ -5,7 +6,8 @@ export function useFormatters() {
     };
 
     const formatDateOnly = (date) => {
-        return date
+        if (!date) return;
+        return format(new Date(parseISO(date)), "MM/dd/yyyy");
     }
     const getInitials  = (word) => {
         if (!word) return;

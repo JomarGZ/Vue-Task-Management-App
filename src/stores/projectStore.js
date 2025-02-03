@@ -8,6 +8,8 @@ export const useProjectStore = defineStore("project", () => {
     const errors = reactive({});
     const projects = ref(null);
     const router = useRouter();
+    const projectStatuses = ref([]);
+    const projectPriorityLevels = ref([]);
     const route = useRoute();
     const project = ref({});
     const searchInput = ref(route.query.search || '');
@@ -16,13 +18,25 @@ export const useProjectStore = defineStore("project", () => {
     const form = reactive({
         name: '',
         description: '',
-        project_manager: ''
+        manager: '',
+        client_name: '',
+        status: '',
+        priority: '',
+        started_at: '',
+        ended_at: '',
+        budget: ''
     });
 
     const resetForm = () => {
         form.name = '';
         form.description = '';
-        form.project_manager = '';
+        form.manager = '';
+        form.client_name = '';
+        form.status = '';
+        form.priority = '';
+        form.started_at = '';
+        form.ended_at = '';
+        form.budget = '';
 
         errors.value = {}
     }
@@ -74,9 +88,15 @@ export const useProjectStore = defineStore("project", () => {
             .then(response => {
                 const data = response?.data?.data;
                 if (editMode) {
-                    form.name = data?.name;
-                    form.description = data?.description;
-                    form.project_manager = data?.project_manager?.id || ''
+                    form.name = data?.name || '';
+                    form.description = data?.description || '';
+                    form.manager = data?.manager?.id || ''
+                    form.client_name = data?.client_name || ''
+                    form.status = data?.status || ''
+                    form.priority = data?.priority || ''
+                    form.started_at = data?.started_at ? data.started_at.split('T')[0] : '';
+                    form.ended_at = data?.ended_at ? data.ended_at.split('T')[0] : '';
+                    form.budget = data?.budget || ''
                 } 
                 project.value = data;
             })
@@ -122,6 +142,7 @@ export const useProjectStore = defineStore("project", () => {
                     errors.value = error.response.data.errors;
                 } else {
                     console.error('Error on adding project:', error)
+                    showToast('Project Added Failed', 'error');
                 }
             })
             .finally(() => loading.value = false);
@@ -147,6 +168,22 @@ export const useProjectStore = defineStore("project", () => {
             .finally(() => loading.value = false)
     }
 
+    const getStatuses = async () => {
+        try {
+            const response = await window.axios.get("v1/project-statuses");
+            projectStatuses.value = response?.data?.data || [];
+        } catch (error) {
+            console.error('Error on fetching project statuses', error);
+        }
+    } 
+    const getPriorityLevels = async () => {
+        try {
+            const response = await window.axios.get("v1/project-priority-levels");
+            projectPriorityLevels.value = response?.data?.data || [];
+        } catch (error) {
+            console.error('Error on fetching project statuses', error);
+        }
+    } 
     
     return {
         getProjects,
@@ -155,8 +192,12 @@ export const useProjectStore = defineStore("project", () => {
         changePage,
         getProject,
         updateProject,
+        getStatuses,
         orderBy,
+        getPriorityLevels,
         project,
+        projectPriorityLevels,
+        projectStatuses,
         debounceSearch,
         searchInput,
         loading,

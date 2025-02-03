@@ -9,7 +9,7 @@ const projectStore = useProjectStore();
 const taskStore = useTaskStore();
 const route = useRoute();
 const isModalShow = ref(false);
-const { getInitials } = useFormatters();
+const { getInitials, formatDateOnly } = useFormatters();
 watchEffect(async () => {
     // Fetch project when route.params.projectId changes
     projectStore.getProject({ id: route?.params?.projectId });
@@ -38,9 +38,9 @@ onMounted(() => {
             <div>
                 <div class="flex items-center gap-3">
                     <h1 class="text-2xl font-bold text-gray-800">{{ projectStore?.project?.name }}</h1>
-                    <span class="px-2 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                    <span class="px-2 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">{{ projectStore?.project?.status }}</span>
                 </div>
-                <p class="mt-1 text-gray-600">Client: Acme Corporation</p>
+                <p class="mt-1 text-gray-600">Client: {{ projectStore?.project?.client_name }}</p>
             </div>
             <div class="flex gap-3">
                 <RouterLink :to="{ name: 'projects.edit', params: {projectId: projectStore?.project?.id}}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
@@ -70,19 +70,19 @@ onMounted(() => {
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
                             <div>
                                 <div class="text-sm text-gray-500">Start Date</div>
-                                <div class="font-medium">Jan 15, 2024</div>
+                                <div class="font-medium">{{ formatDateOnly(projectStore?.project?.started_at) }}</div>
                             </div>
                             <div>
                                 <div class="text-sm text-gray-500">End Date</div>
-                                <div class="font-medium">Dec 31, 2024</div>
+                                <div class="font-medium">{{ formatDateOnly(projectStore?.project?.ended_at) }}</div>
                             </div>
                             <div>
                                 <div class="text-sm text-gray-500">Budget</div>
-                                <div class="font-medium">$75,000</div>
+                                <div class="font-medium">$ {{ projectStore?.project?.budget }}</div>
                             </div>
                             <div>
                                 <div class="text-sm text-gray-500">Priority</div>
-                                <div class="font-medium text-red-600">High</div>
+                                <div class="font-medium text-red-600">{{ projectStore?.project?.priority }}</div>
                             </div>
                         </div>
                     </div>
@@ -236,15 +236,15 @@ onMounted(() => {
                         <!-- Project Manager -->
                         <div>
                             <h3 class="text-sm font-medium text-gray-500 mb-2">Project Manager</h3>
-                            <div v-if="projectStore?.project?.project_manager" class="flex items-center space-x-3">
+                            <div v-if="projectStore?.project?.manager" class="flex items-center space-x-3">
                                 <div class="flex-shrink-0">
                                     <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                        <span class="text-gray-600">{{ getInitials(projectStore?.project?.project_manager?.name) }}</span>
+                                        <span class="text-gray-600">{{ getInitials(projectStore?.project?.manager?.name) }}</span>
                                     </div>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">{{ projectStore?.project?.project_manager?.name }}</p>
-                                    <p class="text-sm text-gray-500">{{ projectStore?.project?.project_manager?.email }}</p>
+                                    <p class="text-sm font-medium text-gray-900">{{ projectStore?.project?.manager?.name }}</p>
+                                    <p class="text-sm text-gray-500">{{ projectStore?.project?.manager?.email }}</p>
                                 </div>
                             </div>
                             <div v-else class="flex items-center space-x-3 ml-2">
