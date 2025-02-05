@@ -1,9 +1,10 @@
 <script setup>
+import AssignTaskModal from '@/components/AssignTaskModal.vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
-import { onMounted, watchEffect } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
-
+const isModalShow = ref(false);
 const route = useRoute();
 const projectStore = useProjectStore();
 const taskStore = useTaskStore();
@@ -124,22 +125,36 @@ watchEffect(() => {
 
                 <!-- Assignments -->
                 <div class="bg-white rounded-lg shadow-sm p-6">
-                    <h2 class="text-lg font-semibold mb-4">Assignments</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Assignments</h2>
+                        <div>
+                            <button @click="isModalShow = true"><IconSVG name="plus-svg"/></button>
+                            <AssignTaskModal 
+                                v-if="isModalShow"
+                                @update:isModalShow="val => isModalShow = val"
+                                :task="taskStore?.taskData"
+                                @taskUpdate="taskStore.getTask({id: route?.params?.taskId})"
+                            />
+                        </div>
+                    </div>
                     <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Developer</label>
-                            <div class="flex items-center space-x-2">
-                                <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Developer avatar">
-                                <span class="text-gray-900">John Doe</span>
+                        <template v-if="taskStore?.taskData?.assigned_users?.length > 0">
+                            <div 
+                                v-for="assignee in taskStore?.taskData?.assigned_users"
+                                :key="assignee.id"
+                            >
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Developer</label>
+                                <div class="flex items-center space-x-2">
+                                    <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Developer avatar">
+                                    <span class="text-gray-900">{{ assignee.name }}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">QA Engineer</label>
-                            <div class="flex items-center space-x-2">
-                                <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="QA avatar">
-                                <span class="text-gray-900">Alice Smith</span>
+                        </template>
+                        <template v-else>
+                            <div>
+                                <p>Unassigned</p>
                             </div>
-                        </div>
+                        </template>
                     </div>
                 </div>
 
