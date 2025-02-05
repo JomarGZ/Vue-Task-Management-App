@@ -64,7 +64,12 @@ onBeforeUnmount(store.resetForm)
                 <!-- Role & Access Section -->
                 <div class="space-y-4 pt-4 border-t">
                     <!-- <h2 class="text-lg font-medium text-gray-900">Role & Access</h2> -->
-
+                     <div class="bg-yellow-50 border p-2 rounded-md">
+                        <p><strong>Temporarily!</strong></p>
+                        <p>Password of the added member account</p>
+                        <p>Password: <strong>password</strong></p>
+                     </div>
+              
                     <!-- Role -->
                     <div>
                         <!-- <label for="role" class="block text-sm font-medium text-gray-700">Role</label> -->
