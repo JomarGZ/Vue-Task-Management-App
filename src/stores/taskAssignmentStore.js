@@ -1,12 +1,13 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
 import { defineStore } from "pinia";
-import { computed, reactive, ref } from "vue";
+import { computed, ref } from "vue";
 
 export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
     const loading = ref(false);
     const errors = ref({});
     const teamMembers = ref([]);
     const selectedAssignees = ref([]);
+    const selectedAssigneeToBeRemove = ref([]);
     const filteredOutMemberIds = ref([]);
     const searchQuery = ref('');
     const {showToast} = useSweetAlert();
@@ -14,6 +15,7 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
     const resetForm = () => {
         searchQuery.value = '';
         selectedAssignees.value = [];
+        selectedAssigneeToBeRemove.value = [];
         errors.value = {};
     }
     const removeSelectedAssignees = (member) => {
@@ -24,8 +26,17 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
             }
         }
     }
+    const removeAssignees = (assignee) => {
+        if (!isExistsOnSelectedAssigneesToBeRemove(assignee) && isExistsOnSelectedAssignees(assignee)) {
+            const index = selectedAssignees.value.findIndex(m => m.id === assignee.id);
+            if (index !== -1) {
+                selectedAssignees.value.splice(index, 1);
+                selectedAssigneeToBeRemove.value.push(assignee);
+            }
+        }
+    }
     const selectAssignee = (assignee) => {
-        selectedAssignees.value.push(assignee);
+        selectedAssignees.value.push(assignee);  
         searchQuery.value = '';
     }
 
@@ -51,11 +62,36 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
             showToast('Task assigned failed', 'error');
             return false;
         } catch (error) {
+            if (error?.response?.status === 422) {
+                errors.value = error?.response?.data?.errors;
+            }
             return false;
         } finally {
             loading.value = false;
         }
     }
+
+    const unassignedUserToTask = async (task) => {
+        if (loading.value) return false; 
+    
+        loading.value = true;
+        errors.value = {};
+    
+        try {
+            await unassignedRequest(task); 
+            showToast('Task unassigned successfully');
+            return true;
+        } catch (error) {
+            if (error?.response?.status == 422) {
+                showToast('Task unassigning failed', 'error');
+                errors.value = error?.response?.data?.errors;
+            }
+            console.error('Error on unassigning task:', error);
+            return false;
+        } finally {
+            loading.value = false;
+        }
+    };
 
     const initializeSelectedAssignees = (assignees) => {
         const uniqueAssignees = assignees?.filter(assignee => !isExistsOnSelectedAssignees(assignee))
@@ -64,6 +100,9 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
 
     const isExistsOnSelectedAssignees = (assignee) => {
         return selectedAssignees.value.some(a => a.id === assignee.id);
+    }
+    const isExistsOnSelectedAssigneesToBeRemove = (assignee) => {
+        return selectedAssigneeToBeRemove.value.some(a => a.id === assignee.id);
     }
 
 
@@ -74,6 +113,11 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
             .catch(error => {
                 console.error('Error on assigning task', error);
             })
+    }
+
+    const unassignedRequest = async (task) => {
+        return await window.axios.put(`v1/tasks/${task?.id}/unassignment`, 
+            {assignees: selectedAssigneeToBeRemove.value.map(assignee => assignee.id)})
     }
 
     const fetchMembers = async () => {
@@ -101,8 +145,11 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
         searchQuery,
         filteredMembers,
         loading,
+        selectedAssigneeToBeRemove,
+        unassignedUserToTask,
         fetchMembers,
         selectAssignee,
+        removeAssignees,
         initializeSelectedAssignees,
         removeSelectedAssignees,
         assignUserToTask,

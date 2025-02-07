@@ -1,9 +1,12 @@
 <script setup>
-import AssignTaskModal from '@/components/AssignTaskModal.vue';
+import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
+import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
-import { onMounted, ref, watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
+
+const isUnassignModalShow = ref(false);
 const isModalShow = ref(false);
 const route = useRoute();
 const projectStore = useProjectStore();
@@ -127,14 +130,27 @@ watchEffect(() => {
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold">Assignments</h2>
-                        <div>
-                            <button @click="isModalShow = true"><IconSVG name="plus-svg"/></button>
-                            <AssignTaskModal 
-                                v-if="isModalShow"
-                                @update:isModalShow="val => isModalShow = val"
-                                :task="taskStore?.taskData"
-                                @taskUpdate="taskStore.getTask({id: route?.params?.taskId})"
-                            />
+                        <div class="flex items-center gap-2">
+                            <div>
+                                <button @click="isUnassignModalShow = true">
+                                    <IconSVG name="minus-svg"/>
+                                </button>
+                                <UnAssignedModal
+                                    v-if="isUnassignModalShow"
+                                    @update:isUnassignModalShow="val => isUnassignModalShow = val"
+                                    :task="taskStore?.taskData"
+                                    @taskUpdate="taskStore.getTask({id: route?.params?.taskId})"
+                                />
+                            </div>
+                            <div>
+                                <button @click="isModalShow = true"><IconSVG name="plus-svg"/></button>
+                                <AssignTaskModal 
+                                    v-if="isModalShow"
+                                    @update:isModalShow="val => isModalShow = val"
+                                    :task="taskStore?.taskData"
+                                    @taskUpdate="taskStore.getTask({id: route?.params?.taskId})"
+                                />
+                            </div>
                         </div>
                     </div>
                     <div class="space-y-4">

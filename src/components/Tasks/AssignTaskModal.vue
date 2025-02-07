@@ -1,7 +1,7 @@
 <script setup>
 import { useTaskAssignmentStore } from '@/stores/taskAssignmentStore';
-import Modal from './Modal.vue';
-import { onBeforeUnmount, onMounted, watch } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
+import Modal from '../Modal.vue';
 const props = defineProps({
     isModalShow: Boolean,
     task: Object
@@ -14,11 +14,6 @@ onMounted(() => {
     taskAssignmentStore.fetchMembers();
 });
 
-watch(() => props.task, (newTask) => {
-    if (newTask) {
-        taskAssignmentStore.initializeSelectedAssignees(newTask.assigned_users);
-    }
-}, { immediate: true });
 
 const handleSubmit = async () => {
     const success = await taskAssignmentStore.assignUserToTask({id: props?.task?.id});
@@ -36,14 +31,13 @@ onBeforeUnmount(() => {
         <Modal>
             <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-4">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-900">Assign Members to task</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Assign to task</h2>
                         <button @click="$emit('update:isModalShow', false)" class="text-gray-400 hover:text-gray-500">
                             <IconSVG name="x-svg"/>
                         </button>
                     </div>
                     <form @submit.prevent="handleSubmit" class="space-y-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Team Members</label>
                             <div class="space-y-3">
                                 <div class="flex flex-wrap gap-2 mb-3">
                                     <span
