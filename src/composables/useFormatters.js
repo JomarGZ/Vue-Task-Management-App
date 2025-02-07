@@ -2,7 +2,8 @@ import { format, parseISO } from "date-fns";
 
 export function useFormatters() {
     const formatDateWithTime = (date) => {
-        return date;
+        if (!date) return ;
+        return format(new Date(parseISO(date)), "MMMM dd, yyyy hh:mm a");
     };
 
     const formatDateOnly = (date) => {

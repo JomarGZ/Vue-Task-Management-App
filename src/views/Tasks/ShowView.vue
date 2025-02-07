@@ -1,19 +1,27 @@
 <script setup>
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
+import { useFormatters } from '@/composables/useFormatters';
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
-import { ref, watchEffect } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+const { formatDateWithTime } = useFormatters();
 const isUnassignModalShow = ref(false);
 const isModalShow = ref(false);
 const route = useRoute();
 const projectStore = useProjectStore();
 const taskStore = useTaskStore();
-watchEffect(() => {
-    projectStore.getProject({id: route?.params?.projectId});
-    taskStore.getTask({id: route?.params?.taskId});
+const taskId = ref(route?.params?.taskId || null);
+
+const onStatusChange = () => {
+    taskStore.updateStatus({ id: taskId.value }).then(res => taskStore.getTask({ id: taskId.value }))
+}
+onMounted(() => {
+    taskStore.fetchStatuses();
+    taskStore.getTask({ id: taskId.value });
+    projectStore.getProject({ id: route.params.projectId });
 })
 </script>
 <template>
@@ -23,8 +31,6 @@ watchEffect(() => {
                 <li><RouterLink :to="{name: 'projects.index'}" class="text-blue-600 hover:text-blue-800">Projects</RouterLink></li>
                 <li class="text-gray-500">/</li>
                 <li><RouterLink :to="{name: 'projects.show', params: {projectId: projectStore?.project?.id}}" class="text-blue-600 hover:text-blue-800">{{ projectStore?.project?.name }}</RouterLink></li>
-                <li class="text-gray-500">/</li>
-                <li class="text-gray-500">TASK-123</li>
             </ol>
         </nav>
 
@@ -33,7 +39,6 @@ watchEffect(() => {
             <div class="flex items-start justify-between mb-4">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">{{ taskStore?.taskData?.title }}</h1>
-                    <p class="text-gray-500 mt-1">TASK-123</p>
                 </div>
                 <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">{{ taskStore?.taskData?.status }}</span>
             </div>
@@ -46,8 +51,8 @@ watchEffect(() => {
                     </svg>
                     {{ projectStore?.project?.name }}
                 </span>
-                <span>Created: {{ taskStore?.taskData?.created_at || '--.--' }}</span>
-                <span>Due: {{ taskStore?.taskData?.deadline_at || '--.--' }}</span>
+                <p>Created: <span class="text-gray-900 font-semibold">{{ formatDateWithTime(taskStore?.taskData?.created_at) || '--.--' }}</span></p>
+                <p>Due: <span class="text-gray-900 font-semibold">{{ formatDateWithTime(taskStore?.taskData?.deadline_at) || '--.--' }}</span></p>
             </div>
         </div>
 
@@ -118,11 +123,13 @@ watchEffect(() => {
                 <!-- Status -->
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <h2 class="text-lg font-semibold mb-4">Status</h2>
-                    <select class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option>To Do</option>
-                        <option selected>In Progress</option>
-                        <option>In Review</option>
-                        <option>Done</option>
+                    <select @change="onStatusChange" v-model="taskStore.selectedStatus" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option
+                            :key="status"
+                            :value="status"
+                            v-for="status in taskStore?.statuses">
+                                {{ status }}
+                        </option>
                     </select>
                 </div>
 

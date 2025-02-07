@@ -10,7 +10,8 @@ export const useTaskStore = defineStore("tasks", () => {
     const route = useRoute();
     const formatter = useFormatters();
     const taskData = ref({});
-    const statuses = reactive({});
+    const selectedStatus = ref('');
+    const statuses = ref([]);
     const priorityLevels = ref(null);
     const searchInput = ref(route.query.search || '');
     const tasks = ref({});
@@ -60,6 +61,7 @@ export const useTaskStore = defineStore("tasks", () => {
                 form.completed_at = data.completed_at;
             } else {
                 taskData.value = data;
+                selectedStatus.value = data?.status
             }
         })
     }
@@ -177,26 +179,21 @@ export const useTaskStore = defineStore("tasks", () => {
             .finally(() => (loading.value = false));
     }
     
-    async function updateStatus (status) {
-        return window.axios.put(`v1/tasks/${taskData.value.id}/status/update`, {status: status})
+    async function updateStatus (task) {
+        return window.axios.patch(`v1/tasks/${task.id}/status`, {status: selectedStatus.value})
             .then(response => {
-                updateStartedAt(response.data.data.started_at);
+                showToast("Task status updated successfully");
             })
             .catch((error) => console.log("error:", error))
     }
-
-    function updateStartedAt(startedAt) {
-        taskData.value.started_at = startedAt;
-    }
-
     
     async function fetchStatuses () {
         return window.axios.get('v1/tasks-statuses')
             .then((response) => {
-                statuses.value = response.data.statuses;
+                statuses.value = response?.data?.data;
             })
             .catch((error) => {
-                console.log("errors",error)
+                console.error("errors",error)
             });
     }
     async function fetchPriorityLevels () {
@@ -242,6 +239,7 @@ export const useTaskStore = defineStore("tasks", () => {
         getTasks,
         resetForm,
         resetTaskData,
+        selectedStatus,
         debounceSearch,
         priorityLevels,
         searchInput,
