@@ -70,7 +70,7 @@ onBeforeUnmount(() => {
                                     taskAssignmentStore.loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'
                               ]">
                                 <IconSpinner v-if="taskAssignmentStore.loading"/>
-                                Assign to task
+                                Unassign to task
                             </button>
                         </div>
                     </form>
