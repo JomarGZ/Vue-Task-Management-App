@@ -12,7 +12,7 @@ export const useTaskStore = defineStore("tasks", () => {
     const taskData = ref({});
     const selectedStatus = ref('');
     const statuses = ref([]);
-    const priorityLevels = ref(null);
+    const priorityLevels = ref([]);
     const searchInput = ref(route.query.search || '');
     const tasks = ref({});
     const loading = ref(false);
@@ -22,10 +22,10 @@ export const useTaskStore = defineStore("tasks", () => {
     const form = reactive({
         title: "",
         description: "",
-        category_id: "",
+        priority_level: "",
         deadline_at: "",
         completed_at: "",
-        status: "not started",
+        status: "",
 
     });
 
@@ -49,16 +49,16 @@ export const useTaskStore = defineStore("tasks", () => {
        }, 300)
 
 
-    async function getTask(task, editMode = false) {
+    const getTask = async (task, editMode = false) => {
         window.axios.get(`v1/tasks/${task.id}`).then(response => {
             const data = response.data.data;
             if (editMode) {
-                form.title = data.title;
-                form.description = data.description;
-                form.status = data.status;
-                form.deadline_at = formatter.formatDateOnly(data.deadline_at);
-                form.category_id = data.category?.id;
-                form.completed_at = data.completed_at;
+                form.title = data?.title;
+                form.description = data?.description;
+                form.status = data?.status;
+                form.deadline_at = data?.deadline_at;
+                form.priority_level = data?.priority_level
+                form.completed_at = data?.completed_at;
             } else {
                 taskData.value = data;
                 selectedStatus.value = data?.status
@@ -148,19 +148,16 @@ export const useTaskStore = defineStore("tasks", () => {
         errors.value = {};
         loading.value = true;
 
-        return window.axios.put(`v1/tasks/${task.id}`, form)
-            .then(() => {
-                router.push({ name : 'tasks.index' })
-            })
-            .catch(error => {
-                console.log("errors", error)
-                if (error.response.status === 422) {
-                    errors.value = error.response.data.errors;
-                }
-            })
-            .finally(() => {
-                loading.value = false;
-            })
+        updateRequest(task).then(response => {
+            showToast('Task updated successfully')
+            const data = response?.data?.data;
+            if (data) {
+                taskData.value = response?.data?.data;
+            }
+        })
+        .finally(() => {
+            loading.value = false
+        })
     }
 
     async function deleteTask(task) {
@@ -183,6 +180,10 @@ export const useTaskStore = defineStore("tasks", () => {
         return window.axios.patch(`v1/tasks/${task.id}/status`, {status: selectedStatus.value})
             .then(response => {
                 showToast("Task status updated successfully");
+                const data = response?.data?.data;
+                if (data) {
+                    taskData.value = data;
+                }
             })
             .catch((error) => console.log("error:", error))
     }
@@ -197,9 +198,9 @@ export const useTaskStore = defineStore("tasks", () => {
             });
     }
     async function fetchPriorityLevels () {
-        return window.axios.get('v1/tasks-priority-levels')
+        return window.axios.get('v1/task-priority-levels')
             .then((response) => {
-                priorityLevels.value = response.data.priority_levels;
+                priorityLevels.value = response?.data?.data || [];
             })
             .catch((error) => {
                 console.error("there is an error on fetching the priority levels:", error)
@@ -217,6 +218,15 @@ export const useTaskStore = defineStore("tasks", () => {
             })
     }
 
+    const updateRequest = async (task) => {
+        return window.axios.put(`v1/tasks/${task.id}`, form)
+            .catch(error => {
+                console.error("errors", error)
+                if (error.response.status === 422) {
+                    errors.value = error.response.data.errors;
+                }
+            })
+    }
 
     async function fetchCategories () {
         return window.axios.get('v1/categories')

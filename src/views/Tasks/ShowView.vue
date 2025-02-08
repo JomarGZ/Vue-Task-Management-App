@@ -1,22 +1,24 @@
 <script setup>
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
+import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { useProjectStore } from '@/stores/projectStore';
 import { useTaskStore } from '@/stores/taskStore';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const { formatDateWithTime } = useFormatters();
 const isUnassignModalShow = ref(false);
 const isModalShow = ref(false);
+const isEditTaskModalShow = ref(false);
 const route = useRoute();
 const projectStore = useProjectStore();
 const taskStore = useTaskStore();
-const taskId = ref(route?.params?.taskId || null);
+const taskId = computed(() => route?.params?.taskId);
 
 const onStatusChange = () => {
-    taskStore.updateStatus({ id: taskId.value }).then(res => taskStore.getTask({ id: taskId.value }))
+    taskStore.updateStatus({ id: taskId.value });
 }
 onMounted(() => {
     taskStore.fetchStatuses();
@@ -26,12 +28,22 @@ onMounted(() => {
 </script>
 <template>
         <!-- Breadcrumb -->
-        <nav class="mb-8 text-sm">
+        <nav class="mb-8 text-sm flex items-center justify-between">
             <ol class="flex items-center space-x-2">
                 <li><RouterLink :to="{name: 'projects.index'}" class="text-blue-600 hover:text-blue-800">Projects</RouterLink></li>
                 <li class="text-gray-500">/</li>
                 <li><RouterLink :to="{name: 'projects.show', params: {projectId: projectStore?.project?.id}}" class="text-blue-600 hover:text-blue-800">{{ projectStore?.project?.name }}</RouterLink></li>
             </ol>
+            <div>
+                <button @click="isEditTaskModalShow = true">
+                    <IconSVG name="edit-svg"/>
+                </button>
+                <TaskEditModal
+                    v-if="isEditTaskModalShow"
+                    @update:isEditTaskModalShow="val => isEditTaskModalShow = val"
+                    :task="taskStore?.taskData"
+                />
+            </div>
         </nav>
 
         <!-- Task Header -->
@@ -185,17 +197,17 @@ onMounted(() => {
                 <div class="bg-white rounded-lg shadow-sm p-6">
                     <h2 class="text-lg font-semibold mb-4">Details</h2>
                     <div class="space-y-3 text-sm">
-                        <div>
+                        <div v-if="taskStore?.taskData?.priority_level">
                             <span class="text-gray-500">Priority:</span>
                             <span class="ml-2 text-gray-900">{{ taskStore?.taskData?.priority_level }}</span>
                         </div>
-                        <div>
-                            <span class="text-gray-500">Story Points:</span>
-                            <span class="ml-2 text-gray-900">5</span>
+                        <div v-if="taskStore?.taskData?.started_at">
+                            <span class="text-gray-500">started on:</span>
+                            <span class="ml-2 text-gray-900">{{ taskStore?.taskData?.started_at }}</span>
                         </div>
-                        <div>
-                            <span class="text-gray-500">Sprint:</span>
-                            <span class="ml-2 text-gray-900">Sprint 23</span>
+                        <div v-if="taskStore?.taskData?.deadline_at">
+                            <span class="text-gray-500">Deadline:</span>
+                            <span class="ml-2 text-gray-900">{{ taskStore?.taskData?.deadline_at }}</span>
                         </div>
                     </div>
                 </div>
