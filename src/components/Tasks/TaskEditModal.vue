@@ -1,5 +1,5 @@
 <script setup>
-import { useTaskStore } from '@/stores/taskStore';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import Modal from '../Modal.vue';
 import { onBeforeUnmount, onMounted } from 'vue';
 const props = defineProps({
@@ -8,7 +8,7 @@ const props = defineProps({
 })
 const editMode = true;
 const emit = defineEmits(['update:isEditTaskModalShow']);
-const taskStore = useTaskStore();
+const taskStore = useProjectTaskStore();
 const handleEditSubmit = () => {
     taskStore.updateTask({id: props?.task?.id}).then(() => {
         emit('update:isEditTaskModalShow', false);

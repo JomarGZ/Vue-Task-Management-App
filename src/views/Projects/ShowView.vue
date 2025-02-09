@@ -2,11 +2,11 @@
 import AssignProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { useProjectStore } from '@/stores/projectStore';
-import { useTaskStore } from '@/stores/taskStore';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { onMounted, ref, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 const projectStore = useProjectStore();
-const taskStore = useTaskStore();
+const taskStore = useProjectTaskStore();
 const route = useRoute();
 const isModalShow = ref(false);
 const { getInitials, formatDateOnly } = useFormatters();

@@ -1,11 +1,11 @@
 <script setup>
 import { useProjectStore } from '@/stores/projectStore';
-import { useTaskStore } from '@/stores/taskStore';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { onBeforeUnmount, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const projectStore = useProjectStore();
-const taskStore = useTaskStore();
+const taskStore = useProjectTaskStore();
 watchEffect(() => {
 projectStore.getProject({id: route?.params?.projectId});
 });
