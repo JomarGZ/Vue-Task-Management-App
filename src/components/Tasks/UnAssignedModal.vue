@@ -69,7 +69,7 @@ onBeforeUnmount(() => {
                                     'flex items-center gap-2 px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
                                     taskAssignmentStore.loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'
                               ]">
-                                <IconSpinner v-if="taskAssignmentStore.loading"/>
+                                <IconSpinner name="white-spinner" v-if="taskAssignmentStore.loading"/>
                                 Unassign to task
                             </button>
                         </div>

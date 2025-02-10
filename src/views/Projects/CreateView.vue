@@ -133,7 +133,7 @@ onMounted(() => {
                             'bg-blue-600 hover:bg-blue-700':! store.loading,
                             'bg-blue-300': store.loading,
                         }">
-                        <IconSpinner v-if="store.loading"/>
+                        <IconSpinner name="white-spinner" v-if="store.loading"/>
                         Create Project
                     </button>
                 </div>

@@ -1,12 +1,11 @@
 <script setup>
-import { useFormatters } from '@/composables/useFormatters';
+import { formatDateOnly } from '@/composables/useFormatters';
+import { capWords } from '@/composables/useUtil';
 import { computed } from 'vue';
-
 
 const props = defineProps({
     task: Object
 })
-const {formatDateOnly} = useFormatters();
 const hasAssignees = computed(() => props.task?.assigned_users?.length > 0);
 
 const formattedDeadline = computed(() => {
@@ -23,7 +22,7 @@ const formattedDeadline = computed(() => {
                     <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ task?.project?.name }}</span>
                     <h3 class="text-lg font-medium text-gray-900">{{ task?.title }}</h3>
                 </div>
-                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ task?.status }}</span>
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ capWords(task?.status) }}</span>
             </div>
             
             <p class="text-gray-600 mb-4">{{ task?.description }}</p>

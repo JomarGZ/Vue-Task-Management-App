@@ -120,7 +120,7 @@ onBeforeUnmount(() => {
                             'bg-indigo-300': taskStore.loading 
                             }"
                         >
-                            <IconSpinner v-if="taskStore.loading"/>
+                            <IconSpinner name="white-spinner" v-if="taskStore.loading"/>
                             Update
                         </button>
                     </div>

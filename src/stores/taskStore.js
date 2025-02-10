@@ -1,13 +1,15 @@
-import { useUtil } from "@/composables/useUtil";
+import { getPageNumber, useUtil } from "@/composables/useUtil";
 import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 
 export const useTaskStore = defineStore('tasks', () => {
-    const { getPageNumber, updateRouteParams, replaceParams } = useUtil();
+    const { updateRouteParams, replaceParams } = useUtil();
     const route = useRoute();
     const statuses = ref([]);
+    const loading = ref(false);
+    const isError = ref(false);
     const tasks = ref([]);
     const priorityLevels = ref([]);
     const selectedAssigneeId = ref(route?.params?.assigneeId || '');
@@ -44,19 +46,28 @@ export const useTaskStore = defineStore('tasks', () => {
         return replaceParams(newSearch).then(() => fetchTasks())
     }, 300);
 
+    const updatePagination = (meta) => {
+        pagination.current_page = meta.current_page || 1;
+        pagination.links = meta.links || {};
+        pagination.last_page = meta.last_page || 0;
+        pagination.total = meta.total || 0;
+        pagination.from = meta.from || 0;
+        pagination.to = meta.to || 0;
+    }
     const fetchTasks = async () => {
+        if (loading.value) return;
+
+        loading.value = true;
+        isError.value = false;
         getTasks().then(response => {
             const data = response?.data;
+            loading.value = false;
             if (data) {
-                tasks.value = data?.data;
-                pagination.current_page = data?.meta?.current_page || 1;
-                pagination.links = data?.meta?.links || {};
-                pagination.last_page = data?.meta?.last_page || 0;
-                pagination.total = data?.meta?.total || 0;
-                pagination.from = data?.meta?.from || 0;
-                pagination.to = data?.meta?.to || 0;
+                tasks.value = data.data;
+                updatePagination(data?.meta || {});
             }
-        })
+        }).catch((error) => isError.value = true)
+        .finally(() => loading.value = false)
     }
 
     const getTasks = async () => {
@@ -94,6 +105,8 @@ export const useTaskStore = defineStore('tasks', () => {
         priorityLevels,
         selectedAssigneeId,
         statuses,
+        isError,
+        loading,
         selectedPriority,
         selectedStatus,
         resetFilters,
