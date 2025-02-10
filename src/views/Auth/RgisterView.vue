@@ -46,7 +46,7 @@ onBeforeUnmount(store.resetForm);
                     'bg-blue-600 hover:bg-blue-700': ! store.loading,
                     'bg-blue-300': store.loading
                 }">
-                <IconSpinner v-show="store.loading" class="animate-spin h-5 w-5"/>
+                <IconSpinner name="white-spinner" v-show="store.loading" class="animate-spin h-5 w-5"/>
                     Create Account
                 </button>
             </form>

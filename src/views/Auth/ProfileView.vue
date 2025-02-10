@@ -60,7 +60,7 @@ onBeforeUnmount(() => {
                     :disabled="storeUpdateProfile.loading"
                     class="w-full bg-blue-500 text-white py-2 mt-3 rounded-md hover:bg-blue-600 transition duration-300"
                 >
-                    <IconSpinner v-show="storeUpdateProfile.loading"/>
+                    <IconSpinner name="white-spinner" v-show="storeUpdateProfile.loading"/>
                     Save Personal Info
                 </button>
             </form>
@@ -122,7 +122,7 @@ onBeforeUnmount(() => {
                     :disabled="storeUpdatePassword.loading"
                     class="w-full bg-green-500 mt-3 text-white py-2 rounded-md hover:bg-green-600 transition duration-300"
                 >
-                    <IconSpinner v-show="storeUpdatePassword.loading"/>
+                    <IconSpinner name="white-spinner" v-show="storeUpdatePassword.loading"/>
                     Change Password
                 </button>
             </form>

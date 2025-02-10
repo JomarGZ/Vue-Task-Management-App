@@ -89,16 +89,18 @@ onBeforeUnmount(() => taskStore.resetFilters());
 
     <!-- Tasks List -->
     <div class="bg-white rounded-lg shadow-sm">
-        <template v-if="taskStore.tasks.length > 0">
-            <TaskItem
-                :key="task.id"
-                v-for="task in taskStore.tasks"
-                :task="task"
-            />
+        <div v-if="taskStore.loading" class="flex items-center justify-center w-full p-4">
+            <IconSpinner class="h-10 w-10 text-gray-500 opacity-30" name="custom-spinner" />
+        </div>
+        <div v-else-if="taskStore.isError" class="flex items-center justify-center w-full p-4">
+            <p>Failed to load tasks</p>
+        </div>
+        <template v-else-if="taskStore.tasks.length > 0">
+            <TaskItem v-for="task in taskStore.tasks" :key="task.id" :task="task" />
         </template>
-        <template v-else>
-            <p class="text-center text-gray-500">No tasks found.</p>
-        </template>
+        <div v-else class="flex items-center justify-center w-full p-4">
+            <p>No Task Found</p>
+        </div>
     </div>
     <!-- Pagination -->
    <PaginationArrow :pagination="taskStore?.pagination" :onChangePage="taskStore.changePage"/>
