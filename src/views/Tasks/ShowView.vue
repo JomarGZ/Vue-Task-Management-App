@@ -4,7 +4,7 @@ import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
 import { useFormatters } from '@/composables/useFormatters';
 import { useProjectStore } from '@/stores/projectStore';
-import { useTaskStore } from '@/stores/taskStore';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -14,7 +14,7 @@ const isModalShow = ref(false);
 const isEditTaskModalShow = ref(false);
 const route = useRoute();
 const projectStore = useProjectStore();
-const taskStore = useTaskStore();
+const taskStore = useProjectTaskStore();
 const taskId = computed(() => route?.params?.taskId);
 
 const onStatusChange = () => {
