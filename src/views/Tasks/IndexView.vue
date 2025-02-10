@@ -44,7 +44,7 @@ onBeforeUnmount(() => taskStore.resetFilters());
     <div class="mx-auto p-6">
     <!-- Page Header -->
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Tasks</h1>
+        <h1 class="text-2xl font-bold text-gray-800">Tasks Management</h1>
     </div>
     <!-- Filters Section -->
     <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -99,9 +99,7 @@ onBeforeUnmount(() => taskStore.resetFilters());
         <template v-else>
             <p class="text-center text-gray-500">No tasks found.</p>
         </template>
-
     </div>
-
     <!-- Pagination -->
    <PaginationArrow :pagination="taskStore?.pagination" :onChangePage="taskStore.changePage"/>
 </div>
