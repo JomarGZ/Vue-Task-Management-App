@@ -1,14 +1,13 @@
 <script setup>
 import PaginationArrow from '@/components/PaginationArrow.vue';
 import TaskItem from '@/components/tasks/TaskItem.vue';
-import { useUtil } from '@/composables/useUtil';
+import { capWords } from '@/composables/useUtil';
 import { useMemberStore } from '@/stores/memberStore';
 import { useTaskStore } from '@/stores/taskStore';
 import { onBeforeUnmount, onMounted, watch } from 'vue';
 
 const taskStore = useTaskStore();
 const memberStore = useMemberStore();
-const { capWords } = useUtil();
 
 const handleSearch = (newSearch, oldSearch) => {
     if (newSearch !== oldSearch) {

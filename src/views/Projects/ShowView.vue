@@ -1,28 +1,25 @@
 <script setup>
 import AssignProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
-import { useFormatters } from '@/composables/useFormatters';
+import { formatDateOnly, getInitials } from '@/composables/useFormatters';
+import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { onMounted, ref, watch, watchEffect } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 const projectStore = useProjectStore();
-const taskStore = useProjectTaskStore();
+const projectTaskStore = useProjectTaskStore();
 const route = useRoute();
 const isModalShow = ref(false);
-const { getInitials, formatDateOnly } = useFormatters();
 watchEffect(async () => {
-    // Fetch project when route.params.projectId changes
     projectStore.getProject({ id: route?.params?.projectId });
-
-    // Debounce search when taskStore.searchInput changes
-    taskStore.debounceSearch(taskStore.searchInput);
+    projectTaskStore.debounceSearch(projectTaskStore.searchInput);
 });
 
 const refetchProject = () => {
     projectStore.getProject({id: route?.params?.projectId})
 }
 onMounted(() => {
-    taskStore.getTasks();
+    projectTaskStore.getTasks();
 });
 </script>
 <template>
@@ -38,7 +35,7 @@ onMounted(() => {
             <div>
                 <div class="flex items-center gap-3">
                     <h1 class="text-2xl font-bold text-gray-800">{{ projectStore?.project?.name }}</h1>
-                    <span class="px-2 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">{{ projectStore?.project?.status }}</span>
+                    <span class="px-2 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">{{ capWords(projectStore?.project?.status) }}</span>
                 </div>
                 <p class="mt-1 text-gray-600">Client: {{ projectStore?.project?.client_name }}</p>
             </div>
@@ -161,7 +158,7 @@ onMounted(() => {
                             <!-- Search -->
                             <div class="relative flex-1">
                                 <input
-                                    v-model="taskStore.searchInput" 
+                                    v-model="projectTaskStore.searchInput" 
                                     type="text" 
                                     placeholder="Search tasks..." 
                                     class="w-full pl-10 pr-4 py-2.5 bg-white rounded-lg border-0 focus:ring-2 focus:ring-blue-500 text-gray-900 text-sm"
@@ -189,7 +186,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <div class="space-y-4">
-                        <div v-for="task in taskStore?.tasks" :key="task.id" class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
+                        <div v-for="task in projectTaskStore?.tasks" :key="task.id" class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
                             <RouterLink :to="{name: 'tasks.show', params: {taskId: task.id, projectId: projectStore?.project?.id}}" class="flex items-center justify-between">
                                 <div class="flex items-center space-x-4">
                                     <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
@@ -199,7 +196,7 @@ onMounted(() => {
                                     </span>
                                     <div>
                                         <h3 class="text-sm font-medium text-gray-900">{{ task.title }}</h3>
-                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">{{ task.status }}</span>
+                                        <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">{{ capWords(task.status) }}</span>
                                     </div>
                                 </div>
                                 <div class="text-right">
@@ -211,7 +208,7 @@ onMounted(() => {
                             </RouterLink>
                         </div>
                     </div>
-                    <PaginationComponent :pagination="taskStore.pagination" size="sm" :onPageChange="taskStore.changePage"/>
+                    <PaginationComponent :pagination="projectTaskStore.pagination" size="sm" :onPageChange="projectTaskStore.changePage"/>
                 </div>
             </div>
             <!-- Right Column - Team & Resources -->

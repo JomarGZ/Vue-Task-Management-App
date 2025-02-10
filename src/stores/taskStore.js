@@ -1,11 +1,11 @@
-import { useUtil } from "@/composables/useUtil";
+import { getPageNumber, useUtil } from "@/composables/useUtil";
 import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 
 export const useTaskStore = defineStore('tasks', () => {
-    const { getPageNumber, updateRouteParams, replaceParams } = useUtil();
+    const { updateRouteParams, replaceParams } = useUtil();
     const route = useRoute();
     const statuses = ref([]);
     const loading = ref(false);

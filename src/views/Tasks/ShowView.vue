@@ -2,13 +2,13 @@
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
 import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
-import { useFormatters } from '@/composables/useFormatters';
+import { formatDateWithTime } from '@/composables/useFormatters';
+import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-const { formatDateWithTime } = useFormatters();
 const isUnassignModalShow = ref(false);
 const isModalShow = ref(false);
 const isEditTaskModalShow = ref(false);
@@ -52,7 +52,7 @@ onMounted(() => {
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">{{ taskStore?.taskData?.title }}</h1>
                 </div>
-                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">{{ taskStore?.taskData?.status }}</span>
+                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">{{ capWords(taskStore?.taskData?.status) }}</span>
             </div>
 
             <!-- Project Info -->
@@ -140,7 +140,7 @@ onMounted(() => {
                             :key="status"
                             :value="status"
                             v-for="status in taskStore?.statuses">
-                                {{ status }}
+                                {{ capWords(status) }}
                         </option>
                     </select>
                 </div>
@@ -199,7 +199,7 @@ onMounted(() => {
                     <div class="space-y-3 text-sm">
                         <div v-if="taskStore?.taskData?.priority_level">
                             <span class="text-gray-500">Priority:</span>
-                            <span class="ml-2 text-gray-900">{{ taskStore?.taskData?.priority_level }}</span>
+                            <span class="ml-2 text-gray-900">{{ capWords(taskStore?.taskData?.priority_level) }}</span>
                         </div>
                         <div v-if="taskStore?.taskData?.started_at">
                             <span class="text-gray-500">started on:</span>
