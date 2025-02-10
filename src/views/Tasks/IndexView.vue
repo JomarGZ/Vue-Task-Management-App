@@ -1,13 +1,44 @@
 <script setup>
 import PaginationArrow from '@/components/PaginationArrow.vue';
 import TaskItem from '@/components/tasks/TaskItem.vue';
+import { useUtil } from '@/composables/useUtil';
+import { useMemberStore } from '@/stores/memberStore';
 import { useTaskStore } from '@/stores/taskStore';
-import { onMounted } from 'vue';
+import { onBeforeUnmount, onMounted, watch } from 'vue';
 
 const taskStore = useTaskStore();
-onMounted(() => {
-    taskStore.fetchTasks();
-})
+const memberStore = useMemberStore();
+const { capWords } = useUtil();
+
+const handleSearch = (newSearch, oldSearch) => {
+    if (newSearch !== oldSearch) {
+        taskStore.debounceSearch({search: newSearch});
+    }
+}
+const handleFilterChange =  ([selectedPriority, selectedStatus, selectedAssigneeId]) => {
+    taskStore.onChangeFilter({
+        priority_level: selectedPriority,
+        status: selectedStatus,
+        assigneeId: selectedAssigneeId
+    });
+}
+watch(() => taskStore.searchInput, handleSearch);
+
+watch(() => [
+    taskStore.selectedPriority, 
+    taskStore.selectedStatus,
+    taskStore.selectedAssigneeId
+], handleFilterChange);
+
+onMounted(async () => {
+    await Promise.all([
+        taskStore.fetchTasks(),
+        taskStore.fetchStatuses(),
+        taskStore.fetchPriorityLevels(),
+        memberStore.getMemberListWithoutPagination()
+    ]);
+});
+onBeforeUnmount(() => taskStore.resetFilters());
 </script>
 <template>
     <div class="mx-auto p-6">
@@ -20,8 +51,9 @@ onMounted(() => {
         <div class="mb-4">
             <div class="relative">
                 <input type="text" 
-                       placeholder="Search tasks..." 
-                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    v-model="taskStore.searchInput"
+                    placeholder="Search tasks..." 
+                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                 >
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
@@ -31,47 +63,25 @@ onMounted(() => {
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <!-- Project Filter -->
-            <div class="relative">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Project</label>
-                <select class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Select Project</option>
-                    <option value="1">E-commerce Platform</option>
-                    <option value="2">Mobile Banking App</option>
-                    <option value="3">CRM System</option>
-                </select>
-            </div>
-
-            <!-- Developer Filter -->
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Assignees</label>
-                <select class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select v-model="taskStore.selectedAssigneeId" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Select Assignee</option>
-                    <option value="1">Sarah Chen</option>
-                    <option value="2">Mike Brown</option>
-                    <option value="3">Lisa Thompson</option>
+                    <option v-for="member in memberStore.memberList" :key="member.id" :value="member.id">{{ capWords(member.name) }}</option>
                 </select>
             </div>
-
-            <!-- QA Filter -->
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Priority Levels</label>
-                <select class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select v-model="taskStore.selectedPriority" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Select Priority</option>
-                    <option value="1">John Doe</option>
-                    <option value="2">Jane Smith</option>
+                    <option v-for=" priority in taskStore?.priorityLevels" :key="priority" :value="priority">{{ capWords(priority) }}</option>
                 </select>
             </div>
-
-            <!-- Status Filter -->
             <div class="relative">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select v-model="taskStore.selectedStatus" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Select Status</option>
-                    <option value="todo">To Do</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="in_review">In Review</option>
-                    <option value="done">Done</option>
+                    <option v-for="status in taskStore?.statuses" :key="status" :value="status">{{ capWords(status) }}</option>
                 </select>
             </div>
         </div>
