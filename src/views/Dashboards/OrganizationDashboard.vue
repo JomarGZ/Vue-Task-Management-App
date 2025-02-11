@@ -125,84 +125,134 @@
                 </div>
             </div>
         </div>
-
-          <!-- Task Distribution -->
-          <div class="grid grid-cols-2 gap-6">
-            <div class="rounded-xl bg-white p-6 shadow-sm">
-              <h3 class="mb-4 text-lg font-semibold">Task Categories</h3>
-              <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                  <span class="text-gray-600">Development</span>
-                  <div class="h-2 w-32 rounded-full bg-gray-200">
-                    <div class="h-2 w-3/4 rounded-full bg-purple-500"></div>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="text-gray-600">Design</span>
-                  <div class="h-2 w-32 rounded-full bg-gray-200">
-                    <div class="h-2 w-1/2 rounded-full bg-pink-500"></div>
-                  </div>
-                </div>
-                <div class="flex items-center justify-between">
-                  <span class="text-gray-600">Marketing</span>
-                  <div class="h-2 w-32 rounded-full bg-gray-200">
-                    <div class="h-2 w-1/4 rounded-full bg-blue-500"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="rounded-xl bg-white p-6 shadow-sm">
-              <h3 class="mb-4 text-lg font-semibold">Priority Distribution</h3>
-              <div class="flex h-32 items-center justify-between">
-                <div class="flex flex-col items-center">
-                  <div class="w-16 rounded-t-lg bg-red-100" style="height: 80%;">
-                    <div class="w-full rounded-t-lg bg-red-500" style="height: 70%;"></div>
-                  </div>
-                  <span class="mt-2 text-sm">High</span>
-                </div>
-                <div class="flex flex-col items-center">
-                  <div class="w-16 rounded-t-lg bg-yellow-100" style="height: 80%;">
-                    <div class="w-full rounded-t-lg bg-yellow-500" style="height: 45%;"></div>
-                  </div>
-                  <span class="mt-2 text-sm">Medium</span>
-                </div>
-                <div class="flex flex-col items-center">
-                  <div class="w-16 rounded-t-lg bg-green-100" style="height: 80%;">
-                    <div class="w-full rounded-t-lg bg-green-500" style="height: 25%;"></div>
-                  </div>
-                  <span class="mt-2 text-sm">Low</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Recent Activity -->
           <div class="rounded-xl bg-white p-6 shadow-sm">
             <h2 class="mb-4 text-xl font-semibold">Recent Activity</h2>
+
+            <!-- Search and Filters -->
+            <div class="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+              <!-- Search Box -->
+              <div class="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search tasks..."
+                  class="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+
+              <!-- Status Filter -->
+              <div>
+                <select
+                  class="rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">All Statuses</option>
+                  <option value="completed">Completed</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+
+              <!-- Priority Filter -->
+              <div>
+                <select
+                  class="rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">All Priorities</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Activity List -->
             <div class="space-y-4">
+              <!-- Activity Item 1 -->
               <div class="flex items-start gap-4">
                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 text-blue-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
                   </svg>
                 </div>
                 <div>
                   <p class="font-medium">New task created: "Update User Interface"</p>
                   <p class="text-sm text-gray-500">2 hours ago</p>
+                  <div class="mt-1 flex space-x-2">
+                    <span class="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-600">In Progress</span>
+                    <span class="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-600">Medium</span>
+                  </div>
                 </div>
               </div>
+
+              <!-- Activity Item 2 -->
               <div class="flex items-start gap-4">
                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 text-green-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <div>
                   <p class="font-medium">Task completed: "Database Optimization"</p>
                   <p class="text-sm text-gray-500">4 hours ago</p>
+                  <div class="mt-1 flex space-x-2">
+                    <span class="rounded-full bg-green-100 px-2 py-1 text-xs text-green-600">Completed</span>
+                    <span class="rounded-full bg-red-100 px-2 py-1 text-xs text-red-600">High</span>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-6 flex justify-center">
+              <nav class="inline-flex space-x-2">
+                <a
+                  href="#"
+                  class="rounded-md bg-blue-100 px-3 py-1 text-sm text-blue-600 hover:bg-blue-200"
+                >
+                  1
+                </a>
+                <a
+                  href="#"
+                  class="rounded-md px-3 py-1 text-sm text-gray-500 hover:bg-gray-100"
+                >
+                  2
+                </a>
+                <a
+                  href="#"
+                  class="rounded-md px-3 py-1 text-sm text-gray-500 hover:bg-gray-100"
+                >
+                  3
+                </a>
+                <span class="px-3 py-1 text-sm text-gray-500">...</span>
+                <a
+                  href="#"
+                  class="rounded-md px-3 py-1 text-sm text-gray-500 hover:bg-gray-100"
+                >
+                  10
+                </a>
+              </nav>
             </div>
           </div>
         </div>
@@ -294,6 +344,52 @@
               </div>
             </div>
           </div>
+          <div class="rounded-xl bg-white p-6 shadow-sm">
+              <h3 class="mb-4 text-lg font-semibold">Task Categories</h3>
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Development</span>
+                  <div class="h-2 w-32 rounded-full bg-gray-200">
+                    <div class="h-2 w-3/4 rounded-full bg-purple-500"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Design</span>
+                  <div class="h-2 w-32 rounded-full bg-gray-200">
+                    <div class="h-2 w-1/2 rounded-full bg-pink-500"></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-gray-600">Marketing</span>
+                  <div class="h-2 w-32 rounded-full bg-gray-200">
+                    <div class="h-2 w-1/4 rounded-full bg-blue-500"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="rounded-xl bg-white p-6 shadow-sm">
+              <h3 class="mb-4 text-lg font-semibold">Priority Distribution</h3>
+              <div class="flex h-32 items-center justify-between">
+                <div class="flex flex-col items-center">
+                  <div class="w-16 rounded-t-lg bg-red-100" style="height: 80%;">
+                    <div class="w-full rounded-t-lg bg-red-500" style="height: 70%;"></div>
+                  </div>
+                  <span class="mt-2 text-sm">High</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-16 rounded-t-lg bg-yellow-100" style="height: 80%;">
+                    <div class="w-full rounded-t-lg bg-yellow-500" style="height: 45%;"></div>
+                  </div>
+                  <span class="mt-2 text-sm">Medium</span>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-16 rounded-t-lg bg-green-100" style="height: 80%;">
+                    <div class="w-full rounded-t-lg bg-green-500" style="height: 25%;"></div>
+                  </div>
+                  <span class="mt-2 text-sm">Low</span>
+                </div>
+              </div>
+            </div>
         </div>
       </div>
 </template>
