@@ -73,7 +73,7 @@
         </div>
   
         <!-- User Dropdown -->
-        <UserDropdown />
+        <UserDetailDropdown/>
       </div>
     </div>
   </template>
@@ -81,7 +81,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { RouterLink } from 'vue-router'
-import UserDropdown from './userDropdown.vue'
+import UserDetailDropdown from './UserDetailDropdown.vue'
 
 const props = defineProps({
 logo: {
