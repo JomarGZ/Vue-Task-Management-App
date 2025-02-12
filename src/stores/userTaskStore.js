@@ -4,6 +4,7 @@ import { computed, reactive, ref } from "vue";
 export const useUserTasks = defineStore('user-tasks', () => {
     const isLoading = ref(false);
     const isError = ref(false);
+    const upcomingTasksDeadline = ref([]);
     const taskCounts = reactive({
         total: 0,
         in_progress: 0,
@@ -15,23 +16,18 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const completed_tasks = computed(() => taskCounts.completed);
     const over_due_tasks = computed(() => taskCounts.over_due);
 
-    const setLoadingState = (loading = true, error = false) => {
-        if (isLoading.value) return false;
-
-        isLoading.value = loading;
-        isError.value = error;
-    }
-
     const setCountTask = (data) => {
         if (!data) return;
-        console.log(data)
         taskCounts.total = data?.total_tasks || 0;
         taskCounts.in_progress = data?.in_progress || 0;
         taskCounts.completed = data?.completed || 0;
         taskCounts.over_due = data?.over_due || 0;
     }
+    const setUpcomingTaskDeadlines = (data) => {
+        if (!data) return;
+        upcomingTasksDeadline.value = data;
+    }
     const fetchTaskCounts = async () => {
-        setLoadingState()
         try {
             const response = await getTaskCounts();
             setCountTask(response?.data?.data)
@@ -39,8 +35,35 @@ export const useUserTasks = defineStore('user-tasks', () => {
             console.error("Error fetching tasks counts:", error);
         }
     }
+
+    const fetchUpcomingTaskDeadlines = async () => {
+        await handleAsyncOperation(getUpcomingTaskDeadlines, (response) => {
+            setUpcomingTaskDeadlines(response.data?.data);
+        });
+    }
+
+    const handleAsyncOperation = async (operation, onSuccess) => {
+        if (isLoading.value) return;
+        isLoading.value = true;
+        isError.value = false;
+    
+        try {
+            const response = await operation();
+            onSuccess(response);
+        } catch (error) {
+            isError.value = true;
+            console.error("Error:", error);
+        } finally {
+            isLoading.value = false;
+        }
+    };  
+
     const getTaskCounts = async () => {
         return window.axios.get("v1/user/task-status-counts");
+    }
+
+    const getUpcomingTaskDeadlines  = async () => {
+        return window.axios.get("v1/user/upcoming-tasks-deadlines");
     }
     return {
         total_tasks,
@@ -48,6 +71,10 @@ export const useUserTasks = defineStore('user-tasks', () => {
         completed_tasks,
         over_due_tasks,
         taskCounts,
-        fetchTaskCounts
+        isLoading,
+        isError,
+        upcomingTasksDeadline,
+        fetchUpcomingTaskDeadlines,
+        fetchTaskCounts,
     }
 });

@@ -4,7 +4,12 @@ import { onMounted } from "vue";
 
 const userTaskStore = useUserTasks();
 
-onMounted(() => userTaskStore.fetchTaskCounts());
+onMounted(async() => {
+  await Promise.all([
+    userTaskStore.fetchTaskCounts(),
+    userTaskStore.fetchUpcomingTaskDeadlines()
+  ]);
+});
 </script>
 <template>
     <div class="grid grid-cols-4 gap-4 mb-4">
@@ -310,35 +315,26 @@ onMounted(() => userTaskStore.fetchTaskCounts());
           <div class="rounded-xl bg-white p-6 shadow-sm">
             <h2 class="mb-4 text-xl font-semibold">Upcoming Deadlines</h2>
             <div class="space-y-4">
-                <div class="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
-                    <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
-                        <span class="text-sm font-medium">FEB</span>
-                        <span class="text-lg font-bold text-red-500">15</span>
-                    </div>
-                    <div>
-                        <h4 class="font-medium">Project Milestone Review</h4>
-                        <p class="text-sm text-gray-500">10:00 AM - 11:30 AM</p>
-                    </div>
+                <div v-if="userTaskStore.isLoading" class="flex items-center justify-center w-full p-4">
+                    <IconSpinner class="h-10 w-10 text-gray-500 opacity-30" name="custom-spinner" />
                 </div>
-                <div class="flex items-center gap-4 p-3 bg-yellow-50 rounded-lg">
-                    <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
-                        <span class="text-sm font-medium">FEB</span>
-                        <span class="text-lg font-bold text-yellow-500">18</span>
-                    </div>
-                    <div>
-                        <h4 class="font-medium">Client Meeting</h4>
-                        <p class="text-sm text-gray-500">2:00 PM - 3:30 PM</p>
-                    </div>
+                <div v-else-if="userTaskStore.isError" class="flex items-center justify-center w-full p-4">
+                    <p>Failed to load upcoming task deadlines</p>
                 </div>
-                <div class="flex items-center gap-4 p-3 bg-blue-50 rounded-lg">
-                    <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
-                        <span class="text-sm font-medium">FEB</span>
-                        <span class="text-lg font-bold text-blue-500">20</span>
+                <template v-else-if="userTaskStore.upcomingTasksDeadline?.length > 0">
+                    <div v-for="task in userTaskStore.upcomingTasksDeadline" :key="task.id" class="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
+                        <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
+                            <span class="text-sm font-medium">FEB</span>
+                            <span class="text-lg font-bold text-red-500">15</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium">{{ task.title }}</h4>
+                            <p class="text-sm text-gray-500">10:00 AM - 11:30 AM</p>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="font-medium">Team Sprint Planning</h4>
-                        <p class="text-sm text-gray-500">11:00 AM - 12:00 PM</p>
-                    </div>
+                </template>
+                <div v-else class="ml-2">
+                    <p>No Upcoming task deadlines</p>
                 </div>
             </div>
           </div>
