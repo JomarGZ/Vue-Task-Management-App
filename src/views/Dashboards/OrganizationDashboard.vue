@@ -1,3 +1,11 @@
+<script setup>
+import { useUserTasks } from "@/stores/userTaskStore";
+import { onMounted } from "vue";
+
+const userTaskStore = useUserTasks();
+
+onMounted(() => userTaskStore.fetchTaskCounts());
+</script>
 <template>
     <div class="grid grid-cols-4 gap-4 mb-4">
         <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-sm p-6 text-white">
@@ -7,7 +15,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
             </div>
-            <div class="text-3xl font-bold">248</div>
+            <div class="text-3xl font-bold">{{ userTaskStore.total_tasks }}</div>
             <div class="text-purple-100 text-sm mt-2">↑ 12% from last month</div>
         </div>
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm p-6 text-white">
@@ -17,7 +25,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <div class="text-3xl font-bold">45</div>
+            <div class="text-3xl font-bold">{{ userTaskStore.in_progress_tasks }}</div>
             <div class="text-blue-100 text-sm mt-2">Active tasks this week</div>
         </div>
         <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-sm p-6 text-white">
@@ -27,7 +35,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <div class="text-3xl font-bold">182</div>
+            <div class="text-3xl font-bold">{{ userTaskStore.completed_tasks }}</div>
             <div class="text-green-100 text-sm mt-2">↑ 8% completion rate</div>
         </div>
         <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-sm p-6 text-white">
@@ -37,7 +45,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <div class="text-3xl font-bold">21</div>
+            <div class="text-3xl font-bold">{{ userTaskStore.over_due_tasks }}</div>
             <div class="text-red-100 text-sm mt-2">Requires immediate attention</div>
         </div>
     </div>
