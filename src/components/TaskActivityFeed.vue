@@ -9,8 +9,13 @@ const props = defineProps({
   searchQuery: String,
   selectedStatus: String,
   selectedPriority: String,
+  isLoading: Boolean,
+  isError: Boolean
 });
 
+
+const isLoadingTask = computed(() => props.isLoading);
+const isErrorTask = computed(() => props.isError);
 const getPriorityBgColor = computed(() => (priority) => {
     return {
         low: "bg-green-200 text-green-700",
@@ -129,25 +134,36 @@ const localSelectedPriority = ref(props.selectedPriority);
   
       <!-- Activity List -->
       <div class="space-y-4">
-        <div class="flex items-start gap-4" v-for="activity in activities" :key="activity.id">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full" :class="getStatusBgColor(activity.status)">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setIcon(activity.status)" />
-            </svg>
-            </div>
-            <div>
-            <p class="font-medium">{{ activity.title }}</p>
-            <p class="text-sm text-gray-500">{{ activity.time }}</p>
-            <div class="mt-1 flex space-x-2">
-                <span class="rounded-full px-2 py-1 text-xs" :class="getStatusBgColor(activity.status)">{{ capWords(activity.status) }}</span>
-                <span class="rounded-full px-2 py-1 text-xs flex items-center gap-1" :class="getPriorityBgColor(activity.priority_level)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setPriorityIcon(activity.priority_level)" />
+        <div v-if="isLoadingTask" class="flex items-center justify-center w-full p-4">
+            <IconSpinner class="h-10 w-10 text-gray-500 opacity-30" name="custom-spinner" />
+        </div>
+        <div v-else-if="isErrorTask" class="flex items-center justify-center w-full p-4">
+            <p>Failed to load assigned tasks</p>
+        </div>
+        <template v-else-if="activities.length > 0">
+          <div class="flex items-start gap-4" v-for="activity in activities" :key="activity.id">
+              <div class="flex h-8 w-8 items-center justify-center rounded-full" :class="getStatusBgColor(activity.status)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setIcon(activity.status)" />
                 </svg>
-                {{ capWords(activity.priority_level) }}
-                </span>
-            </div>
-            </div>
+              </div>
+              <div>
+              <p class="font-medium">{{ activity.title }}</p>
+              <p class="text-sm text-gray-500">{{ activity.time }}</p>
+              <div class="mt-1 flex space-x-2">
+                  <span class="rounded-full px-2 py-1 text-xs" :class="getStatusBgColor(activity.status)">{{ capWords(activity.status) }}</span>
+                  <span class="rounded-full px-2 py-1 text-xs flex items-center gap-1" :class="getPriorityBgColor(activity.priority_level)">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setPriorityIcon(activity.priority_level)" />
+                  </svg>
+                  {{ capWords(activity.priority_level) }}
+                  </span>
+              </div>
+              </div>
+          </div>
+        </template>
+        <div v-else class="flex items-center justify-center w-full p-4">
+            <p>No Assigned Task Found</p>
         </div>
         </div>
       <!-- Pagination -->

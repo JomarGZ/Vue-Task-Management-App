@@ -1,7 +1,7 @@
 <script setup>
-import Pagination from "@/components/Pagination.vue";
 import TaskActivityFeed from "@/components/TaskActivityFeed.vue";
 import { useUserTasks } from "@/stores/userTaskStore";
+import debounce from "lodash.debounce";
 import { ref, onMounted, watch, provide } from "vue";
 
 const userTaskStore = useUserTasks();
@@ -21,15 +21,17 @@ onMounted(async () => {
 });
 
 // Watch for changes in filters and fetch updated activities
-// watch([searchQuery, selectedStatus, selectedPriority], async () => {
-//   await userTaskStore.fetchFilteredTasks({
-//     search: searchQuery.value,
-//     status: selectedStatus.value,
-//     priority: selectedPriority.value,
-//   });
-// });
+const debounceSearch = debounce(async() => {
+  await userTaskStore.fetchAssignedTasks({
+    search: searchQuery.value,
+    status: selectedStatus.value,
+    priority_level: selectedPriority.value,
+  });
+}, 300);
+watch([searchQuery, selectedStatus, selectedPriority], debounceSearch);
+
 const handlePageChange = (page) => {
-  userTaskStore.fetchAssignedTasks(page);
+  userTaskStore.fetchAssignedTasks({page: page});
 };
 
 provide('pagination', userTaskStore.pagination);
@@ -168,6 +170,8 @@ provide('handlePageChange', handlePageChange);
               :searchQuery="searchQuery"
               :selectedStatus="selectedStatus"
               :selectedPriority="selectedPriority"
+              :isLoading="userTaskStore.isAssignedTasksLoading"
+              :isError="userTaskStore.isAssignedTasksError"
               @update:searchQuery="searchQuery = $event"
               @update:selectedStatus="selectedStatus = $event"
               @update:selectedPriority="selectedPriority = $event"

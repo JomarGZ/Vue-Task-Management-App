@@ -9,9 +9,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const isUpcomingDeadlinesError = ref(false);
     const isAssignedTasksLoading = ref(false);
     const isAssignedTasksError = ref(false);
-
-    const currentPage = ref(1);
-    const totalPages = ref(1);
+   
     const upcomingTasksDeadline = ref([]);
     const assignedTasks = ref([]);
     const taskCounts = reactive({
@@ -71,10 +69,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
         }, isUpcomingDeadlinesLoading, isUpcomingDeadlinesError);
     }
 
-    const fetchAssignedTasks = async (page = 1) => {
-        const params = {
-            page: page,
-        };
+    const fetchAssignedTasks = async (params = {page: 1}) => {
         await handleAsyncRequestOperation(
             () => getAssignedTasks(params), (response) => {
             setAssignedTasks(response.data?.data)
@@ -83,7 +78,9 @@ export const useUserTasks = defineStore('user-tasks', () => {
     }
 
     const getAssignedTasks = async (params = {}) => {
-        return window.axios.get("v1/user/assigned-tasks", { params });
+        if (typeof params === 'object' && params !== null) {
+            return window.axios.get("v1/user/assigned-tasks", { params });
+        }
     }
     const getTaskCounts = async () => {
         return window.axios.get("v1/user/task-status-counts");
