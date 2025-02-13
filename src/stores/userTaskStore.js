@@ -1,21 +1,52 @@
+import { handleAsyncRequestOperation } from "@/composables/useUtil";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 
 export const useUserTasks = defineStore('user-tasks', () => {
-    const isLoading = ref(false);
-    const isError = ref(false);
+    const isTaskCountsLoading = ref(false);
+    const isTaskCountsError = ref(false);
+    const isUpcomingDeadlinesLoading = ref(false);
+    const isUpcomingDeadlinesError = ref(false);
+    const isAssignedTasksLoading = ref(false);
+    const isAssignedTasksError = ref(false);
+
+    const currentPage = ref(1);
+    const totalPages = ref(1);
     const upcomingTasksDeadline = ref([]);
+    const assignedTasks = ref([]);
     const taskCounts = reactive({
         total: 0,
         in_progress: 0,
         completed: 0,
         over_due: 0
     });
+
+    const pagination = reactive({
+        current_page: 1,
+        last_page: 0,
+        links: {},
+        from: 0,
+        to: 0,
+        total: 0,
+    })
     const total_tasks = computed(() => taskCounts.total);
     const in_progress_tasks = computed(() => taskCounts.in_progress);
     const completed_tasks = computed(() => taskCounts.completed);
     const over_due_tasks = computed(() => taskCounts.over_due);
 
+    const setPagination = (data) => {
+        if (!data) return;
+        pagination.current_page = data.current_page;
+        pagination.last_page = data.last_page;
+        pagination.links = data.links;
+        pagination.from = data.from;
+        pagination.to = data.to;
+        pagination.total = data.total;
+    }
+    const setAssignedTasks = (data) => {
+        if (!data) return;
+        assignedTasks.value = data
+    }
     const setCountTask = (data) => {
         if (!data) return;
         taskCounts.total = data?.total_tasks || 0;
@@ -27,41 +58,36 @@ export const useUserTasks = defineStore('user-tasks', () => {
         if (!data) return;
         upcomingTasksDeadline.value = data;
     }
+
     const fetchTaskCounts = async () => {
-        try {
-            const response = await getTaskCounts();
-            setCountTask(response?.data?.data)
-        } catch (error) {
-            console.error("Error fetching tasks counts:", error);
-        }
+       await handleAsyncRequestOperation(getTaskCounts, (response) => {
+            setCountTask(response.data?.data)
+       }, isTaskCountsLoading, isTaskCountsError);
     }
 
     const fetchUpcomingTaskDeadlines = async () => {
-        await handleAsyncOperation(getUpcomingTaskDeadlines, (response) => {
+        await handleAsyncRequestOperation(getUpcomingTaskDeadlines, (response) => {
             setUpcomingTaskDeadlines(response.data?.data);
-        });
+        }, isUpcomingDeadlinesLoading, isUpcomingDeadlinesError);
     }
 
-    const handleAsyncOperation = async (operation, onSuccess) => {
-        if (isLoading.value) return;
-        isLoading.value = true;
-        isError.value = false;
-    
-        try {
-            const response = await operation();
-            onSuccess(response);
-        } catch (error) {
-            isError.value = true;
-            console.error("Error:", error);
-        } finally {
-            isLoading.value = false;
-        }
-    };  
+    const fetchAssignedTasks = async () => {
+        const params = {
+            page: currentPage.value,
+        };
+        await handleAsyncRequestOperation(
+            () => getAssignedTasks(params), (response) => {
+            setAssignedTasks(response.data?.data)
+            setPagination(response.data?.meta);
+        }, isAssignedTasksLoading, isAssignedTasksError)
+    }
 
+    const getAssignedTasks = async (params = {}) => {
+        return window.axios.get("v1/user/assigned-tasks", { params });
+    }
     const getTaskCounts = async () => {
         return window.axios.get("v1/user/task-status-counts");
     }
-
     const getUpcomingTaskDeadlines  = async () => {
         return window.axios.get("v1/user/upcoming-tasks-deadlines");
     }
@@ -71,9 +97,16 @@ export const useUserTasks = defineStore('user-tasks', () => {
         completed_tasks,
         over_due_tasks,
         taskCounts,
-        isLoading,
-        isError,
+        assignedTasks,
+        isAssignedTasksLoading,
+        isUpcomingDeadlinesLoading,
+        isAssignedTasksError,
+        isTaskCountsLoading,
+        isUpcomingDeadlinesError,
+        isTaskCountsError,
         upcomingTasksDeadline,
+        pagination,
+        fetchAssignedTasks,
         fetchUpcomingTaskDeadlines,
         fetchTaskCounts,
     }
