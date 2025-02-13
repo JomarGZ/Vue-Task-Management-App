@@ -37,6 +37,15 @@ export const handleAsyncRequestOperation = async (operation, onSuccess, loadingS
         loadingState.value = false;
     }
 };  
+export const getMonth = (dateString) => {
+    if (!dateString) return "";
+    return new Intl.DateTimeFormat("en-US", { month: "short" }).format(new Date(dateString)).toUpperCase();
+};
+
+export const getDay = (dateString) => {
+    if (!dateString) return "";
+    return new Date(dateString).getDate();
+};
 
 
 export function useUtil() {
