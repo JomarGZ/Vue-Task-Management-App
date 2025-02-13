@@ -1,3 +1,46 @@
+<script setup>
+import TaskActivityFeed from "@/components/TaskActivityFeed.vue";
+import UpcomingTaskDeadlines from "@/components/UpcomingTaskDeadlines.vue";
+import { useUserTasks } from "@/stores/userTaskStore";
+import debounce from "lodash.debounce";
+import { onMounted, watch, provide } from "vue";
+
+const userTaskStore = useUserTasks();
+onMounted(async () => {
+  await Promise.all([
+    userTaskStore.fetchTaskCounts(),
+    userTaskStore.fetchAssignedTasks(),
+    userTaskStore.fetchUpcomingTaskDeadlines(),
+  ]);
+});
+
+const handleDebounceSearch = debounce(async(search) => {
+  userTaskStore.clearFilters()
+  await userTaskStore.fetchAssignedTasks({
+    search: search,
+  });
+}, 300);
+
+const handleFilterTask = ([selectedStatus, selectedPriority]) => {
+
+   userTaskStore.fetchAssignedTasks({
+    status: selectedStatus,
+    priority_level: selectedPriority,
+  });
+}
+
+watch(() => [
+    userTaskStore.selectedStatus, 
+    userTaskStore.selectedPriority
+  ],handleFilterTask, { immediate: false });
+
+watch(() => userTaskStore.searchQuery, 
+  handleDebounceSearch
+);
+
+provide('pagination', userTaskStore.pagination);
+provide('handlePageChange', userTaskStore.handlePageChange);
+</script>
 <template>
     <div class="grid grid-cols-4 gap-4 mb-4">
         <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-sm p-6 text-white">
@@ -7,7 +50,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
             </div>
-            <div class="text-3xl font-bold">248</div>
+            <div class="text-3xl font-bold">{{ userTaskStore.total_tasks }}</div>
             <div class="text-purple-100 text-sm mt-2">↑ 12% from last month</div>
         </div>
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm p-6 text-white">
@@ -17,7 +60,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <div class="text-3xl font-bold">45</div>
+            <div class="text-3xl font-bold">{{ userTaskStore.in_progress_tasks }}</div>
             <div class="text-blue-100 text-sm mt-2">Active tasks this week</div>
         </div>
         <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-sm p-6 text-white">
@@ -27,7 +70,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <div class="text-3xl font-bold">182</div>
+            <div class="text-3xl font-bold">{{ userTaskStore.completed_tasks }}</div>
             <div class="text-green-100 text-sm mt-2">↑ 8% completion rate</div>
         </div>
         <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-sm p-6 text-white">
@@ -37,7 +80,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <div class="text-3xl font-bold">21</div>
+            <div class="text-3xl font-bold">{{ userTaskStore.over_due_tasks }}</div>
             <div class="text-red-100 text-sm mt-2">Requires immediate attention</div>
         </div>
     </div>
@@ -126,135 +169,14 @@
             </div>
         </div>
           <!-- Recent Activity -->
-          <div class="rounded-xl bg-white p-6 shadow-sm">
-            <h2 class="mb-4 text-xl font-semibold">Recent Activity</h2>
-
-            <!-- Search and Filters -->
-            <div class="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-              <!-- Search Box -->
-              <div class="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search tasks..."
-                  class="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-
-              <!-- Status Filter -->
-              <div>
-                <select
-                  class="rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option value="">All Statuses</option>
-                  <option value="completed">Completed</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="pending">Pending</option>
-                </select>
-              </div>
-
-              <!-- Priority Filter -->
-              <div>
-                <select
-                  class="rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option value="">All Priorities</option>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Activity List -->
-            <div class="space-y-4">
-              <!-- Activity Item 1 -->
-              <div class="flex items-start gap-4">
-                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4 text-blue-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p class="font-medium">New task created: "Update User Interface"</p>
-                  <p class="text-sm text-gray-500">2 hours ago</p>
-                  <div class="mt-1 flex space-x-2">
-                    <span class="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-600">In Progress</span>
-                    <span class="rounded-full bg-yellow-100 px-2 py-1 text-xs text-yellow-600">Medium</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Activity Item 2 -->
-              <div class="flex items-start gap-4">
-                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4 text-green-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p class="font-medium">Task completed: "Database Optimization"</p>
-                  <p class="text-sm text-gray-500">4 hours ago</p>
-                  <div class="mt-1 flex space-x-2">
-                    <span class="rounded-full bg-green-100 px-2 py-1 text-xs text-green-600">Completed</span>
-                    <span class="rounded-full bg-red-100 px-2 py-1 text-xs text-red-600">High</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Pagination -->
-            <div class="mt-6 flex justify-center">
-              <nav class="inline-flex space-x-2">
-                <a
-                  href="#"
-                  class="rounded-md bg-blue-100 px-3 py-1 text-sm text-blue-600 hover:bg-blue-200"
-                >
-                  1
-                </a>
-                <a
-                  href="#"
-                  class="rounded-md px-3 py-1 text-sm text-gray-500 hover:bg-gray-100"
-                >
-                  2
-                </a>
-                <a
-                  href="#"
-                  class="rounded-md px-3 py-1 text-sm text-gray-500 hover:bg-gray-100"
-                >
-                  3
-                </a>
-                <span class="px-3 py-1 text-sm text-gray-500">...</span>
-                <a
-                  href="#"
-                  class="rounded-md px-3 py-1 text-sm text-gray-500 hover:bg-gray-100"
-                >
-                  10
-                </a>
-              </nav>
-            </div>
-          </div>
+          <TaskActivityFeed
+              :activities="userTaskStore.assignedTasks"
+              :isLoading="userTaskStore.isAssignedTasksLoading"
+              :isError="userTaskStore.isAssignedTasksError"
+              v-model:searchQuery="userTaskStore.searchQuery"
+              v-model:selectedStatus="userTaskStore.selectedStatus"
+              v-model:selectedPriority="userTaskStore.selectedPriority"
+            />
         </div>
 
         <!-- Right Column -->
@@ -297,43 +219,12 @@
               </div>
             </div>
           </div>
-
           <!-- Upcoming Deadlines -->
-          <div class="rounded-xl bg-white p-6 shadow-sm">
-            <h2 class="mb-4 text-xl font-semibold">Upcoming Deadlines</h2>
-            <div class="space-y-4">
-                <div class="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
-                    <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
-                        <span class="text-sm font-medium">FEB</span>
-                        <span class="text-lg font-bold text-red-500">15</span>
-                    </div>
-                    <div>
-                        <h4 class="font-medium">Project Milestone Review</h4>
-                        <p class="text-sm text-gray-500">10:00 AM - 11:30 AM</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 p-3 bg-yellow-50 rounded-lg">
-                    <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
-                        <span class="text-sm font-medium">FEB</span>
-                        <span class="text-lg font-bold text-yellow-500">18</span>
-                    </div>
-                    <div>
-                        <h4 class="font-medium">Client Meeting</h4>
-                        <p class="text-sm text-gray-500">2:00 PM - 3:30 PM</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 p-3 bg-blue-50 rounded-lg">
-                    <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
-                        <span class="text-sm font-medium">FEB</span>
-                        <span class="text-lg font-bold text-blue-500">20</span>
-                    </div>
-                    <div>
-                        <h4 class="font-medium">Team Sprint Planning</h4>
-                        <p class="text-sm text-gray-500">11:00 AM - 12:00 PM</p>
-                    </div>
-                </div>
-            </div>
-          </div>
+         <UpcomingTaskDeadlines
+            :isUpcomingDeadlinesLoading="userTaskStore.isUpcomingDeadlinesLoading"
+            :isUpcomingDeadlinesError="userTaskStore.isUpcomingDeadlinesError"
+            :upcomingTasksDeadline="userTaskStore.upcomingTasksDeadline"
+         />
 
           <!-- Quick Notes -->
           <div class="rounded-xl bg-white p-6 shadow-sm">

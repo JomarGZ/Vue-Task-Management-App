@@ -14,7 +14,7 @@ const handleSearch = (newSearch, oldSearch) => {
         taskStore.debounceSearch({search: newSearch});
     }
 }
-const handleFilterChange =  ([selectedPriority, selectedStatus, selectedAssigneeId]) => {
+const handleFilterChange = ([selectedPriority, selectedStatus, selectedAssigneeId]) => {
     taskStore.onChangeFilter({
         priority_level: selectedPriority,
         status: selectedStatus,

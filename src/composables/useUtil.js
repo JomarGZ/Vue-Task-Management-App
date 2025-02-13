@@ -14,7 +14,39 @@ export const getPageNumber = (pageUrl) => {
 export const capWords = (str) => {
     if (typeof str !== 'string' || !str.trim()) return '';
     return str.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-} 
+}
+
+export const snakeCaseWord = (words) => {
+    if (!words) return '';
+    return words.toLowerCase().replace(/\s+/g, "_");
+}
+
+
+export const handleAsyncRequestOperation = async (operation, onSuccess, loadingState, errorState) => {
+    if (loadingState.value) return;
+    loadingState.value = true;
+    errorState.value = false;
+    
+    try {
+        const response = await operation();
+        onSuccess(response);
+    } catch (error) {
+        errorState.value = true;
+        console.error("Error:", error);
+    } finally {
+        loadingState.value = false;
+    }
+};  
+export const getMonth = (dateString) => {
+    if (!dateString) return "";
+    return new Intl.DateTimeFormat("en-US", { month: "short" }).format(new Date(dateString)).toUpperCase();
+};
+
+export const getDay = (dateString) => {
+    if (!dateString) return "";
+    return new Date(dateString).getDate();
+};
+
 
 export function useUtil() {
     const router = useRouter();
