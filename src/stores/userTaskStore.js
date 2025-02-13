@@ -71,9 +71,9 @@ export const useUserTasks = defineStore('user-tasks', () => {
         }, isUpcomingDeadlinesLoading, isUpcomingDeadlinesError);
     }
 
-    const fetchAssignedTasks = async () => {
+    const fetchAssignedTasks = async (page = 1) => {
         const params = {
-            page: currentPage.value,
+            page: page,
         };
         await handleAsyncRequestOperation(
             () => getAssignedTasks(params), (response) => {

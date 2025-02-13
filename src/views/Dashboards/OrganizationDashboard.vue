@@ -2,7 +2,7 @@
 import Pagination from "@/components/Pagination.vue";
 import TaskActivityFeed from "@/components/TaskActivityFeed.vue";
 import { useUserTasks } from "@/stores/userTaskStore";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, provide } from "vue";
 
 const userTaskStore = useUserTasks();
 
@@ -21,13 +21,19 @@ onMounted(async () => {
 });
 
 // Watch for changes in filters and fetch updated activities
-watch([searchQuery, selectedStatus, selectedPriority], async () => {
-  await userTaskStore.fetchFilteredTasks({
-    search: searchQuery.value,
-    status: selectedStatus.value,
-    priority: selectedPriority.value,
-  });
-});
+// watch([searchQuery, selectedStatus, selectedPriority], async () => {
+//   await userTaskStore.fetchFilteredTasks({
+//     search: searchQuery.value,
+//     status: selectedStatus.value,
+//     priority: selectedPriority.value,
+//   });
+// });
+const handlePageChange = (page) => {
+  userTaskStore.fetchAssignedTasks(page);
+};
+
+provide('pagination', userTaskStore.pagination);
+provide('handlePageChange', handlePageChange);
 </script>
 <template>
     <div class="grid grid-cols-4 gap-4 mb-4">
@@ -159,7 +165,6 @@ watch([searchQuery, selectedStatus, selectedPriority], async () => {
           <!-- Recent Activity -->
           <TaskActivityFeed
               :activities="userTaskStore.assignedTasks"
-              :pagination="userTaskStore.pagination"
               :searchQuery="searchQuery"
               :selectedStatus="selectedStatus"
               :selectedPriority="selectedPriority"

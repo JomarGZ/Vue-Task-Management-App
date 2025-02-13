@@ -6,7 +6,6 @@ import { capWords, snakeCaseWord } from "@/composables/useUtil";
 // Define props
 const props = defineProps({
   activities: Array,
-  pagination: Object,
   searchQuery: String,
   selectedStatus: String,
   selectedPriority: String,
@@ -152,6 +151,6 @@ const localSelectedPriority = ref(props.selectedPriority);
         </div>
         </div>
       <!-- Pagination -->
-      <ModernPagination :pagination="pagination"/>
+      <ModernPagination />
     </div>
   </template>
