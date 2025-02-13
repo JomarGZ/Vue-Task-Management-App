@@ -3,16 +3,9 @@ import TaskActivityFeed from "@/components/TaskActivityFeed.vue";
 import UpcomingTaskDeadlines from "@/components/UpcomingTaskDeadlines.vue";
 import { useUserTasks } from "@/stores/userTaskStore";
 import debounce from "lodash.debounce";
-import { ref, onMounted, watch, provide } from "vue";
+import { onMounted, watch, provide } from "vue";
 
 const userTaskStore = useUserTasks();
-
-// Reactive filters
-const searchQuery = ref("");
-const selectedStatus = ref("");
-const selectedPriority = ref("");
-
-// Fetch tasks when the component is mounted
 onMounted(async () => {
   await Promise.all([
     userTaskStore.fetchTaskCounts(),
@@ -21,22 +14,32 @@ onMounted(async () => {
   ]);
 });
 
-// Watch for changes in filters and fetch updated activities
-const debounceSearch = debounce(async() => {
+const handleDebounceSearch = debounce(async(search) => {
+  userTaskStore.clearFilters()
   await userTaskStore.fetchAssignedTasks({
-    search: searchQuery.value,
-    status: selectedStatus.value,
-    priority_level: selectedPriority.value,
+    search: search,
   });
 }, 300);
-watch([searchQuery, selectedStatus, selectedPriority], debounceSearch);
 
-const handlePageChange = (page) => {
-  userTaskStore.fetchAssignedTasks({page: page});
-};
+const handleFilterTask = ([selectedStatus, selectedPriority]) => {
+
+   userTaskStore.fetchAssignedTasks({
+    status: selectedStatus,
+    priority_level: selectedPriority,
+  });
+}
+
+watch(() => [
+    userTaskStore.selectedStatus, 
+    userTaskStore.selectedPriority
+  ],handleFilterTask, { immediate: false });
+
+watch(() => userTaskStore.searchQuery, 
+  handleDebounceSearch
+);
 
 provide('pagination', userTaskStore.pagination);
-provide('handlePageChange', handlePageChange);
+provide('handlePageChange', userTaskStore.handlePageChange);
 </script>
 <template>
     <div class="grid grid-cols-4 gap-4 mb-4">
@@ -168,14 +171,11 @@ provide('handlePageChange', handlePageChange);
           <!-- Recent Activity -->
           <TaskActivityFeed
               :activities="userTaskStore.assignedTasks"
-              :searchQuery="searchQuery"
-              :selectedStatus="selectedStatus"
-              :selectedPriority="selectedPriority"
               :isLoading="userTaskStore.isAssignedTasksLoading"
               :isError="userTaskStore.isAssignedTasksError"
-              @update:searchQuery="searchQuery = $event"
-              @update:selectedStatus="selectedStatus = $event"
-              @update:selectedPriority="selectedPriority = $event"
+              v-model:searchQuery="userTaskStore.searchQuery"
+              v-model:selectedStatus="userTaskStore.selectedStatus"
+              v-model:selectedPriority="userTaskStore.selectedPriority"
             />
         </div>
 

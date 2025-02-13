@@ -1,9 +1,9 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import ModernPagination from "./ModernPagination.vue";
 import { capWords, snakeCaseWord } from "@/composables/useUtil";
+import { useTaskStore } from "@/stores/taskStore";
 
-// Define props
 const props = defineProps({
   activities: Array,
   searchQuery: String,
@@ -13,9 +13,13 @@ const props = defineProps({
   isError: Boolean
 });
 
+const emit = defineEmits(["update:searchQuery", "update:selectedStatus", "update:selectedPriority"]);
+
+const taskStore = useTaskStore();
 
 const isLoadingTask = computed(() => props.isLoading);
 const isErrorTask = computed(() => props.isError);
+const hasActivities = computed(() => props.activities.length > 0);
 const getPriorityBgColor = computed(() => (priority) => {
     return {
         low: "bg-green-200 text-green-700",
@@ -80,11 +84,25 @@ const getStatusBgColor = computed(() => (status) => {
     }[snakeCaseWord(status)] || "bg-gray-200 text-gray-700";
 });
 
+onMounted(async () => {
+  await Promise.all([
+    taskStore.fetchPriorityLevels(),
+    taskStore.fetchStatuses()
+  ]);
+})
 
-// Local state to avoid modifying props directly
-const localSearchQuery = ref(props.searchQuery);
-const localSelectedStatus = ref(props.selectedStatus);
-const localSelectedPriority = ref(props.selectedPriority);
+const searchQueryModel = computed({
+  get: () => props.searchQuery,
+  set: (value) => emit('update:searchQuery', value)
+});
+const selectedStatusModel = computed({
+  get: () => props.selectedStatus,
+  set: (value) => emit('update:selectedStatus', value)
+});
+const selectedPriorityModel = computed({
+  get: () => props.selectedPriority,
+  set: (value) => emit('update:selectedPriority', value)
+});
 </script>
 <template>
     <div class="rounded-xl bg-white p-6 shadow-sm">
@@ -98,8 +116,7 @@ const localSelectedPriority = ref(props.selectedPriority);
             type="text"
             placeholder="Search tasks..."
             class="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-            v-model="localSearchQuery"
-            @input="$emit('update:searchQuery', localSearchQuery)"
+            v-model="searchQueryModel"
           />
         </div>
   
@@ -107,13 +124,10 @@ const localSelectedPriority = ref(props.selectedPriority);
         <div>
           <select
             class="rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-            v-model="localSelectedStatus"
-            @change="$emit('update:selectedStatus', localSelectedStatus)"
+            v-model="selectedStatusModel"
           >
             <option value="">All Statuses</option>
-            <option value="completed">Completed</option>
-            <option value="in-progress">In Progress</option>
-            <option value="pending">Pending</option>
+            <option v-for="(status, index) in taskStore.statuses" :key="index" :value="status">{{ capWords(status) }}</option>
           </select>
         </div>
   
@@ -121,13 +135,10 @@ const localSelectedPriority = ref(props.selectedPriority);
         <div>
           <select
             class="rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-blue-500"
-            v-model="localSelectedPriority"
-            @change="$emit('update:selectedPriority', localSelectedPriority)"
+            v-model="selectedPriorityModel"
           >
             <option value="">All Priorities</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
+            <option v-for="(priority, index) in taskStore.priorityLevels" :key="index" :value="priority">{{ capWords(priority) }}</option>
           </select>
         </div>
       </div>
@@ -140,7 +151,7 @@ const localSelectedPriority = ref(props.selectedPriority);
         <div v-else-if="isErrorTask" class="flex items-center justify-center w-full p-4">
             <p>Failed to load assigned tasks</p>
         </div>
-        <template v-else-if="activities.length > 0">
+        <template v-else-if="hasActivities">
           <div class="flex items-start gap-4" v-for="activity in activities" :key="activity.id">
               <div class="flex h-8 w-8 items-center justify-center rounded-full" :class="getStatusBgColor(activity.status)">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -167,6 +178,6 @@ const localSelectedPriority = ref(props.selectedPriority);
         </div>
         </div>
       <!-- Pagination -->
-      <ModernPagination />
+      <ModernPagination v-if="hasActivities" />
     </div>
   </template>

@@ -10,8 +10,12 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const isAssignedTasksLoading = ref(false);
     const isAssignedTasksError = ref(false);
    
+    const searchQuery = ref("");
+    const selectedStatus = ref("");
+    const selectedPriority = ref("");
     const upcomingTasksDeadline = ref([]);
     const assignedTasks = ref([]);
+
     const taskCounts = reactive({
         total: 0,
         in_progress: 0,
@@ -27,10 +31,16 @@ export const useUserTasks = defineStore('user-tasks', () => {
         to: 0,
         total: 0,
     })
+    
     const total_tasks = computed(() => taskCounts.total);
     const in_progress_tasks = computed(() => taskCounts.in_progress);
     const completed_tasks = computed(() => taskCounts.completed);
     const over_due_tasks = computed(() => taskCounts.over_due);
+
+    const clearFilters = () => {
+        selectedStatus.value = "";
+        selectedPriority.value = "";
+    };
 
     const setPagination = (data) => {
         if (!data) return;
@@ -57,6 +67,10 @@ export const useUserTasks = defineStore('user-tasks', () => {
         upcomingTasksDeadline.value = data;
     }
 
+    const handlePageChange = async (page) => {
+        await fetchAssignedTasks({page: page});
+    };
+
     const fetchTaskCounts = async () => {
        await handleAsyncRequestOperation(getTaskCounts, (response) => {
             setCountTask(response.data?.data)
@@ -70,6 +84,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
     }
 
     const fetchAssignedTasks = async (params = {page: 1}) => {
+
         await handleAsyncRequestOperation(
             () => getAssignedTasks(params), (response) => {
             setAssignedTasks(response.data?.data)
@@ -78,6 +93,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
     }
 
     const getAssignedTasks = async (params = {}) => {
+       
         if (typeof params === 'object' && params !== null) {
             return window.axios.get("v1/user/assigned-tasks", { params });
         }
@@ -98,13 +114,18 @@ export const useUserTasks = defineStore('user-tasks', () => {
         isAssignedTasksLoading,
         isUpcomingDeadlinesLoading,
         isAssignedTasksError,
+        searchQuery,
+        selectedStatus,
         isTaskCountsLoading,
         isUpcomingDeadlinesError,
         isTaskCountsError,
         upcomingTasksDeadline,
         pagination,
+        selectedPriority,
+        handlePageChange,
         fetchAssignedTasks,
         fetchUpcomingTaskDeadlines,
         fetchTaskCounts,
+        clearFilters,
     }
 });
