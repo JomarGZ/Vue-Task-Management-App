@@ -85,6 +85,8 @@ export const useMemberStore = defineStore("memberStore", () => {
               if (error?.response?.status === 422) {
                   console.log(error.response.data.errors);
                   errors.value = error.response.data.errors;
+              } else {
+                  showToast("Failed to add member", 'error');
               }
           })
           .finally(() =>{
@@ -162,6 +164,7 @@ export const useMemberStore = defineStore("memberStore", () => {
       deleteMember,
       getMemberListWithoutPagination,
       debounceSearch,
+      loading,
       isFetchLoading,
       isFetchError,
       memberList,
