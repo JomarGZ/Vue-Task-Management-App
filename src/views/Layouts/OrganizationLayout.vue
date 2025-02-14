@@ -34,11 +34,6 @@ const router = [
         link: {name: 'teams.index'},
         icon: 'list'
     },
-    {
-        name: 'Account',
-        link: {name: 'account.index'},
-        icon: 'person'
-    },
 ];
 
 const handleSidebarToggle = () => {
@@ -72,30 +67,22 @@ watch(route, () => {
                         {{ r.name }}
                     </NavLink>
                 </li>
-                <li>
-                    <button @click="auth.logout()" 
-                    class="flex items-center w-full p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">                     
-                        <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" 
-                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="2 3 17 20">                         
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />                     
-                        </svg>                     
-                        <span class="ms-3 whitespace-nowrap">Logout</span>                     
-                    </button>
-                </li>
-              
             </ul>
         </div>
     </aside>
-    <main class="bg-gray-100">
-        <div class="p-4 sm:ml-64">
-            <div class="p-4 rounded-lg mt-14">
-                <RouterView />
+    <div class="sm:ml-64">
+        <main class="bg-gray-100">
+            <div class="p-4">
+                <div class="p-4 rounded-lg mt-14">
+                    <RouterView />
+                </div>
             </div>
-        </div>
-    </main>
-    <footer class="bg-white py-6 border-t">
-        <div class="container mx-auto text-center text-gray-600">
-            © 2025 SprintSync. All rights reserved.
-        </div>
-    </footer>
+        </main>
+
+        <footer class="bg-white py-6 border-t">
+            <div class="container mx-auto text-center text-gray-600">
+                © 2025 SprintSync. All rights reserved.
+            </div>
+        </footer>
+    </div>
 </template>

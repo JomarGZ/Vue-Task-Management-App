@@ -24,19 +24,19 @@
         >
           <div class="px-4 py-3" role="none">
             <p class="text-sm text-gray-900 dark:text-white" role="none">
-              Neil Sims
+              {{ auth.userName }}
             </p>
             <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
-              neil.sims@flowbite.com
+              {{ auth.userEmail }}
             </p>
           </div>
           <ul class="py-1" role="none">
             <li>
-              <a
-                href="#"
+              <RouterLink
+                :to="{name: 'organization.dashboard'}"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
-              >Dashboard</a>
+              >Dashboard</RouterLink>
             </li>
             <li>
               <a
@@ -46,15 +46,16 @@
               >Settings</a>
             </li>
             <li>
-              <a
-                href="#"
+              <RouterLink
+                :to="{name: 'account.index'}"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
-              >Earnings</a>
+              >Account</RouterLink>
             </li>
             <li>
               <a
                 href="#"
+                @click.prevent="auth.logout()"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
               >Sign out</a>
@@ -66,11 +67,13 @@
   </template>
   
   <script setup>
-  import { ref, onMounted, onBeforeUnmount } from 'vue'
+  import { useAuth } from '@/stores/auth'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
   
   const isOpen = ref(false)
   const dropdownButton = ref(null)
   
+  const auth = useAuth();
   const toggleDropdown = () => {
     isOpen.value = !isOpen.value
   }

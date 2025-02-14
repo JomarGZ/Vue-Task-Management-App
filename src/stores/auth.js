@@ -7,8 +7,7 @@ export const useAuth = defineStore("auth", () => {
   const router = useRouter();
   const accessToken = useStorage("access_token", "");
   const check = computed(() => !!accessToken.value);
-  const user = ref(null);
-  
+  const user = useStorage("auth_user", {});
   const userEmail = computed(() => user.value?.email);
   const userName = computed(() => user.value?.name);
   const userPhoneNumber = computed(() => user.value?.phone_number);
@@ -28,30 +27,30 @@ export const useAuth = defineStore("auth", () => {
  
   function destroyTokenAndRedirectTo(routeName = "welcome") {
     setAccessToken(null);
+    setAuthUserData(null);
     router.push({ name: routeName });
   }
  
   async function logout() {
     return window.axios.post("v1/auth/logout").finally(() => {
-      resetUserData();
       destroyTokenAndRedirectTo();
     });
   }
   const fetchAuthUser = async () => {
     try {
-      const response = await window.axios.get("/v1/user");
-      storeUserData(response?.data || null) 
+      const response = await window.axios.get("/v1/user", {
+        headers: { Authorization: `Bearer ${accessToken.value}`},
+      });
+      if (response.status !== 200) throw new Error("Failed to fetch user");
+      console.log(response)
+      setAuthUserData(response?.data || null) 
     } catch (error) {
-      resetUserData()
+      setAuthUserData(null);
       throw error
     }
   }
-  const storeUserData = (userData) => {
-    if (!userData) return;
+  const setAuthUserData = (userData) => {
     user.value = userData;
-  }
-  const resetUserData = () => {
-    user.value = null;
   }
  
   return { 
@@ -59,6 +58,7 @@ export const useAuth = defineStore("auth", () => {
     logout, 
     check, 
     userEmail,
+    user,
     userName,
     userPhoneNumber,
     destroyTokenAndRedirectTo 
