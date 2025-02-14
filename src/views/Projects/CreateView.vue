@@ -31,7 +31,7 @@ onMounted(() => {
                     
                     <!-- Project Name -->
                     <div>
-                        <label for="project_name" class="block text-sm font-medium text-gray-700">Project Name *</label>
+                        <label for="project_name" class="block text-sm font-medium text-gray-700">Project Name <span class="text-red-500">*</span></label>
                         <input v-model="store.form.name" type="text" id="project_name" name="project_name"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <ValidationError :errors="store.errors" field="name"/>    
@@ -39,7 +39,7 @@ onMounted(() => {
 
                     <!-- Client -->
                     <div>
-                        <label for="client" class="block text-sm font-medium text-gray-700">Client Name *</label>
+                        <label for="client" class="block text-sm font-medium text-gray-700">Client Name <span class="text-red-500">*</span></label>
                         <input v-model="store.form.client_name" type="text" id="client" name="client"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                         <ValidationError :errors="store.errors" field="client_name"/>
@@ -47,7 +47,7 @@ onMounted(() => {
 
                     <!-- Description -->
                     <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Project Description</label>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Project Description <span class="text-red-500">*</span></label>
                         <textarea v-model="store.form.description" id="description" name="description" rows="4"
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                             placeholder="Describe the project objectives and scope..."></textarea>
@@ -62,20 +62,20 @@ onMounted(() => {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date *</label>
+                            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
                             <input v-model="store.form.started_at" type="date" id="start_date" name="start_date"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             <ValidationError :errors="store.errors" field="started_at"/>
                         </div>
 
                         <div>
-                            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date *</label>
+                            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date</label>
                             <input v-model="store.form.ended_at" type="date" id="end_date" name="end_date"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                             <ValidationError :errors="store.errors" field="ended_at"/>
                         </div>
                         <div>
-                            <label for="priority" class="block text-sm font-medium text-gray-700">Priority *</label>
+                            <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
                             <select v-model="store.form.priority" id="priority" name="priority"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Select priority</option>
@@ -84,7 +84,7 @@ onMounted(() => {
                             <ValidationError :errors="store.errors" field="priority"/>
                         </div>
                         <div>
-                            <label for="priority" class="block text-sm font-medium text-gray-700">Status *</label>
+                            <label for="priority" class="block text-sm font-medium text-gray-700">Status</label>
                             <select v-model="store.form.status" id="priority" name="priority"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Select Status</option>

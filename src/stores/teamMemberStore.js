@@ -29,14 +29,14 @@ export const useTeamMemberStore = defineStore("teamMembrs", () => {
         const page = params.get('page')
 
         if (page) {
-            updateQueryAndFetchPosts({ page: page })
+            updateRouteQuery({ page: page })
         }
     }
     const onSelectTeam = (team) => {
         console.log(team);
 
     }
-    const updateQueryAndFetchPosts = (params = {}) => {
+    const updateRouteQuery = (params = {}) => {
         router
           .push({
             query: {
