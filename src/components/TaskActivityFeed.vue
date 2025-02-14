@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted } from "vue";
 import ModernPagination from "./ModernPagination.vue";
 import { capWords, snakeCaseWord } from "@/composables/useUtil";
 import { useTaskStore } from "@/stores/taskStore";
@@ -144,7 +144,7 @@ const selectedPriorityModel = computed({
       </div>
   
       <!-- Activity List -->
-      <div class="space-y-4">
+      <div class="space-y-2">
         <div v-if="isLoadingTask" class="flex items-center justify-center w-full p-4">
             <IconSpinner class="h-10 w-10 text-gray-500 opacity-30" name="custom-spinner" />
         </div>
@@ -152,24 +152,31 @@ const selectedPriorityModel = computed({
             <p>Failed to load assigned tasks</p>
         </div>
         <template v-else-if="hasActivities">
-          <div class="flex items-start gap-4" v-for="activity in activities" :key="activity.id">
-              <div class="flex h-8 w-8 items-center justify-center rounded-full" :class="getStatusBgColor(activity.status)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setIcon(activity.status)" />
-                </svg>
+          <div class="flex justify-between items-center border px-4 py-2 rounded-md" v-for="activity in activities" :key="activity.id">
+              <div class="flex items-center gap-4 ">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-full" :class="getStatusBgColor(activity.status)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setIcon(activity.status)" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-medium">{{ activity.title }}</p>
+                    <p class="text-sm text-gray-500">{{ activity?.project?.name }}</p>
+                    <div class="mt-1 flex space-x-2">
+                        <span class="rounded-full px-2 py-1 text-xs" :class="getStatusBgColor(activity.status)">{{ capWords(activity.status) }}</span>
+                        <span class="rounded-full px-2 py-1 text-xs flex items-center gap-1" :class="getPriorityBgColor(activity.priority_level)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setPriorityIcon(activity.priority_level)" />
+                        </svg>
+                        {{ capWords(activity.priority_level) }}
+                        </span>
+                    </div>
+                  </div>
               </div>
-              <div>
-              <p class="font-medium">{{ activity.title }}</p>
-              <p class="text-sm text-gray-500">{{ activity.time }}</p>
-              <div class="mt-1 flex space-x-2">
-                  <span class="rounded-full px-2 py-1 text-xs" :class="getStatusBgColor(activity.status)">{{ capWords(activity.status) }}</span>
-                  <span class="rounded-full px-2 py-1 text-xs flex items-center gap-1" :class="getPriorityBgColor(activity.priority_level)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setPriorityIcon(activity.priority_level)" />
-                  </svg>
-                  {{ capWords(activity.priority_level) }}
-                  </span>
-              </div>
+              <div class="flex items-center justify-center">
+                <RouterLink :to="{name: 'tasks.show', params: { projectId: activity.project?.id, taskId: activity.id }}" class="p-2 text-blue-400 hover:text-blue-700">
+                    <IconSVG name="eye-svg"/>
+                </RouterLink>
               </div>
           </div>
         </template>
