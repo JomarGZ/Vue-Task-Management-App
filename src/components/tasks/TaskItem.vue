@@ -15,8 +15,8 @@ const formattedDeadline = computed(() => {
 })
 </script>
 <template>
-    <div class="border-b border-gray-200 hover:bg-gray-50">
-        <div class="p-4">
+    <RouterLink :to="{name: 'tasks.show', params: { projectId: task.project?.id, taskId: task.id }}" class="border-b border-gray-200 hover:bg-gray-700">
+        <div class="p-4 hover:bg-blue-100">
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center space-x-3">
                     <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ task?.project?.name }}</span>
@@ -49,5 +49,5 @@ const formattedDeadline = computed(() => {
                 </div>
             </div>
         </div>
-    </div>
+    </RouterLink>
 </template>

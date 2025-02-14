@@ -9,7 +9,11 @@
                 <p>Failed to load upcoming task deadlines</p>
             </div>
             <template v-else-if="upcomingTasksDeadline?.length > 0">
-                <div v-for="task in upcomingTasksDeadline" :key="task.id" class="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
+                <RouterLink
+                  :to="{name: 'tasks.show', params: { projectId: task.project?.id, taskId: task.id }}"
+                  v-for="task in upcomingTasksDeadline"
+                  :key="task.id"
+                  class="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
                     <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
                         <span class="text-sm font-medium">{{ getMonth(task.deadline_at) }}</span>
                         <span class="text-lg font-bold text-red-500">{{ getDay(task.deadline_at) }}</span>
@@ -18,7 +22,7 @@
                         <h4 class="font-medium">{{ task.title }}</h4>
                         <p class="text-sm text-gray-500">{{ formatDateOnly(task.deadline_at) }}</p>
                     </div>
-                </div>
+                </RouterLink>
             </template>
             <div v-else class="ml-2">
                 <p>No Upcoming task deadlines</p>
