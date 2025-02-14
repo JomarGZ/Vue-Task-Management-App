@@ -24,9 +24,7 @@ const formattedDeadline = computed(() => {
                 </div>
                 <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ capWords(task?.status) }}</span>
             </div>
-            
             <p class="text-gray-600 mb-4">{{ task?.description }}</p>
-            
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
                     <!-- Assigned Dev -->

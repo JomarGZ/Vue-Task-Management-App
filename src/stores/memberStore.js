@@ -9,6 +9,8 @@ export const useMemberStore = defineStore("memberStore", () => {
   const errors = reactive({});
   const loading = ref(false);
   const router = useRouter();
+  const isFetchLoading = ref(false);
+  const isFetchError = ref(false);
   const route = useRoute();
   const memberList = ref(null);
   const members = ref(null);
@@ -44,7 +46,7 @@ export const useMemberStore = defineStore("memberStore", () => {
 
   const orderBy = (column = 'created_at') => {
       const toggleDirection = route.query.direction === 'desc' ? 'asc' : 'desc'
-      updateQueryAndFetchPosts({ column, direction: toggleDirection })
+      updateRouteQuery({ column, direction: toggleDirection })
   }
   const changePage = (pageUrl) => {
       console.log(pageUrl)
@@ -54,10 +56,10 @@ export const useMemberStore = defineStore("memberStore", () => {
       const page = params.get('page')
 
       if (page) {
-          updateQueryAndFetchPosts({ page: page })
+          updateRouteQuery({ page: page })
       }
   }
-  const updateQueryAndFetchPosts = (params = {}) => {
+  const updateRouteQuery = (params = {}) => {
       router
         .push({
           query: {
@@ -83,6 +85,8 @@ export const useMemberStore = defineStore("memberStore", () => {
               if (error?.response?.status === 422) {
                   console.log(error.response.data.errors);
                   errors.value = error.response.data.errors;
+              } else {
+                  showToast("Failed to add member", 'error');
               }
           })
           .finally(() =>{
@@ -91,23 +95,28 @@ export const useMemberStore = defineStore("memberStore", () => {
   }
 
   const getMembers = async () => {
-      return window.axios
-          .get("v1/tenant/members", { params:  route.query })
-          .then((response) => {
-              const membersData = response?.data
-              if (membersData) {
-                members.value = membersData.data
-                pagination.current_page = membersData.meta.current_page || 1
-                pagination.links = membersData.meta?.links || {}
-                pagination.last_page = membersData.meta?.last_page || 0
-                pagination.total = membersData.meta?.total || 0
-                pagination.from = membersData.meta?.from || 0
-                pagination.to = membersData.meta?.to || 0
-              }
-          })
-          .catch((error) => {
-              console.error('Error on fetching members', error)
-          })
+    if (isFetchLoading.value) return;
+    isFetchLoading.value = true;
+    isFetchError.value = false;
+
+    return window.axios
+        .get("v1/tenant/members", { params:  route.query })
+        .then((response) => {
+            const membersData = response?.data
+            if (membersData) {
+              members.value = membersData.data
+              pagination.current_page = membersData.meta.current_page || 1
+              pagination.links = membersData.meta?.links || {}
+              pagination.last_page = membersData.meta?.last_page || 0
+              pagination.total = membersData.meta?.total || 0
+              pagination.from = membersData.meta?.from || 0
+              pagination.to = membersData.meta?.to || 0
+            }
+        })
+        .catch((error) => {
+            isFetchError.value = true;
+            console.error('Error on fetching members', error)
+        }).finally(() => isFetchLoading.value = false);
   }
 
   const getMemberListWithoutPagination = async () => {
@@ -155,6 +164,9 @@ export const useMemberStore = defineStore("memberStore", () => {
       deleteMember,
       getMemberListWithoutPagination,
       debounceSearch,
+      loading,
+      isFetchLoading,
+      isFetchError,
       memberList,
       pagination,
       searchInput,

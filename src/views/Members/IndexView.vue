@@ -57,44 +57,67 @@ onMounted(store.getMembers);
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <!-- Sample Row 1 -->
-                    <tr 
-                        v-for="member in store?.members"
-                        :key="member.id"
-                    >
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <span class="text-gray-600">JD</span>
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
-                                </div>
+                     <tr v-if="store.isFetchLoading">
+                        <td colspan="100%" class="p-4">
+                            <div class="flex items-center justify-center">
+                                <IconSpinner class="h-10 w-10 text-gray-500 opacity-30" name="custom-spinner" />
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ member.email }}</div>
+                     </tr>
+                     <tr v-else-if="store.isFetchError">
+                        <td colspan="100%" class="p-4">
+                            <div class="flex items-center justify-center">
+                                <p>Failed to load members</p>
+                            </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ member.role }}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <!-- <button 
-                                @click="store.deleteMember(member)" 
-                                :class="{
-                                    'text-red-600 hover:text-red-900':! store.loading,
-                                    'text-red-400': store.loading,
-                                }" 
-                                title="Delete"
-                                :disabled="store.loading"
-                            >
-                                <IconSVG name="trash-svg"/>
-                            </button> -->
-                            <button class="text-purple-600 hover:text-purple-900" title="Impersonate">
-                                <IconSVG name="user-svg"/>
-                            </button>
+                     </tr>
+                     <template v-else-if="store?.members?.length > 0">
+                        <tr 
+                        v-for="member in store?.members"
+                        :key="member.id"
+                        >
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <span class="text-gray-600">JD</span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ member.email }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ member.role }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                <!-- <button 
+                                    @click="store.deleteMember(member)" 
+                                    :class="{
+                                        'text-red-600 hover:text-red-900':! store.loading,
+                                        'text-red-400': store.loading,
+                                    }" 
+                                    title="Delete"
+                                    :disabled="store.loading"
+                                >
+                                    <IconSVG name="trash-svg"/>
+                                </button> -->
+                                <button class="text-purple-600 hover:text-purple-900" title="Impersonate">
+                                    <IconSVG name="user-svg"/>
+                                </button>
+                            </td>
+                        </tr>
+                     </template>
+                     <tr v-else >
+                        <td colspan="100%" class="p-4">
+                            <div class="flex items-center justify-center">
+                                <p>No member found</p>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

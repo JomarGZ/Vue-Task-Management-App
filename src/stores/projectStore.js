@@ -9,7 +9,11 @@ export const useProjectStore = defineStore("project", () => {
     const projects = ref(null);
     const router = useRouter();
     const projectStatuses = ref([]);
+    const isFetchingProjects = ref(false);
+    const hasFetchProjectsError = ref(false);
     const projectPriorityLevels = ref([]);
+    const selectedPriority = ref("");
+    const selectedStatus = ref("");
     const route = useRoute();
     const project = ref({});
     const searchInput = ref(route.query.search || '');
@@ -49,6 +53,37 @@ export const useProjectStore = defineStore("project", () => {
         to: 0,
         total: 0,
       })
+    const setProjects = (data) => {
+        if (!data) return;
+        projects.value = data;
+    }
+    const setProject = (data) => {
+        if (!data) return;
+        project.value = data;
+    }
+    const setProjectDataOnEditMode = (editMode, data) => {
+        if (editMode) {
+            if (typeof data !== 'object' && data === null) return;
+            form.name = data?.name || '';
+            form.description = data?.description || '';
+            form.manager = data?.manager?.id || ''
+            form.client_name = data?.client_name || '';
+            form.status = data?.status || ''
+            form.priority = data?.priority || '';
+            form.started_at = data?.started_at ? data.started_at.split('T')[0] : '';
+            form.ended_at = data?.ended_at ? data.ended_at.split('T')[0] : '';
+            form.budget = data?.budget || '';
+        }
+    }
+    const setPagination = (projectsData) => {
+        if (!projectsData) return;
+            pagination.current_page = projectsData.current_page || 1
+            pagination.links = projectsData.links || {}
+            pagination.last_page = projectsData.last_page || 0
+            pagination.total = projectsData.total || 0
+            pagination.from = projectsData.from || 0
+            pagination.to = projectsData.to || 0
+    }
     const changePage = (pageUrl) => {
         if (!pageUrl) return
   
@@ -56,9 +91,10 @@ export const useProjectStore = defineStore("project", () => {
         const page = params.get('page')
   
         if (page) {
-            updateQueryAndFetchPosts({ page: page })
+            updateRouteQuery({ page: page })
         }
     }
+
     const debounceSearch = debounce((newSearch) => {
         router
         .replace({
@@ -68,12 +104,17 @@ export const useProjectStore = defineStore("project", () => {
             getProjects()
         })
     }, 300)
+
     const orderBy = (column = 'created_at') => {
         const toggleDirection = route.query.direction === 'desc' ? 'asc' : 'desc'
-        updateQueryAndFetchPosts({ column, direction: toggleDirection })
+        updateRouteQuery({ column, direction: toggleDirection })
     }
-    const updateQueryAndFetchPosts = (params = {}) => {
-        router
+    const filterProjects = (params) => {
+        updateRouteQuery(params);
+    }
+    const updateRouteQuery = (params = {}) => {
+        console.log(params);
+        return router
           .push({
             query: {
               ...route.query,
@@ -82,46 +123,36 @@ export const useProjectStore = defineStore("project", () => {
           })
           .then(() => getProjects())
       }
+
     const getProject = async (projectData, editMode = false) => {
         return window.axios
             .get(`v1/projects/${projectData?.id}`)
             .then(response => {
                 const data = response?.data?.data;
-                if (editMode) {
-                    form.name = data?.name || '';
-                    form.description = data?.description || '';
-                    form.manager = data?.manager?.id || ''
-                    form.client_name = data?.client_name || ''
-                    form.status = data?.status || ''
-                    form.priority = data?.priority || ''
-                    form.started_at = data?.started_at ? data.started_at.split('T')[0] : '';
-                    form.ended_at = data?.ended_at ? data.ended_at.split('T')[0] : '';
-                    form.budget = data?.budget || ''
-                } 
-                project.value = data;
+                setProjectDataOnEditMode(editMode, data);
+                setProject(data);
             })
             .catch(error => {
                 console.error('Error on fetching project:', error);
             });
     }
+
     const getProjects = () => {
+        if (isFetchingProjects.value) return;
+        isFetchingProjects.value = true
+
+        hasFetchProjectsError.value = false;
         return window.axios
             .get("v1/projects", {params: route.query})
             .then((response) => {
                 const projectsData = response?.data;
-                if (projectsData) {
-                    projects.value = projectsData.data
-                    pagination.current_page = projectsData.meta.current_page || 1
-                    pagination.links = projectsData.meta?.links || {}
-                    pagination.last_page = projectsData.meta?.last_page || 0
-                    pagination.total = projectsData.meta?.total || 0
-                    pagination.from = projectsData.meta?.from || 0
-                    pagination.to = projectsData.meta?.to || 0
-                  }
+                setProjects(projectsData.data)
+                setPagination(projectsData.meta);
             })
             .catch((error) => {
+                hasFetchProjectsError.value = true;
                 console.error('Error on fetching projects:', error)
-            })
+            }).finally(() => isFetchingProjects.value = false)
     }
 
     const handleSubmit = async () => {
@@ -147,6 +178,7 @@ export const useProjectStore = defineStore("project", () => {
             })
             .finally(() => loading.value = false);
     }
+    
     const updateProject = async (projectData) => {
         if (loading.value) return;
         loading.value = true;
@@ -176,6 +208,7 @@ export const useProjectStore = defineStore("project", () => {
             console.error('Error on fetching project statuses', error);
         }
     } 
+
     const getPriorityLevels = async () => {
         try {
             const response = await window.axios.get("v1/project-priority-levels");
@@ -194,8 +227,13 @@ export const useProjectStore = defineStore("project", () => {
         updateProject,
         getStatuses,
         orderBy,
+        filterProjects,
         getPriorityLevels,
         project,
+        selectedPriority,
+        selectedStatus,
+        hasFetchProjectsError,
+        isFetchingProjects,
         projectPriorityLevels,
         projectStatuses,
         debounceSearch,
