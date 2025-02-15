@@ -1,3 +1,65 @@
+ 
+<script setup>
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { RouterLink } from 'vue-router'
+import UserDetailDropdown from './UserDetailDropdown.vue'
+import { useNotifications } from '@/stores/notificationStore'
+import { formatDateDistance } from '@/composables/useFormatters'
+
+const props = defineProps({
+  logo: {
+    type: String,
+    required: true
+  },
+  onSideBarToggle: {
+    type: Function,
+    required: true
+  }
+})
+
+const notificationStore = useNotifications();
+
+const hasNotifications = computed(() => notificationStore.notifications?.length > 0);
+// Notification state
+const isNotificationsOpen = ref(false)
+const notificationButton = ref(null)
+const unreadCount = ref(3)
+
+
+const toggleNotifications = () => {
+  if (!isNotificationsOpen.value) {
+    notificationStore.fetchNotifications();
+  }
+  isNotificationsOpen.value = !isNotificationsOpen.value
+}
+
+const handleClickOutside = (event) => {
+const notificationElement = notificationButton.value
+if (notificationElement && !notificationElement.contains(event.target)) {
+  isNotificationsOpen.value = false
+}
+}
+
+const setNotificationRedirection = (entityId, entityType, otherEntity = {}) => {
+  if (!entityId || !entityType) return '#';
+
+  const redirectionMap = {
+    task: () => ({ name: 'tasks.show', params: { projectId: otherEntity.id, taskId: entityId } }),
+    project: () => ({ name: 'projects.show', params: { projectId: entityId } }),
+  };
+  return redirectionMap[entityType]?.() || '#';
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+  notificationStore.setupEcho()
+  
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+</script>
 <template>
     <div class="flex items-center justify-between">
       <!-- Left side with logo -->
@@ -51,89 +113,53 @@
               Notifications
             </div>
             <div class="divide-y divide-gray-100 dark:divide-gray-600">
-              <a
-                v-for="notification in notifications"
-                :key="notification.id"
-                href="#"
-                class="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600"
-              >
-                <div class="w-full">
-                  <p class="text-sm text-gray-900 dark:text-white">{{ notification.message }}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ notification.time }}</p>
-                </div>
+              <a v-if="notificationStore.isFetchLoading" disabled class="text-center flex items-center justify-center p-2">
+                  <IconSpinner name="white-spinner"/>
               </a>
+              <a
+                  v-else-if="notificationStore.isFetchError"
+                  href="#"
+                  disabled
+                  class="block py-2 text-sm text-center text-gray-200 bg-gray-50 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                >
+                  Failed to load notification
+                </a>
+              <template v-else-if="hasNotifications">
+                <RouterLink
+                  v-for="notification in notificationStore.notifications"
+                  :key="notification.id"
+                  :to="setNotificationRedirection(
+                    notification.data?.main_entity?.entity_id, 
+                    notification.data?.main_entity?.entity_type, 
+                    { id: notification.data?.related_entity?.entity_id }
+                  )"
+                  class="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600"
+                >
+                  <div class="w-full">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ notification.data?.message }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatDateDistance(notification.created_at) }}</p>
+                  </div>
+                </RouterLink>
+                <a
+                  href="#"
+                  class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                >
+                  View all notifications
+                </a>
+              </template>
+                <a
+                  v-else
+                  href="#"
+                  disabled
+                  class="block py-2 text-sm text-center text-gray-200 bg-gray-50 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                >
+                  No notification found
+                </a>
             </div>
-            <a
-              href="#"
-              class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              View all notifications
-            </a>
           </div>
         </div>
-  
         <!-- User Dropdown -->
         <UserDetailDropdown/>
       </div>
     </div>
   </template>
-  
-<script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { RouterLink } from 'vue-router'
-import UserDetailDropdown from './UserDetailDropdown.vue'
-
-const props = defineProps({
-logo: {
-    type: String,
-    required: true
-},
-onSideBarToggle: {
-    type: Function,
-    required: true
-}
-})
-
-// Notification state
-const isNotificationsOpen = ref(false)
-const notificationButton = ref(null)
-const unreadCount = ref(3)
-
-// Sample notifications data
-const notifications = ref([
-{
-    id: 1,
-    message: 'New sprint "Q1 Planning" has been created',
-    time: '10 minutes ago'
-},
-{
-    id: 2,
-    message: 'John Doe commented on your task',
-    time: '1 hour ago'
-},
-{
-    id: 3,
-    message: 'Sprint review meeting in 30 minutes',
-    time: '2 hours ago'
-}
-])
-
-const toggleNotifications = () => {
-    isNotificationsOpen.value = !isNotificationsOpen.value
-}
-
-const handleClickOutside = (event) => {
-const notificationElement = notificationButton.value
-if (notificationElement && !notificationElement.contains(event.target)) {
-    isNotificationsOpen.value = false
-}
-}
-
-onMounted(() => {
-    document.addEventListener('click', handleClickOutside)
-})
-
-onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside)
-})
-  </script>

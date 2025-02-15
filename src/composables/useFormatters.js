@@ -1,9 +1,13 @@
-import { format, parseISO } from "date-fns";
+import { format, formatDistance, parseISO, subDays } from "date-fns";
 
 export const formatDateWithTime = (date) => {
     if (!date) return ;
     return format(new Date(parseISO(date)), "MMMM dd, yyyy hh:mm a");
 };
+export const formatDateDistance = (date) => {
+    if (!date) return;
+    return formatDistance(new Date(parseISO(date)), new Date(), { addSuffix: true });
+}
 
 export const formatDateOnly = (date) => {
     if (!date) return;
