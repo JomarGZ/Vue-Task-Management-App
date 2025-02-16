@@ -19,7 +19,7 @@ export const useProfile = defineStore("profile", () => {
   }
  
   async function fetchProfile() {
-    return window.axios.get("v1/profile").then((response) => {
+    return window.axios.get("api/v1/profile").then((response) => {
       form.name = response.data.name;
       form.email = response.data.email;
     });
@@ -31,7 +31,7 @@ export const useProfile = defineStore("profile", () => {
     status.value = "";
  
     return window.axios
-      .put("v1/profile", form)
+      .put("api/v1/profile", form)
       .then((response) => {
         form.name = response.data.name;
         form.email = response.data.email;

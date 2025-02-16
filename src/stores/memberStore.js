@@ -76,7 +76,7 @@ export const useMemberStore = defineStore("memberStore", () => {
       loading.value = true;
       errors.value = {};
       return window.axios
-          .post("v1/tenant/members", form)
+          .post("api/v1/tenant/members", form)
           .then((response) => {
               showToast('New Member Added to Your Organization');
               router.push({name: 'members.index'})
@@ -100,7 +100,7 @@ export const useMemberStore = defineStore("memberStore", () => {
     isFetchError.value = false;
 
     return window.axios
-        .get("v1/tenant/members", { params:  route.query })
+        .get("api/v1/tenant/members", { params:  route.query })
         .then((response) => {
             const membersData = response?.data
             if (membersData) {
@@ -121,7 +121,7 @@ export const useMemberStore = defineStore("memberStore", () => {
 
   const getMemberListWithoutPagination = async () => {
     return window.axios
-      .get("v1/tenant/members/list")
+      .get("api/v1/tenant/members/list")
       .then(response => {
         memberList.value = response?.data?.data;
       })
@@ -139,7 +139,7 @@ export const useMemberStore = defineStore("memberStore", () => {
       .then((result =>{
         if (result.isConfirmed) {
           return window.axios
-          .delete(`v1/tenant/members/${member.id}`)
+          .delete(`api/v1/tenant/members/${member.id}`)
           .then((response => {
               getMembers()
               showToast("Member deleted Successfully")

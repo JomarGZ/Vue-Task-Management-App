@@ -5,6 +5,7 @@ import { RouterLink } from 'vue-router'
 import UserDetailDropdown from './UserDetailDropdown.vue'
 import { useNotifications } from '@/stores/notificationStore'
 import { formatDateDistance } from '@/composables/useFormatters'
+import { useAuth } from '@/stores/auth'
 
 const props = defineProps({
   logo: {
@@ -18,7 +19,7 @@ const props = defineProps({
 })
 
 const notificationStore = useNotifications();
-
+const auth = useAuth();
 const hasNotifications = computed(() => notificationStore.notifications?.length > 0);
 // Notification state
 const isNotificationsOpen = ref(false)
@@ -49,7 +50,16 @@ const setNotificationRedirection = (entityId, entityType, otherEntity = {}) => {
   };
   return redirectionMap[entityType]?.() || '#';
 };
-
+const authId = auth.user?.id;
+console.log(authId)
+ window.Echo.private(`App.Models.User.${authId}`)
+          .notification((notification) => {
+            console.log(notification)
+          });
+window.Echo.channel('test-channel')
+    .listen('TestBroadcast', (e) => {
+        console.log("Received TestBroadcast event!", e);
+    });
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   notificationStore.setupEcho()

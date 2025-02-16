@@ -107,7 +107,7 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
 
 
     const assignmentRequest = async (task) => {
-        return await window.axios.post(`v1/tasks/${task?.id}/assignment`, 
+        return await window.axios.post(`api/v1/tasks/${task?.id}/assignment`, 
             {assignees: selectedAssignees.value.map(assignee => assignee.id)}
         )
             .catch(error => {
@@ -116,7 +116,7 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
     }
 
     const unassignedRequest = async (task) => {
-        return await window.axios.put(`v1/tasks/${task?.id}/unassignment`, 
+        return await window.axios.put(`api/v1/tasks/${task?.id}/unassignment`, 
             {assignees: selectedAssigneeToBeRemove.value.map(assignee => assignee.id)})
     }
 
@@ -131,7 +131,7 @@ export const useTaskAssignmentStore = defineStore('TaskAssignment', () => {
     
     const memberListRequest = async (filteredOutMemberIds) => {
         try {
-            const response = await window.axios.get('v1/tenant/members/list', {
+            const response = await window.axios.get('api/v1/tenant/members/list', {
                 params: { filtered_out_member_ids: filteredOutMemberIds }
             });
             return response;

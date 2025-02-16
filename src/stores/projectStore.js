@@ -113,7 +113,6 @@ export const useProjectStore = defineStore("project", () => {
         updateRouteQuery(params);
     }
     const updateRouteQuery = (params = {}) => {
-        console.log(params);
         return router
           .push({
             query: {
@@ -126,7 +125,7 @@ export const useProjectStore = defineStore("project", () => {
 
     const getProject = async (projectData, editMode = false) => {
         return window.axios
-            .get(`v1/projects/${projectData?.id}`)
+            .get(`api/v1/projects/${projectData?.id}`)
             .then(response => {
                 const data = response?.data?.data;
                 setProjectDataOnEditMode(editMode, data);
@@ -143,7 +142,7 @@ export const useProjectStore = defineStore("project", () => {
 
         hasFetchProjectsError.value = false;
         return window.axios
-            .get("v1/projects", {params: route.query})
+            .get("api/v1/projects", {params: route.query})
             .then((response) => {
                 const projectsData = response?.data;
                 setProjects(projectsData.data)
@@ -162,7 +161,7 @@ export const useProjectStore = defineStore("project", () => {
 
         errors.value = {};
         return window.axios
-            .post("v1/projects", form)
+            .post("api/v1/projects", form)
             .then(response => {
                 showToast("Project Added Successfully");
                 resetForm()
@@ -184,7 +183,7 @@ export const useProjectStore = defineStore("project", () => {
         loading.value = true;
         errors.value = {};
         return window.axios
-            .put(`v1/projects/${projectData?.id}`, form)
+            .put(`api/v1/projects/${projectData?.id}`, form)
             .then(response => {
                 resetForm()
                 showToast("Project Updated successfully");
@@ -202,7 +201,7 @@ export const useProjectStore = defineStore("project", () => {
 
     const getStatuses = async () => {
         try {
-            const response = await window.axios.get("v1/project-statuses");
+            const response = await window.axios.get("api/v1/project-statuses");
             projectStatuses.value = response?.data?.data || [];
         } catch (error) {
             console.error('Error on fetching project statuses', error);
@@ -211,7 +210,7 @@ export const useProjectStore = defineStore("project", () => {
 
     const getPriorityLevels = async () => {
         try {
-            const response = await window.axios.get("v1/project-priority-levels");
+            const response = await window.axios.get("api/v1/project-priority-levels");
             projectPriorityLevels.value = response?.data?.data || [];
         } catch (error) {
             console.error('Error on fetching project statuses', error);

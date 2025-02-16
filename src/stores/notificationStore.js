@@ -18,7 +18,7 @@ export const useNotifications = defineStore("notifications", () => {
         },isFetchLoading, isFetchError);
     }
     const getNotifications = async () => {
-        return window.axios.get("v1/user/notifications");
+        return window.axios.get("api/v1/user/notifications");
     }
 
     const setupEcho = () => {

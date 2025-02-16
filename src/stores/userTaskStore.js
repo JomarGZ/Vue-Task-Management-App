@@ -95,14 +95,14 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const getAssignedTasks = async (params = {}) => {
        
         if (typeof params === 'object' && params !== null) {
-            return window.axios.get("v1/user/assigned-tasks", { params });
+            return window.axios.get("api/v1/user/assigned-tasks", { params });
         }
     }
     const getTaskCounts = async () => {
-        return window.axios.get("v1/user/task-status-counts");
+        return window.axios.get("api/v1/user/task-status-counts");
     }
     const getUpcomingTaskDeadlines  = async () => {
-        return window.axios.get("v1/user/upcoming-tasks-deadlines");
+        return window.axios.get("api/v1/user/upcoming-tasks-deadlines");
     }
     return {
         total_tasks,

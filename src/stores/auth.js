@@ -32,13 +32,13 @@ export const useAuth = defineStore("auth", () => {
   }
  
   async function logout() {
-    return window.axios.post("v1/auth/logout").finally(() => {
+    return window.axios.post("api/v1/auth/logout").finally(() => {
       destroyTokenAndRedirectTo();
     });
   }
   const fetchAuthUser = async () => {
     try {
-      const response = await window.axios.get("/v1/user", {
+      const response = await window.axios.get("api/v1/user", {
         headers: { Authorization: `Bearer ${accessToken.value}`},
       });
       if (response.status !== 200) throw new Error("Failed to fetch user");

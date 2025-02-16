@@ -59,7 +59,7 @@ export const useTeamMemberStore = defineStore("teamMembrs", () => {
 
     const getTeamMembers = async () => {
         return window.axios
-            .get(`v1/teams/${route.params.teamId}/members`, {params: router.query})
+            .get(`api/v1/teams/${route.params.teamId}/members`, {params: router.query})
             .then(response => {
                 const teamMembersData = response?.data;
                 if (teamMembersData) {
@@ -79,7 +79,7 @@ export const useTeamMemberStore = defineStore("teamMembrs", () => {
 
     const getTeamMemberCounts = async (team) => {
         return window.axios
-            .get(`v1/teams/${team.id}/statistic`)
+            .get(`api/v1/teams/${team.id}/statistic`)
             .then(response => {
                 console.log(response)
             })
@@ -90,7 +90,7 @@ export const useTeamMemberStore = defineStore("teamMembrs", () => {
 
     const getTeams = async () => {
         return window.axios
-            .get(`v1/teams`)
+            .get(`api/v1/teams`)
             .then(response => {
                 teams.value = response.data.data;
                  
@@ -102,7 +102,7 @@ export const useTeamMemberStore = defineStore("teamMembrs", () => {
 
     const addMemberToTeam = async (team) => {
         return window.axios
-            .post(`v1/teams/${team.id}/members`, form)
+            .post(`api/v1/teams/${team.id}/members`, form)
             .then(response => {
                 showToast('Member added to team successfully');
                 router.push({name: 'teams.show', params: {teamId: team.id}});

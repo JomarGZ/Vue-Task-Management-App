@@ -48,7 +48,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
 
 
     const getTask = async (task, editMode = false) => {
-        window.axios.get(`v1/tasks/${task.id}`).then(response => {
+        window.axios.get(`api/v1/tasks/${task.id}`).then(response => {
             const data = response.data.data;
             if (editMode) {
                 form.title = data?.title;
@@ -85,7 +85,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
       }
     async function getTasks() {
         return window.axios
-            .get(`v1/projects/${route.params.projectId}/tasks`, {params: route.query})
+            .get(`api/v1/projects/${route.params.projectId}/tasks`, {params: route.query})
             .then(response => {
                 const tasksData = response?.data;
                 if (tasksData) {
@@ -123,7 +123,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         errors.value = {};
         loading.value = true;
 
-        return window.axios.post(`v1/projects/${project.id}/tasks`, form)
+        return window.axios.post(`api/v1/projects/${project.id}/tasks`, form)
             .then((response) => {
                 const data = response.data.data;
                 showToast("Task added successfully")
@@ -164,7 +164,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
             return;
         }
         loading.value = true;
-        window.axios.delete(`v1/tasks/${task.id}`)
+        window.axios.delete(`api/v1/tasks/${task.id}`)
             .then(() => {
                 getTasks();
             })
@@ -175,7 +175,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     }
     
     async function updateStatus (task) {
-        return window.axios.patch(`v1/tasks/${task.id}/status`, {status: selectedStatus.value})
+        return window.axios.patch(`api/v1/tasks/${task.id}/status`, {status: selectedStatus.value})
             .then(response => {
                 showToast("Task status updated successfully");
                 const data = response?.data?.data;
@@ -187,7 +187,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     }
     
     async function fetchStatuses () {
-        return window.axios.get('v1/tasks-statuses')
+        return window.axios.get('api/v1/tasks-statuses')
             .then((response) => {
                 statuses.value = response?.data?.data;
             })
@@ -196,7 +196,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
             });
     }
     async function fetchPriorityLevels () {
-        return window.axios.get('v1/task-priority-levels')
+        return window.axios.get('api/v1/task-priority-levels')
             .then((response) => {
                 priorityLevels.value = response?.data?.data || [];
             })
@@ -207,7 +207,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
 
 
     async function updatePriorityLevel (level) {
-        return window.axios.put(`v1/tasks/${taskData.value.id}/priority/update`, { priority: level })
+        return window.axios.put(`api/v1/tasks/${taskData.value.id}/priority/update`, { priority: level })
             .then(response => {
                 console.log(response);
             })
@@ -217,7 +217,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     }
 
     const updateRequest = async (task) => {
-        return window.axios.put(`v1/tasks/${task.id}`, form)
+        return window.axios.put(`api/v1/tasks/${task.id}`, form)
             .catch(error => {
                 console.error("errors", error)
                 if (error.response.status === 422) {
@@ -227,7 +227,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     }
 
     async function fetchCategories () {
-        return window.axios.get('v1/categories')
+        return window.axios.get('api/v1/categories')
             .then(response => {
                 categories.value = response.data;
             })
