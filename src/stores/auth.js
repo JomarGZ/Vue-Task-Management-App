@@ -42,7 +42,6 @@ export const useAuth = defineStore("auth", () => {
         headers: { Authorization: `Bearer ${accessToken.value}`},
       });
       if (response.status !== 200) throw new Error("Failed to fetch user");
-      console.log(response)
       setAuthUserData(response?.data || null) 
     } catch (error) {
       setAuthUserData(null);

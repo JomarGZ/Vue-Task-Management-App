@@ -5,7 +5,6 @@ import { RouterLink } from 'vue-router'
 import UserDetailDropdown from './UserDetailDropdown.vue'
 import { useNotifications } from '@/stores/notificationStore'
 import { formatDateDistance } from '@/composables/useFormatters'
-import { useAuth } from '@/stores/auth'
 
 const props = defineProps({
   logo: {
@@ -19,12 +18,10 @@ const props = defineProps({
 })
 
 const notificationStore = useNotifications();
-const auth = useAuth();
 const hasNotifications = computed(() => notificationStore.notifications?.length > 0);
 // Notification state
 const isNotificationsOpen = ref(false)
 const notificationButton = ref(null)
-const unreadCount = ref(3)
 
 
 const toggleNotifications = () => {
@@ -43,27 +40,17 @@ if (notificationElement && !notificationElement.contains(event.target)) {
 
 const setNotificationRedirection = (entityId, entityType, otherEntity = {}) => {
   if (!entityId || !entityType) return '#';
-
   const redirectionMap = {
     task: () => ({ name: 'tasks.show', params: { projectId: otherEntity.id, taskId: entityId } }),
     project: () => ({ name: 'projects.show', params: { projectId: entityId } }),
   };
   return redirectionMap[entityType]?.() || '#';
 };
-const authId = auth.user?.id;
-console.log(authId)
- window.Echo.private(`App.Models.User.${authId}`)
-          .notification((notification) => {
-            console.log(notification)
-          });
-window.Echo.channel('test-channel')
-    .listen('TestBroadcast', (e) => {
-        console.log("Received TestBroadcast event!", e);
-    });
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   notificationStore.setupEcho()
-  
+  notificationStore.fetchNotifications()
 })
 
 onBeforeUnmount(() => {
@@ -105,8 +92,8 @@ onBeforeUnmount(() => {
           >
             <span class="sr-only">View notifications</span>
             <!-- Notification Badge -->
-            <div v-if="unreadCount" class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-1 -right-1">
-              {{ unreadCount }}
+            <div v-if="notificationStore.unreadCount" class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-1 -right-1">
+              {{ notificationStore.unreadCount }}
             </div>
             <!-- Bell Icon -->
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
