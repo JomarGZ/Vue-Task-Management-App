@@ -6,7 +6,7 @@ import { formatDateWithTime } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const isUnassignModalShow = ref(false);
@@ -22,6 +22,10 @@ const onStatusChange = () => {
 }
 onMounted(() => {
     taskStore.fetchStatuses();
+    taskStore.getTask({ id: taskId.value });
+    projectStore.getProject({ id: route.params.projectId });
+})
+watch(() =>[taskId.value, route.params.projectId], () => {
     taskStore.getTask({ id: taskId.value });
     projectStore.getProject({ id: route.params.projectId });
 })

@@ -109,49 +109,48 @@ onBeforeUnmount(() => {
             <div class="block px-4 py-2 font-medium text-gray-700 dark:text-gray-200 border-b dark:border-gray-600">
               Notifications
             </div>
-            <div class="divide-y divide-gray-100 dark:divide-gray-600">
-              <a v-if="notificationStore.isFetchLoading" disabled class="text-center flex items-center justify-center p-2">
-                  <IconSpinner name="white-spinner"/>
-              </a>
-              <a
+            <div class="divide-y divide-gray-100 dark:divide-gray-600 max-h-60 overflow-y-auto custom-scrollbar">
+                <a v-if="notificationStore.isFetchLoading" disabled class="text-center flex items-center justify-center p-2">
+                  <IconSpinner name="white-spinner" />
+                </a>
+                <a
                   v-else-if="notificationStore.isFetchError"
                   href="#"
                   disabled
                   class="block py-2 text-sm text-center text-gray-200 bg-gray-50 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                 >
-                  Failed to load notification
+                  Failed to load notifications
                 </a>
-              <template v-else-if="hasNotifications">
-                <RouterLink
-                  v-for="notification in notificationStore.notifications"
-                  :key="notification.id"
-                  :to="setNotificationRedirection(
-                    notification.data?.main_entity?.entity_id, 
-                    notification.data?.main_entity?.entity_type, 
-                    { id: notification.data?.related_entity?.entity_id }
-                  )"
-                  class="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600"
-                >
-                  <div class="w-full">
-                    <p class="text-sm text-gray-900 dark:text-white">{{ notification.data?.message }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatDateDistance(notification.created_at) }}</p>
-                  </div>
-                </RouterLink>
-                <a
-                  href="#"
-                  class="block py-2 text-sm font-medium text-center text-gray-900 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                >
-                  View all notifications
-                </a>
-              </template>
+                <template v-else-if="hasNotifications">
+                  <RouterLink
+                    v-for="notification in notificationStore.notifications"
+                    :key="notification.id"
+                    @click="notificationStore.handleMarkAsReadNotification(notification)"
+                    :to="setNotificationRedirection(
+                      notification.data?.main_entity?.entity_id,
+                      notification.data?.main_entity?.entity_type,
+                      { id: notification.data?.related_entity?.entity_id }
+                    )"
+                    class="flex px-4 py-3 items-center hover:bg-gray-100 dark:hover:bg-gray-600"
+                    :class="notification.read_at ? 'bg-gray-800' : ''"
+                  >
+                    <div class="w-full">
+                      <p class="text-sm text-gray-900 dark:text-white">{{ notification.data?.message }}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatDateDistance(notification.created_at) }}</p>
+                    </div>
+                  </RouterLink>
+                </template>
                 <a
                   v-else
                   href="#"
                   disabled
                   class="block py-2 text-sm text-center text-gray-200 bg-gray-50 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                 >
-                  No notification found
+                  No notifications found
                 </a>
+              </div>
+              <div v-if="hasNotifications" class="block px-4 py-2 text-sm text-center font-medium text-gray-700 dark:text-gray-200 border-b dark:border-gray-600">
+                <RouterLink to="#">View all notifications</RouterLink>
             </div>
           </div>
         </div>
