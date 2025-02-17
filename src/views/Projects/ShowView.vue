@@ -4,22 +4,29 @@ import { formatDateOnly, getInitials } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { onMounted, ref, watchEffect } from 'vue';
+import { useTaskStore } from '@/stores/taskStore';
+import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 const projectStore = useProjectStore();
 const projectTaskStore = useProjectTaskStore();
+const taskStore = useTaskStore();
 const route = useRoute();
 const isModalShow = ref(false);
-watchEffect(async () => {
-    projectStore.getProject({ id: route?.params?.projectId });
-    projectTaskStore.debounceSearch(projectTaskStore.searchInput);
-});
+watch(() => projectTaskStore.searchInput, projectTaskStore.debounceSearch);
 
 const refetchProject = () => {
     projectStore.getProject({id: route?.params?.projectId})
 }
+const handleTaskFilterChange = ([selectedStatus, selectedPriority]) => {
+    projectTaskStore.updateParams({status: selectedStatus, priority_level: selectedPriority});
+}
+watch(() => [projectTaskStore.selectedStatus, projectTaskStore.selectedPriority], handleTaskFilterChange);
+
 onMounted(() => {
+    projectStore.getProject({ id: route?.params?.projectId });
     projectTaskStore.getTasks();
+    taskStore.fetchPriorityLevels();
+    taskStore.fetchStatuses();
 });
 </script>
 <template>
@@ -170,17 +177,13 @@ onMounted(() => {
                             
                             <!-- Filters -->
                             <div class="flex gap-3">
-                                <select class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
+                                <select v-model="projectTaskStore.selectedStatus" class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
                                     <option value="">All Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="pending">Pending</option>
+                                    <option v-for="(status, index) in taskStore.statuses" :key="index" :value="status">{{ capWords(status) }}</option>
                                 </select>
-                                <select class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
-                                    <option value="">All Dates</option>
-                                    <option value="today">Today</option>
-                                    <option value="week">This Week</option>
-                                    <option value="month">This Month</option>
+                                <select v-model="projectTaskStore.selectedPriority" class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
+                                    <option value="">All Priority</option>
+                                    <option v-for="(priority, index) in taskStore.priorityLevels" :key="index" :value="priority">{{ capWords(priority) }}</option>
                                 </select>
                             </div>
                         </div>
@@ -200,7 +203,7 @@ onMounted(() => {
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <time class="text-sm text-gray-500">Mar 15</time>
+                                    <p class="text-sm text-gray-500">{{ capWords(task.priority_level) }}</p>
                                     <div class="mt-1">
                                         <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
                                     </div>
