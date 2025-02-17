@@ -1,5 +1,6 @@
 <script setup>
 import AssignProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
+import Comments from '@/components/Comments.vue';
 import { formatDateOnly, getInitials } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
@@ -209,6 +210,7 @@ onMounted(() => {
                     </div>
                     <PaginationComponent :pagination="projectTaskStore.pagination" size="sm" :onPageChange="projectTaskStore.changePage"/>
                 </div>
+               <Comments/>
             </div>
             <!-- Right Column - Team & Resources -->
             <div class="space-y-6">
@@ -322,125 +324,6 @@ onMounted(() => {
                         </div>
                     </div>
                 </div>
-                <div class="max-w-sm mx-auto bg-white rounded-lg shadow-lg border border-gray-200">
-                <div class="border-b border-gray-200 bg-gray-50 p-4 rounded-t-lg">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-semibold text-gray-800">Comments</h3>
-                        <span class="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-full">12</span>
-                    </div>
-                </div>
-
-                <!-- Comments Thread -->
-                <div class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
-                    <!-- Comment 1 -->
-                    <div class="p-4 bg-white">
-                        <div class="space-y-3">
-                            <div class="flex items-start gap-3">
-                                <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="User avatar">
-                                <div class="flex-1 space-y-1">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-medium text-gray-900">Sarah Johnson</span>
-                                        <span class="text-xs text-gray-500">Product Manager</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500">Yesterday at 2:34 PM</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Referenced Task -->
-                            <div class="ml-11 p-2 bg-gray-50 rounded-md text-xs text-gray-600 border-l-2 border-blue-500">
-                                Re: <span class="font-medium">Homepage Redesign - Navigation Updates</span>
-                            </div>
-
-                            <!-- Comment Content -->
-                            <div class="ml-11">
-                                <p class="text-sm text-gray-700">The navigation layout looks much better now. Can we make sure all the dropdown menus have consistent spacing?</p>
-                                <div class="mt-3 flex items-center gap-4">
-                                    <button class="text-xs text-gray-600 hover:text-gray-900">Reply</button>
-                                    <button class="text-xs text-gray-600 hover:text-gray-900">Edit</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Comment 2 with thread -->
-                    <div class="p-4 bg-white">
-                        <div class="space-y-3">
-                            <div class="flex items-start gap-3">
-                                <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="User avatar">
-                                <div class="flex-1 space-y-1">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-medium text-gray-900">Alex Chen</span>
-                                        <span class="text-xs text-gray-500">Developer</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500">Yesterday at 3:15 PM</span>
-                                </div>
-                            </div>
-
-                            <!-- Comment Content -->
-                            <div class="ml-11">
-                                <p class="text-sm text-gray-700">I've updated the spacing to 16px across all dropdown menus. Also fixed the hover states for better consistency.</p>
-                                
-                                <!-- Code Snippet -->
-                                <div class="mt-2 p-2 bg-gray-800 rounded-md">
-                                    <code class="text-xs text-gray-200">
-                                        .dropdown-menu { padding: 16px; }
-                                    </code>
-                                </div>
-
-                                <div class="mt-3 flex items-center gap-4">
-                                    <button class="text-xs text-gray-600 hover:text-gray-900">Reply</button>
-                                    <button class="text-xs text-gray-600 hover:text-gray-900">Edit</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Nested Reply -->
-                        <div class="mt-4 ml-11 pl-4 border-l-2 border-gray-100">
-                            <div class="flex items-start gap-3">
-                                <img src="https://i.pravatar.cc/32" class="w-6 h-6 rounded-full" alt="User avatar">
-                                <div class="flex-1 space-y-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-medium text-gray-900">Sarah Johnson</span>
-                                        <span class="text-xs text-gray-500">Just now</span>
-                                    </div>
-                                    <p class="text-sm text-gray-700">Perfect, thank you! This looks much better now.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add Comment -->
-                    <div class="p-4 bg-gray-50">
-                        <div class="flex gap-3">
-                            <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Your avatar">
-                            <div class="flex-1 space-y-3">
-                                <textarea 
-                                    rows="3" 
-                                    class="w-full px-3 py-2 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-                                    placeholder="Add your comment..."
-                                ></textarea>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <button class="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                            </svg>
-                                        </button>
-                                        <button class="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <button class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                                        Comment
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             </div>
         </div>
     </div>
