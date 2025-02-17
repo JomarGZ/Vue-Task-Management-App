@@ -51,10 +51,6 @@ onMounted(() => {
                     <i class="fas fa-edit"></i>
                     Edit
                 </RouterLink>
-                <button class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center gap-2">
-                    <i class="fas fa-trash"></i>
-                    Delete
-                </button>
             </div>
         </div>
 
