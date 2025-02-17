@@ -23,8 +23,7 @@ export const useNotifications = defineStore("notifications", () => {
         };
         window.Echo.private(`App.Models.User.${userId}`)
           .notification((notification) => {
-            notifications.value.unshift(notification);
-            unreadCount.value++; 
+            fetchNotifications()
           });
     };
     const handleMarkAsReadNotification = async (notification) => {
