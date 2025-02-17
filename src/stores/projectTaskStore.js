@@ -9,6 +9,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     const route = useRoute();
     const taskData = ref({});
     const selectedStatus = ref('');
+    const selectedPriority = ref('');
     const statuses = ref([]);
     const priorityLevels = ref([]);
     const searchInput = ref(route.query.search || '');
@@ -247,6 +248,8 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         getTasks,
         resetForm,
         resetTaskData,
+        updateParams,
+        selectedPriority,
         selectedStatus,
         debounceSearch,
         priorityLevels,
