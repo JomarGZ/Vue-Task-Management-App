@@ -71,14 +71,15 @@ export const useTaskStore = defineStore('tasks', () => {
     }
 
     const getTasks = async () => {
-        return window.axios.get("v1/standalone/tasks", {params: route?.query})
+        return window.axios.get("api/v1/standalone/tasks", {params: route?.query})
             .catch(error => {
                 console.error('Error on fetching tasks:', error)
             });
+
     }
 
     const fetchStatuses = async () => {
-        return window.axios.get('v1/tasks-statuses')
+        return window.axios.get('api/v1/tasks-statuses')
             .then((response) => {
                 statuses.value = response?.data?.data;
             })
@@ -88,7 +89,7 @@ export const useTaskStore = defineStore('tasks', () => {
     }
 
     const fetchPriorityLevels = async () => {
-        return window.axios.get('v1/task-priority-levels')
+        return window.axios.get('api/v1/task-priority-levels')
             .then((response) => {
                 priorityLevels.value = response?.data?.data || [];
             })

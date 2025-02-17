@@ -1,5 +1,6 @@
 
 import "@/bootstrap.js";
+import "@/echo.js";
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ValidationError from "@/components/ValidationError.vue";

@@ -67,7 +67,7 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
 
     const fetchMembers = async () => {
         try {
-            const response = await window.axios.get('v1/tenant/members/list', {params: {filtered_out_member_ids: filteredOutMemberIds.value}});
+            const response = await window.axios.get('api/v1/tenant/members/list', {params: {filtered_out_member_ids: filteredOutMemberIds.value}});
             teamMembers.value = response?.data?.data || [];
         } catch (error) {
             console.error('Error fetching member list:', error);
@@ -77,7 +77,7 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
     const handleAssignMembers = async (closeModal) => {
         try {
             const response = await window.axios.post(
-                `v1/projects/${project.value.id}/assignment`, 
+                `api/v1/projects/${project.value.id}/assignment`, 
                 {assign_team_members: selectedMembers.value.map(member => member.id)}
             )
             fetchMembers();

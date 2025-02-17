@@ -26,7 +26,7 @@ export const useChangePassword = defineStore("change-password", () => {
     status.value = "";
  
     return window.axios
-      .put("av1/password", form)
+      .put("api/v1/password", form)
       .then(() => {
         status.value = "Password has been updated.";
       })
