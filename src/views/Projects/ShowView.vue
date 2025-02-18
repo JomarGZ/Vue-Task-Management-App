@@ -1,6 +1,6 @@
 <script setup>
 import AssignProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
-import Comments from '@/components/Comments.vue';
+import CommentsSection from '@/components/CommentsSection.vue';
 import { formatDateOnly, getInitials } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
@@ -210,7 +210,7 @@ onMounted(() => {
                     </div>
                     <PaginationComponent :pagination="projectTaskStore.pagination" size="sm" :onPageChange="projectTaskStore.changePage"/>
                 </div>
-               <Comments/>
+               <CommentsSection/>
             </div>
             <!-- Right Column - Team & Resources -->
             <div class="space-y-6">

@@ -1,5 +1,5 @@
 <script setup>
-import Comments from '@/components/Comments.vue';
+import CommentsSection from '@/components/CommentsSection.vue';
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
 import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
@@ -108,7 +108,7 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 </div>
 
                 <!-- Comments -->
-                <Comments/>
+                <CommentsSection/>
             </div>
 
             <!-- Right Column -->
