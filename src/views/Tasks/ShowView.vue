@@ -1,4 +1,5 @@
 <script setup>
+import Comments from '@/components/Comments.vue';
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
 import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
@@ -107,31 +108,7 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 </div>
 
                 <!-- Comments -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <h2 class="text-lg font-semibold mb-4">Comments</h2>
-                    <!-- Comment List -->
-                    <div class="space-y-6">
-                        <div class="flex space-x-3">
-                            <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full" alt="User avatar">
-                            <div class="flex-1">
-                                <div class="bg-gray-50 rounded-lg p-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="font-medium text-gray-900">Sarah Chen</span>
-                                        <span class="text-sm text-gray-500">2 hours ago</span>
-                                    </div>
-                                    <p class="text-gray-700">Design specs have been updated. Please check the latest Figma file.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- New Comment Form -->
-                    <div class="mt-6">
-                        <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="3" placeholder="Add a comment..."></textarea>
-                        <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            Add Comment
-                        </button>
-                    </div>
-                </div>
+                <Comments/>
             </div>
 
             <!-- Right Column -->
