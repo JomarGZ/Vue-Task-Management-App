@@ -22,7 +22,7 @@ export const snakeCaseWord = (words) => {
 }
 
 
-export const handleAsyncRequestOperation = async (operation, onSuccess, loadingState, errorState) => {
+export const handleAsyncRequestOperation = async (operation, onSuccess, loadingState, errorState, onError = null) => {
     if (loadingState.value) return;
     loadingState.value = true;
     errorState.value = false;
@@ -32,6 +32,9 @@ export const handleAsyncRequestOperation = async (operation, onSuccess, loadingS
         onSuccess(response);
     } catch (error) {
         errorState.value = true;
+        if (onError !== null && typeof onError === 'function'){
+            onError(error);
+        }
         console.error("Error:", error);
     } finally {
         loadingState.value = false;

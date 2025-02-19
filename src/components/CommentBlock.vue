@@ -5,6 +5,7 @@ const props = defineProps({
     comment: Object,
     author: Object
 })
+const emit = defineEmits(['clicked-reply']);
 </script>
 <template>
     <div class="bg-gray-50 rounded-2xl p-4">
@@ -23,6 +24,6 @@ const props = defineProps({
             </div>
         </div>
         <p class="mt-2 text-gray-700">{{ comment?.content }}</p>
-        <CommentOption/>
+        <CommentOption @clicked-reply="$emit('clicked-reply')"/>
     </div>
 </template>

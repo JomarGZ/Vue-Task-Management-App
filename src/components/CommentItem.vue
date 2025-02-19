@@ -19,30 +19,34 @@ const isRepliesOpen = ref(false);
 const handleToggleReplies = () => {
     isRepliesOpen.value = ! isRepliesOpen.value;
 }
+const replyclicked = () => {
+    handleToggleReplies()
+}
 </script>
 <template>
-    <div class="flex gap-4 group">
+    <div class="flex group">
         <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
         <div class="flex-grow">
             <CommentBlock
               :comment="comment"
-              :author="comment?.author" />
+              :author="comment?.author"
+              @clicked-reply="replyclicked"
+              />
             <div v-if="hasReplies" class="ml-4">
                 <button @click="handleToggleReplies" class="hover:underline text-gray-700">{{ repliedLabel }}</button>
              </div>
             <!-- Nested Reply -->
-             <template v-if="hasReplies && isRepliesOpen">
-                <div class="mt-4 ml-6 flex flex-col gap-4">
-                    <div v-for="reply in replies" :key="reply" class="flex gap-4">
+            <div class="mt-4 ml-6 flex flex-col">
+                <template v-if="hasReplies && isRepliesOpen">
+                    <div v-for="reply in replies" :key="reply" class="flex">
                         <img src="https://i.pravatar.cc/40" class="w-8 h-8 rounded-full shadow-sm" alt="User avatar"/>
                         <div class="flex-grow">
-                            <CommentBlock :comment="reply" :author="reply?.author"/>
+                            <CommentBlock :comment="reply" :author="reply?.author" @clicked-reply="replyclicked"/>
                         </div>
                     </div>
-                <CommentForm class="flex gap-4"/>
-                </div>
-             </template>
-           
+                </template>
+                <CommentForm v-if="isRepliesOpen" class="flex gap-4"/>
+            </div>
         </div>
     </div>
 </template>
