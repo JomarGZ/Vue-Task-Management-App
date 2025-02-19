@@ -10,9 +10,10 @@ const props = defineProps({
 
 const hasReplies = computed(() => props.replies?.length > 0);
 const replyCounts = computed(() => props.replies?.length || 0);
-const replyLabel = computed(() => 
-  props.replyCounts > 1 ? `${replyCounts.value} replies` : `${replyCounts.value} reply`
+const repliedLabel = computed(() => 
+  replyCounts.value > 1 ? `${props.replies[0]?.author?.name} and others replied • ${replyCounts.value} replies` : `${props.replies[0]?.author?.name} replied • ${replyCounts.value} reply`
 );
+
 const isRepliesOpen = ref(false);
 
 const handleToggleReplies = () => {
@@ -27,7 +28,7 @@ const handleToggleReplies = () => {
               :comment="comment"
               :author="comment?.author" />
             <div v-if="hasReplies" class="ml-4">
-                <button @click="handleToggleReplies" class="hover:underline text-gray-700">John Doe replied • {{ replyLabel }}</button>
+                <button @click="handleToggleReplies" class="hover:underline text-gray-700">{{ repliedLabel }}</button>
              </div>
             <!-- Nested Reply -->
              <template v-if="hasReplies && isRepliesOpen">

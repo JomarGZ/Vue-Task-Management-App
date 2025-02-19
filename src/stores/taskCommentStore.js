@@ -12,7 +12,6 @@ export const useTaskComments = defineStore("task-comments", () => {
     }
     const fetchComments = async (task) => {
         await handleAsyncRequestOperation(() => getComments(task), (response) => {
-            console.log(response);
             setComments(response.data?.data);
         }, isFetchLoading, isFetchError)
     }

@@ -2,20 +2,30 @@
 import { computed } from 'vue';
 import CommentItem from './CommentItem.vue';
 import CommentForm from './forms/CommentForm.vue';
+import { formatDateDistance } from '@/composables/useFormatters';
 const props = defineProps({
     comments: Array,
     isFetchLoading: Boolean,
     isFetchError: Boolean
 })
 const hasComments = computed(() => props.comments?.length > 0);
-const commentCounts = computed(() => props.comments?.length || 0) ;
+const commentCounts = computed(() => props.comments?.length || 0);
+const latestActivity = computed(() => {
+  if (!props.comments.length) return '';
+
+  const latestDate = props.comments.reduce((latest, comment) => 
+    new Date(comment?.created_at) > new Date(latest) ? comment?.created_at : latest
+  ,props.comments[0]?.created_at); 
+
+  return latestDate ? `Latest activity ${formatDateDistance(latestDate)}` : '';
+});
 </script>
 
 <template>
      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-lg font-semibold text-gray-800">Comments ({{ commentCounts }})</h3>
-            <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">Latest activity 2h ago</span>
+            <span v-if="latestActivity" class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">{{ latestActivity }}</span>
         </div>
         <!-- New Comment Input -->
         <div class="mb-8">
