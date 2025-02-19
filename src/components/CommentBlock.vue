@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import { formatDateDistance } from '@/composables/useFormatters';
 import CommentOption from './CommentOption.vue';
-
+const props = defineProps({
+    comment: Object,
+    author: Object
+})
 </script>
 <template>
     <div class="bg-gray-50 rounded-2xl p-4">
         <div class="flex items-start justify-between">
             <div class="flex items-center gap-2">
-                <h4 class="font-medium text-gray-800">Sarah Chen</h4>
+                <h4 class="font-medium text-gray-800">{{ author?.name }}</h4>
                 <span class="text-sm text-gray-500">Product Manager</span>
-                <span class="text-sm text-gray-400">• 2 hours ago</span>
+                <span class="text-sm text-gray-400">• {{ formatDateDistance(comment?.created_at) }}</span>
             </div>
             <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button class="p-1 hover:bg-gray-200 rounded transition-colors">
@@ -18,7 +22,7 @@ import CommentOption from './CommentOption.vue';
                 </button>
             </div>
         </div>
-        <p class="mt-2 text-gray-700">We need to ensure this authentication system supports both email/password and social login options. Please refer to the security requirements document for specific implementation details.</p>
+        <p class="mt-2 text-gray-700">{{ comment?.content }}</p>
         <CommentOption/>
     </div>
 </template>

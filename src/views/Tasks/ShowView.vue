@@ -7,6 +7,7 @@ import { formatDateWithTime } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
+import { useTaskComments } from '@/stores/taskCommentStore';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -16,15 +17,20 @@ const isEditTaskModalShow = ref(false);
 const route = useRoute();
 const projectStore = useProjectStore();
 const taskStore = useProjectTaskStore();
+const taskCommentStore = useTaskComments();
 const taskId = computed(() => route?.params?.taskId);
 
 const onStatusChange = () => {
     taskStore.updateStatus({ id: taskId.value });
 }
-onMounted(() => {
-    taskStore.fetchStatuses();
-    taskStore.getTask({ id: taskId.value });
-    projectStore.getProject({ id: route.params.projectId });
+onMounted(async () => {
+    await Promise.all([
+        taskStore.fetchStatuses(),
+        taskStore.getTask({ id: taskId.value }),
+        projectStore.getProject({ id: route.params.projectId }),
+        taskCommentStore.fetchComments({id: taskId.value})
+    ])
+    
 })
 watch(() =>[taskId.value, route.params.projectId], () => {
     taskStore.getTask({ id: taskId.value });
@@ -108,7 +114,10 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 </div>
 
                 <!-- Comments -->
-                <CommentsSection/>
+                <CommentsSection
+                  :comments="taskCommentStore.comments"
+                  :isFetchLoading="taskCommentStore.isFetchLoading"
+                  :isFetchError="taskCommentStore.isFetchError" />
             </div>
 
             <!-- Right Column -->

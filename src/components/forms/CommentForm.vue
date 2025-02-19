@@ -2,7 +2,7 @@
     <div>
         <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
         <form class="flex-grow">
-            <div class="bg-gray-50 rounded-2xl p-2">
+            <div class="bg-gray-50 rounded-2xl p-4">
                 <textarea 
                     class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 p-0 scrollbar-hide resize-none text-gray-700 placeholder-gray-400"
                     rows="2"
