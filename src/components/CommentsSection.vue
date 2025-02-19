@@ -5,9 +5,11 @@ import CommentForm from './forms/CommentForm.vue';
 import { formatDateDistance } from '@/composables/useFormatters';
 const props = defineProps({
     comments: Array,
+    content: String,
     isFetchLoading: Boolean,
     isFetchError: Boolean
 })
+const emit = defineEmits(['update:content', 'submit-comment']);
 const hasComments = computed(() => props.comments?.length > 0);
 const commentCounts = computed(() => props.comments?.length || 0);
 const latestActivity = computed(() => {
@@ -19,6 +21,11 @@ const latestActivity = computed(() => {
 
   return latestDate ? `Latest activity ${formatDateDistance(latestDate)}` : '';
 });
+
+const contentModel = computed({
+    get: () => props.content,
+    set: (value) => emit('update:content', value) 
+})
 </script>
 
 <template>
@@ -29,7 +36,7 @@ const latestActivity = computed(() => {
         </div>
         <!-- New Comment Input -->
         <div class="mb-8">
-          <CommentForm class="flex gap-4"/>
+          <CommentForm class="flex gap-4" v-model:content="contentModel" @submit-comment="$emit('submit-comment', $event)"/>
         </div>
         <div class="space-y-6">
             <div v-if="isFetchLoading" class="flex items-center justify-center p-4 w-full">

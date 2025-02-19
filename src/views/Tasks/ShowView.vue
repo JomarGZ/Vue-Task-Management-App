@@ -8,7 +8,7 @@ import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { useTaskComments } from '@/stores/taskCommentStore';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, provide, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const isUnassignModalShow = ref(false);
@@ -117,7 +117,10 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 <CommentsSection
                   :comments="taskCommentStore.comments"
                   :isFetchLoading="taskCommentStore.isFetchLoading"
-                  :isFetchError="taskCommentStore.isFetchError" />
+                  :isFetchError="taskCommentStore.isFetchError"
+                  v-model:content="taskCommentStore.form.content"
+                  @submit-comment="taskCommentStore.handleAddComment({id: taskId})" 
+                />
             </div>
 
             <!-- Right Column -->

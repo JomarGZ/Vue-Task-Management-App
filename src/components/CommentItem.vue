@@ -41,7 +41,7 @@ const replyclicked = () => {
                     <div v-for="reply in replies" :key="reply" class="flex">
                         <img src="https://i.pravatar.cc/40" class="w-8 h-8 rounded-full shadow-sm" alt="User avatar"/>
                         <div class="flex-grow">
-                            <CommentBlock :comment="reply" :author="reply?.author" @clicked-reply="replyclicked"/>
+                            <CommentBlock :comment="reply" :author="reply?.author" @clicked-reply="handleToggleReplies"/>
                         </div>
                     </div>
                 </template>

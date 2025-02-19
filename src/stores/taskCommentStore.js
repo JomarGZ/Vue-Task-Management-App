@@ -8,6 +8,7 @@ export const useTaskComments = defineStore("task-comments", () => {
     const isStoreLoading = ref(false);
     const isStoreError = ref(false);
     const comments = ref([]);
+    const errors = ref([]);
     const form = reactive({
         content: ''
     });
@@ -29,19 +30,27 @@ export const useTaskComments = defineStore("task-comments", () => {
     }
     const handleAddComment = async (task) => {
         await handleAsyncRequestOperation(() => addComment(task), (response) => {
-            console.log(response);
-        }, isStoreLoading, isStoreError); 
+            console.log(response?.data?.data);
+            if (response?.status === 201) {
+                comments.value.unshift(response?.data?.data);
+            }
+        }, isStoreLoading, isStoreError, handleError); 
+    }
+    const handleError = (error) => {
+        console.log(error);
     }
 
     const addComment = async (task) => {
         if (!task) return;
-        return window.axios.post(`api/v1/tasks/${task?.id}/comments`)
+        return window.axios.post(`api/v1/tasks/${task?.id}/comments`, form)
     }
     return {
         fetchComments,
         setComments,
         resetForm,
         handleAddComment,
+        errors,
+        form,
         isStoreError,
         isStoreLoading,
         comments,
