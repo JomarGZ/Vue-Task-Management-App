@@ -10,6 +10,7 @@ const props = defineProps({
 const taskComment = useTaskComments();
 const isOpen = ref(false);
 const toggleOpenButton = ref(null);
+
 const handleClickeOutside = (event) => {
     const toggleButtonEl = toggleOpenButton.value;
     if (toggleButtonEl && !toggleButtonEl.contains(event.target)) {
