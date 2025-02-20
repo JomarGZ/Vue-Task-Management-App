@@ -210,7 +210,6 @@ onMounted(() => {
                     </div>
                     <PaginationComponent :pagination="projectTaskStore.pagination" size="sm" :onPageChange="projectTaskStore.changePage"/>
                 </div>
-               <CommentsSection/>
             </div>
             <!-- Right Column - Team & Resources -->
             <div class="space-y-6">

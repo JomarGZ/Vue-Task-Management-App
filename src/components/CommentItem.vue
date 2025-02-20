@@ -36,7 +36,7 @@ const replyclicked = () => {
                 <button @click="handleToggleReplies" class="hover:underline text-gray-700">{{ repliedLabel }}</button>
              </div>
             <!-- Nested Reply -->
-            <div class="mt-4 ml-6 flex flex-col">
+            <div class="mt-4 ml-6 gap-4 flex flex-col">
                 <template v-if="hasReplies && isRepliesOpen">
                     <div v-for="reply in replies" :key="reply" class="flex">
                         <img src="https://i.pravatar.cc/40" class="w-8 h-8 rounded-full shadow-sm" alt="User avatar"/>
