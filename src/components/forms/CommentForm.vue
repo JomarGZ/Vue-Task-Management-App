@@ -1,12 +1,12 @@
 <script setup>
 import { useTaskComments } from '@/stores/taskCommentStore';
 import { storeToRefs } from 'pinia';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
     content: String
 });
-
+const textareaRef = ref(null);
 const taskCommentStore = useTaskComments();
 const { isStoreLoading } = storeToRefs(taskCommentStore);
 const emit = defineEmits(['update:content', 'submit-comment']);
@@ -21,17 +21,27 @@ const handleSumbit = () => {
     emit('submit-comment', contentModel.value);
     emit('update:content', '');
 }
+const refocusInput = (isEditMode) => {
+    if (isEditMode && textareaRef.value) {
+        textareaRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        textareaRef.value.focus();
+    }
+}
 
+watch(() => taskCommentStore.isEditMode, refocusInput);
 </script>
 <template>
     <div>
         <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
-        <form @submit.prevent="handleSumbit"  class="flex-grow">
+        <form @submit.prevent="handleSumbit" class="flex-grow">
+
             <div class="bg-gray-50 rounded-2xl p-4">
+                <span v-if="taskCommentStore.isEditMode" class="text-sm text-gray-600"><button type="button" @click="taskCommentStore.clearEdit" class="text-blue-500 hover:text-blue-700">Cancel</button> editing</span>
                 <textarea 
                     class="w-full bg-transparent border-0 focus:outline-none focus:ring-0 p-0 scrollbar-hide resize-none text-gray-700 placeholder-gray-400"
                     rows="2"
                     v-model="contentModel"
+                    ref="textareaRef"
                     placeholder="Add your comment..."
                 ></textarea>
                 <div class="flex items-center justify-between mt-1 pt-1 border-gray-200">

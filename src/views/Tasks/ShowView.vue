@@ -119,7 +119,7 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                   :isFetchLoading="taskCommentStore.isFetchLoading"
                   :isFetchError="taskCommentStore.isFetchError"
                   v-model:content="taskCommentStore.form.content"
-                  @submit-comment="taskCommentStore.handleAddComment({id: taskId})" 
+                  @submit-comment="taskCommentStore.handleSubmitComment({id: taskId})" 
                 />
             </div>
 

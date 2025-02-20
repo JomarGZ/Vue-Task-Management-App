@@ -2,15 +2,17 @@
 import { formatDateDistance } from '@/composables/useFormatters';
 import CommentOption from './CommentOption.vue';
 import { useTaskComments } from '@/stores/taskCommentStore';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useAuth } from '@/stores/auth';
 const props = defineProps({
     comment: Object,
     author: Object
 })
 const taskComment = useTaskComments();
+const { authId } = useAuth();
 const isOpen = ref(false);
 const toggleOpenButton = ref(null);
-
+const isCommentOwnerOptionsVisible = computed(() => authId === props.author?.id);
 const handleClickeOutside = (event) => {
     const toggleButtonEl = toggleOpenButton.value;
     if (toggleButtonEl && !toggleButtonEl.contains(event.target)) {
@@ -19,6 +21,9 @@ const handleClickeOutside = (event) => {
 }
 const handleDelete = async () => {
      await taskComment.handleDeleteComment({id: props.comment?.id});
+}
+const handleEdit = () => {
+    taskComment.setEditContent(props.comment);
 }
 const emit = defineEmits(['clicked-reply']);
 onMounted(() => {
@@ -36,7 +41,7 @@ onBeforeUnmount(() => {
                 <span class="text-sm text-gray-500">Product Manager</span>
                 <span class="text-sm text-gray-400">• {{ formatDateDistance(comment?.created_at) }}</span>
             </div>
-            <div class="relative inline-block" ref="dropdownRef">
+            <div v-if="isCommentOwnerOptionsVisible" class="relative inline-block" ref="dropdownRef">
                 <button
                     @click="isOpen = !isOpen"
                     ref="toggleOpenButton"

@@ -8,8 +8,10 @@ export const useAuth = defineStore("auth", () => {
   const accessToken = useStorage("access_token", "");
   const check = computed(() => !!accessToken.value);
   const user = useStorage("auth_user", {});
-  const userEmail = computed(() => user.value?.email);
+
+  const authId = computed(() => user.value?.id);
   const userName = computed(() => user.value?.name);
+  const userEmail = computed(() => user.value?.email);
   const userPhoneNumber = computed(() => user.value?.phone_number);
 
   function setAccessToken(value) {
@@ -57,6 +59,7 @@ export const useAuth = defineStore("auth", () => {
     logout, 
     check, 
     userEmail,
+    authId,
     user,
     userName,
     userPhoneNumber,
