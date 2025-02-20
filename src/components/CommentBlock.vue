@@ -2,17 +2,30 @@
 import { formatDateDistance } from '@/composables/useFormatters';
 import CommentOption from './CommentOption.vue';
 import { useTaskComments } from '@/stores/taskCommentStore';
-import { ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 const props = defineProps({
     comment: Object,
     author: Object
 })
 const taskComment = useTaskComments();
 const isOpen = ref(false);
+const toggleOpenButton = ref(null);
+const handleClickeOutside = (event) => {
+    const toggleButtonEl = toggleOpenButton.value;
+    if (toggleButtonEl && !toggleButtonEl.contains(event.target)) {
+        isOpen.value = false;
+    }
+}
 const handleDelete = async () => {
      await taskComment.handleDeleteComment({id: props.comment?.id});
 }
 const emit = defineEmits(['clicked-reply']);
+onMounted(() => {
+    document.addEventListener('click', handleClickeOutside);
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickeOutside)
+})
 </script>
 <template>
     <div class="bg-gray-50 rounded-2xl p-4">
@@ -22,17 +35,18 @@ const emit = defineEmits(['clicked-reply']);
                 <span class="text-sm text-gray-500">Product Manager</span>
                 <span class="text-sm text-gray-400">• {{ formatDateDistance(comment?.created_at) }}</span>
             </div>
-            <div class="relative inline-block opacity-0 group-hover:opacity-100 transition-opacity" ref="dropdownRef">
+            <div class="relative inline-block" ref="dropdownRef">
                 <button
                     @click="isOpen = !isOpen"
+                    ref="toggleOpenButton"
                     class="p-1 hover:bg-gray-200 rounded-full transition-colors"
                 >
                     <IconSVG name="three-dot-svg"  class="w-4 h-4 text-gray-500"/>
                 </button>
                 <div
-                v-if="isOpen"
-                class="absolute right-0 mt-2 w-36 bg-white rounded-md shadow-lg border border-gray-200 z-50"
-                >
+                    v-if="isOpen"
+                    class="absolute right-0 bg-white rounded-md shadow-lg border border-gray-200 z-50"
+                    >
                     <div class="py-1">
                         <button
                             @click="handleEdit"
@@ -40,11 +54,11 @@ const emit = defineEmits(['clicked-reply']);
                             >
                             <IconSVG name="edit-svg" class="w-4 h-4"/>
                         </button>
-                            <button
-                            @click="handleDelete"
-                            class="w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 text-left flex items-center"
-                            >
-                            <IconSVG name="trash-svg"  class="w-4 h-4"/>
+                        <button
+                        @click="handleDelete"
+                        class="w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100 text-left flex items-center"
+                        >
+                        <IconSVG name="trash-svg"  class="w-4 h-4"/>
                         </button>
                     </div>
                 </div>
