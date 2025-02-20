@@ -1,7 +1,11 @@
 <script setup>
+import { useTaskComments } from '@/stores/taskCommentStore';
+
 const emit = defineEmits(['clicked-reply'])
+const { clearEdit } = useTaskComments();
 const handleReplyClick = () => {
     emit('clicked-reply'); 
+    clearEdit();
 };
 </script>
 <template>

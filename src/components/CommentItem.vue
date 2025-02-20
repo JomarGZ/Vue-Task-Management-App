@@ -45,7 +45,7 @@ const replyclicked = () => {
                         </div>
                     </div>
                 </template>
-                <CommentForm v-if="isRepliesOpen" class="flex gap-4"/>
+                <!-- <CommentForm v-if="isRepliesOpen" class="flex gap-4"/> -->
             </div>
         </div>
     </div>

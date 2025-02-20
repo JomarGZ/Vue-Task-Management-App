@@ -1,7 +1,7 @@
 <script setup>
 import { useTaskComments } from '@/stores/taskCommentStore';
 import { storeToRefs } from 'pinia';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 const props = defineProps({
     content: String
@@ -21,12 +21,15 @@ const handleSumbit = () => {
     emit('submit-comment', contentModel.value);
     emit('update:content', '');
 }
-const refocusInput = (isEditMode) => {
-    if (isEditMode && textareaRef.value) {
-        textareaRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        textareaRef.value.focus();
+const refocusInput = async (isEditMode) => {
+    if (isEditMode) {
+        await nextTick(); 
+        if (textareaRef?.value) {
+            textareaRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            textareaRef.value.focus();
+        }
     }
-}
+};
 
 watch(() => taskCommentStore.isEditMode, refocusInput);
 </script>
