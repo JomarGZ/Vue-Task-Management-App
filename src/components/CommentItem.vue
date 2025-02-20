@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import CommentForm from './forms/CommentForm.vue';
 import CommentOption from './CommentOption.vue';
 import CommentBlock from './CommentBlock.vue';
+import CommentReplyForm from './forms/CommentReplyForm.vue';
 const props = defineProps({
     comment: Object,
     replies: Array
@@ -24,7 +25,7 @@ const replyclicked = () => {
 }
 </script>
 <template>
-    <div class="flex group">
+    <div class="flex gap-4 group">
         <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
         <div class="flex-grow">
             <CommentBlock
@@ -36,7 +37,7 @@ const replyclicked = () => {
                 <button @click="handleToggleReplies" class="hover:underline text-gray-700">{{ repliedLabel }}</button>
              </div>
             <!-- Nested Reply -->
-            <div class="mt-4 ml-6 gap-4 flex flex-col">
+            <div v-if="false" class="mt-4 ml-6 gap-4 flex flex-col">
                 <template v-if="hasReplies && isRepliesOpen">
                     <div v-for="reply in replies" :key="reply" class="flex">
                         <img src="https://i.pravatar.cc/40" class="w-8 h-8 rounded-full shadow-sm" alt="User avatar"/>
@@ -45,7 +46,7 @@ const replyclicked = () => {
                         </div>
                     </div>
                 </template>
-                <!-- <CommentForm v-if="isRepliesOpen" class="flex gap-4"/> -->
+                <CommentReplyForm v-if="isRepliesOpen" class="flex gap-4"/>
             </div>
         </div>
     </div>

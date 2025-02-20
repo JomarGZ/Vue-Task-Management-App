@@ -34,7 +34,7 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-    <div class="bg-gray-50 rounded-2xl p-4">
+    <div class="bg-gray-100 rounded-2xl p-4">
         <div class="flex items-start justify-between">
             <div class="flex items-center gap-2">
                 <h4 class="font-medium text-gray-800">{{ author?.name }}</h4>
@@ -71,6 +71,6 @@ onBeforeUnmount(() => {
             </div>
         </div>
         <p class="mt-2 text-gray-700">{{ comment?.content }}</p>
-        <CommentOption @clicked-reply="$emit('clicked-reply')"/>
+        <!-- <CommentOption @clicked-reply="$emit('clicked-reply')"/> -->
     </div>
 </template>
