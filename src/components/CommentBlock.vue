@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { formatDateDistance } from '@/composables/useFormatters';
 import CommentOption from './CommentOption.vue';
+import { useTaskComments } from '@/stores/taskCommentStore';
 const props = defineProps({
     comment: Object,
     author: Object
 })
+const taskComment = useTaskComments();
+
+const handleDelete = async () => {
+     await taskComment.handleDeleteComment({id: props.comment?.id});
+}
 const emit = defineEmits(['clicked-reply']);
 </script>
 <template>
@@ -16,10 +22,8 @@ const emit = defineEmits(['clicked-reply']);
                 <span class="text-sm text-gray-400">• {{ formatDateDistance(comment?.created_at) }}</span>
             </div>
             <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button class="p-1 hover:bg-gray-200 rounded transition-colors">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
-                    </svg>
+                <button @click="handleDelete" class="p-1 hover:bg-gray-200 rounded-full transition-colors" title="delete">
+                    <IconSVG name="x-svg" class="w-4 h-4 text-gray-500"/>
                 </button>
             </div>
         </div>
