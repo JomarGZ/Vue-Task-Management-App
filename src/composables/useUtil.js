@@ -50,6 +50,32 @@ export const getDay = (dateString) => {
     return new Date(dateString).getDate();
 };
 
+export const subscribeToChannel = (channelName, eventName, callback) => {
+    if (typeof callback !== 'function') {
+        console.warn(`Third argument expected to be a function but got ${typeof callback}`);
+        return;
+    }
+    if (!channelName || !eventName) {
+        console.error(`Both channelName and eventName are required`);
+        return;
+    }
+
+    try {
+        const channel = window.Echo.channel(channelName); 
+        channel.listen(eventName, (event) => {
+            callback(event);
+        });
+
+        return () => {
+            channel.stopListening(eventName);
+            console.log(`Unsubscribed from ${eventName} on ${channelName}`);
+        };
+    } catch (error) {
+        console.error('Failed to subscribe to channel:', error);
+    }
+};
+
+
 
 export function useUtil() {
     const router = useRouter();

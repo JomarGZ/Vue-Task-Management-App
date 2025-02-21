@@ -70,7 +70,9 @@ onBeforeUnmount(() => {
                 </div>
             </div>
         </div>
-        <p class="mt-2 text-gray-700">{{ comment?.content }}</p>
+        <p class="mt-2 text-gray-700 break-all">
+            {{ comment?.content }}
+        </p>
         <!-- <CommentOption @clicked-reply="$emit('clicked-reply')"/> -->
     </div>
 </template>

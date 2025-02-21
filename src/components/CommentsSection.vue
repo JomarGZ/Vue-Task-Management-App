@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import CommentItem from './CommentItem.vue';
 import CommentForm from './forms/CommentForm.vue';
 import { formatDateDistance } from '@/composables/useFormatters';
+import { subscribeToChannel } from '@/composables/useUtil';
+import { useTaskComments } from '@/stores/taskCommentStore';
+import { useAuth } from '@/stores/auth';
 const props = defineProps({
     comments: Array,
     content: String,
     isFetchLoading: Boolean,
     isFetchError: Boolean
 })
+const {authId} = useAuth();
+const taskComment = useTaskComments();
 const emit = defineEmits(['update:content', 'submit-comment']);
 const hasComments = computed(() => props.comments?.length > 0);
 const commentCounts = computed(() => props.comments?.length || 0);
@@ -21,10 +26,25 @@ const latestActivity = computed(() => {
 
   return latestDate ? `Latest activity ${formatDateDistance(latestDate)}` : '';
 });
+const handleRealTimeCommentAdd = (event) => {
+    if (!event) return;
+        const isOwnComment = event.data.author.id === authId;
+        if (isOwnComment) return;
 
+        taskComment.setAddComment(event.data);
+}
 const contentModel = computed({
     get: () => props.content,
     set: (value) => emit('update:content', value) 
+})
+let unsubscribe = null;
+onMounted(() => {
+    unsubscribe = subscribeToChannel('task.comment.created', 'CommentCreated',handleRealTimeCommentAdd);
+})
+onUnmounted(() => {
+    if (unsubscribe) {
+        unsubscribe(); //stop channel listening
+    }
 })
 </script>
 

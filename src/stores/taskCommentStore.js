@@ -34,6 +34,10 @@ export const useTaskComments = defineStore("task-comments", () => {
         }
        
     }
+    const setAddComment = (data) => {
+        if (!data) return;
+        comments.value.unshift(data);
+    }
     const resetForm = () => {
         form.content = '';
     }
@@ -82,7 +86,7 @@ export const useTaskComments = defineStore("task-comments", () => {
         await handleAsyncRequestOperation(() => addComment(task), (response) => {
             console.log(response?.data?.data);
             if (response?.status === 201) {
-                comments.value.unshift(response?.data?.data);
+                setAddComment(response?.data?.data);
             }
         }, isStoreLoading, isStoreError, handleError); 
     }
@@ -99,7 +103,6 @@ export const useTaskComments = defineStore("task-comments", () => {
         showConfirmDialog().then(async result => {
             if (result.isConfirmed) {
                 await handleAsyncRequestOperation(() => deleteComment(comment), (response) => {
-                    console.log(comment);
                     removeComment(comment);
                     showToast('Comment deleted Successfully');
                 }, isDeleteLoading, isDeleteError, (error) => {
@@ -123,6 +126,7 @@ export const useTaskComments = defineStore("task-comments", () => {
         if(!comment) return;
         return window.axios.delete(`api/v1/comments/${comment?.id}`);
     }
+
     return {
         fetchComments,
         setComments,
@@ -131,6 +135,7 @@ export const useTaskComments = defineStore("task-comments", () => {
         handleDeleteComment,
         setEditContent,
         clearEdit,
+        setAddComment,
         errors,
         editCommentId,
         isEditMode,
