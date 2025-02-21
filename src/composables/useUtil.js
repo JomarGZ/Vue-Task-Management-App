@@ -22,7 +22,7 @@ export const snakeCaseWord = (words) => {
 }
 
 
-export const handleAsyncRequestOperation = async (operation, onSuccess, loadingState, errorState) => {
+export const handleAsyncRequestOperation = async (operation, onSuccess, loadingState, errorState, onError = null) => {
     if (loadingState.value) return;
     loadingState.value = true;
     errorState.value = false;
@@ -32,6 +32,9 @@ export const handleAsyncRequestOperation = async (operation, onSuccess, loadingS
         onSuccess(response);
     } catch (error) {
         errorState.value = true;
+        if (onError !== null && typeof onError === 'function'){
+            onError(error);
+        }
         console.error("Error:", error);
     } finally {
         loadingState.value = false;
@@ -46,6 +49,32 @@ export const getDay = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).getDate();
 };
+
+export const subscribeToChannel = (channelName, eventName, callback) => {
+    if (typeof callback !== 'function') {
+        console.warn(`Third argument expected to be a function but got ${typeof callback}`);
+        return;
+    }
+    if (!channelName || !eventName) {
+        console.error(`Both channelName and eventName are required`);
+        return;
+    }
+
+    try {
+        const channel = window.Echo.channel(channelName); 
+        channel.listen(eventName, (event) => {
+            callback(event);
+        });
+
+        return () => {
+            channel.stopListening(eventName);
+            console.log(`Unsubscribed from ${eventName} on ${channelName}`);
+        };
+    } catch (error) {
+        console.error('Failed to subscribe to channel:', error);
+    }
+};
+
 
 
 export function useUtil() {

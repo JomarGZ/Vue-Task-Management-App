@@ -1,5 +1,5 @@
 <script setup>
-import Comments from '@/components/Comments.vue';
+import CommentsSection from '@/components/CommentsSection.vue';
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
 import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
@@ -7,7 +7,8 @@ import { formatDateWithTime } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { computed, onMounted, ref, watch } from 'vue';
+import { useTaskComments } from '@/stores/taskCommentStore';
+import { computed, onMounted, provide, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const isUnassignModalShow = ref(false);
@@ -16,15 +17,20 @@ const isEditTaskModalShow = ref(false);
 const route = useRoute();
 const projectStore = useProjectStore();
 const taskStore = useProjectTaskStore();
+const taskCommentStore = useTaskComments();
 const taskId = computed(() => route?.params?.taskId);
 
 const onStatusChange = () => {
     taskStore.updateStatus({ id: taskId.value });
 }
-onMounted(() => {
-    taskStore.fetchStatuses();
-    taskStore.getTask({ id: taskId.value });
-    projectStore.getProject({ id: route.params.projectId });
+onMounted(async () => {
+    await Promise.all([
+        taskStore.fetchStatuses(),
+        taskStore.getTask({ id: taskId.value }),
+        projectStore.getProject({ id: route.params.projectId }),
+        taskCommentStore.fetchComments({id: taskId.value})
+    ])
+    
 })
 watch(() =>[taskId.value, route.params.projectId], () => {
     taskStore.getTask({ id: taskId.value });
@@ -108,7 +114,13 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 </div>
 
                 <!-- Comments -->
-                <Comments/>
+                <CommentsSection
+                  :comments="taskCommentStore.comments"
+                  :isFetchLoading="taskCommentStore.isFetchLoading"
+                  :isFetchError="taskCommentStore.isFetchError"
+                  v-model:content="taskCommentStore.form.content"
+                  @submit-comment="taskCommentStore.handleSubmitComment({id: taskId})" 
+                />
             </div>
 
             <!-- Right Column -->
