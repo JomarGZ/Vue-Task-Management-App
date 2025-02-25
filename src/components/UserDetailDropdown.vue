@@ -10,10 +10,12 @@
           >
             <span class="sr-only">Open user menu</span>
             <img
+              v-if="false"
               class="w-8 h-8 rounded-full"
               src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
               alt="user photo"
             >
+            <span v-else class="w-8 h-8 rounded-full bg-blue-300 text-blue-800 font-bold flex items-center justify-center">{{ getInitials(auth.userName) }}</span>
           </button>
         </div>
         
@@ -67,7 +69,8 @@
   </template>
   
   <script setup>
-  import { useAuth } from '@/stores/auth'
+  import { getInitials } from '@/composables/useFormatters';
+import { useAuth } from '@/stores/auth'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
   
   const isOpen = ref(false)

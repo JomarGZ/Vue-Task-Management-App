@@ -3,7 +3,7 @@ import CommentsSection from '@/components/CommentsSection.vue';
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
 import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
-import { formatDateWithTime } from '@/composables/useFormatters';
+import { formatDateWithTime, getInitials } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
@@ -176,7 +176,8 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                             >
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Developer</label>
                                 <div class="flex items-center space-x-2">
-                                    <img src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Developer avatar">
+                                    <img v-if="false" src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Developer avatar">
+                                    <span v-else class="w-8 h-8 rounded-full text-blue-800 bg-blue-300 flex items-center text-sm font-semibold justify-center">{{ getInitials(assignee.name) }}</span>
                                     <span class="text-gray-900">{{ assignee.name }}</span>
                                 </div>
                             </div>

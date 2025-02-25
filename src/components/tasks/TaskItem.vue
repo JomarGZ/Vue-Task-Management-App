@@ -1,5 +1,5 @@
 <script setup>
-import { formatDateOnly } from '@/composables/useFormatters';
+import { formatDateOnly, getInitials } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { computed } from 'vue';
 
@@ -30,8 +30,9 @@ const formattedDeadline = computed(() => {
                     <!-- Assigned Dev -->
                    <template v-if="hasAssignees">
                         <div v-for="assignee in task?.assigned_users" :key="assignee?.id" class="flex items-center space-x-2">
-                            <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                <span class="text-blue-600 text-sm font-medium">SC</span>
+                            <img v-if="false" class="h-8 w-8 rounded-full" src="https://i.pravatar.cc/40" alt="">
+                            <div v-else class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                <span class="text-blue-600 text-sm font-medium">{{ getInitials(assignee.name) }}</span>
                             </div>
                             <span class="text-sm text-gray-600">{{ assignee?.name }}</span>
                         </div>
