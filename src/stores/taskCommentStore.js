@@ -84,7 +84,6 @@ export const useTaskComments = defineStore("task-comments", () => {
  
     const handleAddComment = async (task) => {
         await handleAsyncRequestOperation(() => addComment(task), (response) => {
-            console.log(response?.data?.data);
             if (response?.status === 201) {
                 setAddComment(response?.data?.data);
             }

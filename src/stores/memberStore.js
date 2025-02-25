@@ -49,7 +49,6 @@ export const useMemberStore = defineStore("memberStore", () => {
       updateRouteQuery({ column, direction: toggleDirection })
   }
   const changePage = (pageUrl) => {
-      console.log(pageUrl)
       if (!pageUrl) return
 
       const params = new URLSearchParams(new URL(pageUrl).search)
@@ -83,7 +82,6 @@ export const useMemberStore = defineStore("memberStore", () => {
           })
           .catch((error) => {
               if (error?.response?.status === 422) {
-                  console.log(error.response.data.errors);
                   errors.value = error.response.data.errors;
               } else {
                   showToast("Failed to add member", 'error');

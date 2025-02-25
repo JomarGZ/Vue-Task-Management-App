@@ -68,7 +68,6 @@ export const subscribeToChannel = (channelName, eventName, callback) => {
 
         return () => {
             channel.stopListening(eventName);
-            console.log(`Unsubscribed from ${eventName} on ${channelName}`);
         };
     } catch (error) {
         console.error('Failed to subscribe to channel:', error);
