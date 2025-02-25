@@ -4,11 +4,12 @@ import CommentForm from './forms/CommentForm.vue';
 import CommentOption from './CommentOption.vue';
 import CommentBlock from './CommentBlock.vue';
 import CommentReplyForm from './forms/CommentReplyForm.vue';
+import { getInitials } from '@/composables/useFormatters';
+import { useAuth } from '@/stores/auth';
 const props = defineProps({
     comment: Object,
     replies: Array
 })
-
 const hasReplies = computed(() => props.replies?.length > 0);
 const replyCounts = computed(() => props.replies?.length || 0);
 const repliedLabel = computed(() => 
@@ -26,7 +27,8 @@ const replyclicked = () => {
 </script>
 <template>
     <div class="flex gap-4 group">
-        <img src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
+        <img v-if="false" src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
+        <span v-else class="w-10 h-10 rounded-full bg-blue-300 text-blue-700 flex justify-center items-center">{{ getInitials(comment.author?.name) }}</span>
         <div class="flex-grow">
             <CommentBlock
               :comment="comment"

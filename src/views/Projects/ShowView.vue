@@ -202,7 +202,7 @@ onMounted(() => {
                                 <div class="text-right">
                                     <p class="text-sm text-gray-500">{{ capWords(task.priority_level) }}</p>
                                     <div class="mt-1">
-                                        <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
+                                        <img v-if="false" class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/50" alt="User avatar" />
                                     </div>
                                 </div>
                             </RouterLink>
