@@ -4,19 +4,19 @@ import { RouterLink } from 'vue-router';
 </script>
 
 <template>
-        <div class="space-y-7">
-            <h1 class="text-5xl font-extrabold text-gray-900 leading-tight">
+        <div class="space-y-7 text-center md:text-start">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight">
                 Empower Your <br/>
                 <span class="text-blue-600">Engineering Workflow</span>
             </h1>
-            <p class="text-xl text-gray-600">
+            <p class="text-base md:text-xl text-gray-600">
                 Sprint Sync helps software teams collaborate, track progress, and deliver exceptional results faster and more efficiently.
             </p>
-            <div class="flex space-x-4">
-                <RouterLink :to="{ name: 'login' }" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition">
+            <div class="flex justify-center md:justify-start space-x-4">
+                <RouterLink :to="{ name: 'login' }" class="bg-blue-600 text-white p-3 md:px-8 md:py-3 rounded-lg hover:bg-blue-700 transition">
                     Get Started
                 </RouterLink>
-                <button class="border border-blue-600 text-blue-600 px-8 py-3 rounded-lg hover:bg-blue-50 transition">
+                <button class="border border-blue-600 text-blue-600 p-3 md:px-8 md:py-3 rounded-lg hover:bg-blue-50 transition">
                     Learn More
                 </button>
             </div>
@@ -31,7 +31,7 @@ import { RouterLink } from 'vue-router';
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-2xl p-8 flex items-center justify-center">
+        <div class="bg-white rounded-2xl hidden shadow-2xl p-8 md:flex items-center justify-center">
             <div class="grid grid-cols-2 gap-6">
                 <div class="bg-blue-50 p-6 rounded-xl text-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mx-auto text-blue-600 mb-4">
