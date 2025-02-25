@@ -58,17 +58,19 @@ watch(() =>[taskId.value, route.params.projectId], () => {
         </nav>
 
         <!-- Task Header -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div class="flex items-start justify-between mb-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">{{ taskStore?.taskData?.title }}</h1>
+        <div class="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-6">
+            <div class="flex flex-col md:flex-row items-center md:items-start justify-between mb-4 text-center md:text-left">
+                <div class="mb-4 md:mb-0">
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-900">{{ taskStore?.taskData?.title }}</h1>
                 </div>
-                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">{{ capWords(taskStore?.taskData?.status) }}</span>
+                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                    {{ capWords(taskStore?.taskData?.status) }}
+                </span>
             </div>
 
             <!-- Project Info -->
-            <div class="flex items-center space-x-4 text-sm text-gray-600">
-                <span class="flex items-center">
+            <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 text-sm text-gray-600 text-center md:text-left">
+                <span class="flex items-center justify-center md:justify-start">
                     <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
                     </svg>
@@ -77,20 +79,21 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 <p>Created: <span class="text-gray-900 font-semibold">{{ formatDateWithTime(taskStore?.taskData?.created_at) || '--.--' }}</span></p>
                 <p>Due: <span class="text-gray-900 font-semibold">{{ formatDateWithTime(taskStore?.taskData?.deadline_at) || '--.--' }}</span></p>
             </div>
+
         </div>
 
         <!-- Main Content Grid -->
-        <div class="grid grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Left Column -->
-            <div class="col-span-2 space-y-6">
+            <div class="col-span-1 md:col-span-2 space-y-6">
                 <!-- Description -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <h2 class="text-lg font-semibold mb-4">Description</h2>
                     <p class="text-gray-700">{{ taskStore?.taskData?.description }}</p>
                 </div>
 
                 <!-- Links -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <h2 class="text-lg font-semibold mb-4">Related Links</h2>
                     <div class="space-y-3">
                         <a href="#" class="block text-blue-600 hover:text-blue-800">
@@ -124,9 +127,9 @@ watch(() =>[taskId.value, route.params.projectId], () => {
             </div>
 
             <!-- Right Column -->
-            <div class="space-y-6">
+            <div class="col-span-1 space-y-6">
                 <!-- Status -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <h2 class="text-lg font-semibold mb-4">Status</h2>
                     <select @change="onStatusChange" v-model="taskStore.selectedStatus" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option
@@ -139,7 +142,7 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 </div>
 
                 <!-- Assignments -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold">Assignments</h2>
                         <div class="flex items-center gap-2">
@@ -187,7 +190,7 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 </div>
 
                 <!-- Metadata -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <h2 class="text-lg font-semibold mb-4">Details</h2>
                     <div class="space-y-3 text-sm">
                         <div v-if="taskStore?.taskData?.priority_level">
