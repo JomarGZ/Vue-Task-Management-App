@@ -1,4 +1,5 @@
 <script setup>
+import DefaultUserPic from '@/components/DefaultUserPic.vue';
 import { getInitials } from '@/composables/useFormatters';
 import { useMemberStore } from '@/stores/memberStore';
 import { onMounted, watch } from 'vue';
@@ -79,9 +80,7 @@ onMounted(store.getMembers);
                         >
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                        <span class="text-gray-600">{{ getInitials(member.name) }}</span>
-                                    </div>
+                                    <DefaultUserPic :name="member.name" class="h-10 w-10 border-2"/>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
                                     </div>

@@ -1,6 +1,7 @@
 <script setup>
 import AssignProjectTeamModal from '@/components/AssignProjectTeamModal.vue';
 import CommentsSection from '@/components/CommentsSection.vue';
+import DefaultUserPic from '@/components/DefaultUserPic.vue';
 import { formatDateOnly, getInitials } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
@@ -235,9 +236,7 @@ onMounted(() => {
                             <h3 class="text-sm font-medium text-gray-500 mb-2">Project Manager</h3>
                             <div v-if="projectStore?.project?.manager" class="flex items-center space-x-3">
                                 <div class="flex-shrink-0">
-                                    <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                        <span class="text-gray-600">{{ getInitials(projectStore?.project?.manager?.name) }}</span>
-                                    </div>
+                                    <DefaultUserPic :name="projectStore?.project?.manager?.name" class="h-10 w-10 border-2"/>
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-900">{{ projectStore?.project?.manager?.name }}</p>
@@ -257,9 +256,7 @@ onMounted(() => {
                             <div v-if="projectStore?.project?.assigned_members?.length > 0" class="space-y-3">
                                 <div v-for="member in projectStore?.project?.assigned_members" :key="member.id" class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
-                                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <pre class="text-blue-600">{{ getInitials(member.name) }}</pre>
-                                        </div>
+                                        <DefaultUserPic :name="member.name" class="h-10 w-10 border-2"/>
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-gray-900">{{ member.name }}</p>

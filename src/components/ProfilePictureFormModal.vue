@@ -22,7 +22,7 @@ defineEmits(['close-modal']);
                         <!-- Current Profile Picture -->
                         <div class="flex flex-col items-center mb-6">
                             <img v-if="false" src="https://i.pravatar.cc/250" alt="Current profile" class="h-32 w-32 md:h-52 md:w-52 rounded-full object-cover border-4 border-gray-200 mb-2" />
-                            <DefaultUserPic v-else :name="auth.userName" class="h-32 w-32 md:h-52 md:w-52 text-6xl"/>
+                            <DefaultUserPic v-else :name="auth.userName" class="h-32 w-32 md:h-52 md:w-52 text-6xl border-4"/>
                             <p class="text-sm text-gray-500">Current Photo</p>
                         </div>
                         

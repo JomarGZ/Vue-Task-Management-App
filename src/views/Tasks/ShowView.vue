@@ -1,5 +1,6 @@
 <script setup>
 import CommentsSection from '@/components/CommentsSection.vue';
+import DefaultUserPic from '@/components/DefaultUserPic.vue';
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
 import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
@@ -177,7 +178,7 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Developer</label>
                                 <div class="flex items-center space-x-2">
                                     <img v-if="false" src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Developer avatar">
-                                    <span v-else class="w-8 h-8 rounded-full text-blue-800 bg-blue-300 flex items-center text-sm font-semibold justify-center">{{ getInitials(assignee.name) }}</span>
+                                    <DefaultUserPic v-else :name="assignee.name" class="w-8 h-8 border-2 text-sm"/>
                                     <span class="text-gray-900">{{ assignee.name }}</span>
                                 </div>
                             </div>

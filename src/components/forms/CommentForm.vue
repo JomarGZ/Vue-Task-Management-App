@@ -4,6 +4,7 @@ import { useAuth } from '@/stores/auth';
 import { useTaskComments } from '@/stores/taskCommentStore';
 import { storeToRefs } from 'pinia';
 import { computed, nextTick, ref, watch } from 'vue';
+import DefaultUserPic from '../DefaultUserPic.vue';
 
 const props = defineProps({
     content: String
@@ -39,7 +40,7 @@ watch(() => taskCommentStore.isEditMode, refocusInput);
 <template>
     <div>
         <img v-if="false" src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
-        <span v-else class="w-10 h-10 rounded-full bg-blue-300 text-blue-700 flex items-center justify-center">{{ getInitials(auth.userName) }}</span>
+        <DefaultUserPic v-else class="w-10 h-10 border-2" :name="auth.userName"/>
         <form @submit.prevent="handleSumbit" class="flex-grow">
 
             <div class="bg-gray-100 rounded-2xl p-4">
