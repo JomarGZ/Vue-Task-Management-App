@@ -1,4 +1,4 @@
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { defineStore } from "pinia";
 import { handleAsyncRequestOperation } from "@/composables/useUtil";
 import { useSweetAlert } from "@/composables/useSweetAlert2";
@@ -14,7 +14,10 @@ export const useChangePassword = defineStore("change-password", () => {
     password: "",
     password_confirmation: "",
   });
- 
+  
+  const isEmptyFields = computed(() => {
+    return form.current_password.trim() === '' || form.password.trim() === '' || form.password_confirmation.trim() === '';
+  })
   function resetForm() {
     form.current_password = "";
     form.password = "";
@@ -40,6 +43,7 @@ export const useChangePassword = defineStore("change-password", () => {
     isUpdatePasswordError,
     errors,
     status,
+    isEmptyFields,
     resetForm,
     handleUpdatePassword,
     updatePassword,

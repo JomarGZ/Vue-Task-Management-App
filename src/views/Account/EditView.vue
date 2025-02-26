@@ -1,9 +1,18 @@
 <script setup>
+import { useAuth } from '@/stores/auth';
 import { useChangePassword } from '@/stores/changePassword';
-import { onBeforeUnmount } from 'vue';
+import { useChangeProfile } from '@/stores/changeProfile';
+import { computed, onBeforeUnmount } from 'vue';
 
 const changePassword = useChangePassword();
-onBeforeUnmount(() => changePassword.resetForm())
+const changeProfile = useChangeProfile();
+const auth = useAuth();
+const isChangeProfileDisabled = computed(() => changeProfile.isUpdateProfileLoading || changeProfile.isEmptyFields);
+const isChangePasswordDisabled = computed(() => changePassword.isUpdatePasswordloading || changePassword.isEmptyFields);
+onBeforeUnmount(() => {
+  changePassword.resetForm();
+  changeProfile.resetForm();
+})
 </script>
 <template>
     <nav class="mb-8 text-sm">
@@ -19,41 +28,50 @@ onBeforeUnmount(() => changePassword.resetForm())
       <div class="mx-auto bg-white p-8 rounded-lg shadow-md mb-8">
         <h3 class="text-xl font-semibold text-gray-800 mb-6">Update Account Details</h3>
 
-        <!-- Name Field -->
-        <div class="mb-6">
-          <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="John Doe"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-        </div>
+        <form @submit.prevent="changeProfile.handleUpdateProfile">
+                  <!-- Name Field -->
+          <div class="mb-6">
+            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+            <input
+              type="text"
+              v-model="changeProfile.form.name"
+              id="name"
+              name="name"
+              :placeholder="auth.userName"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <ValidationError :errors="changeProfile.errors" field="name"/>
+          </div>
 
-        <!-- Email Field -->
-        <div class="mb-6">
-          <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="john.doe@example.com"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-        </div>
+          <!-- Email Field -->
+          <div class="mb-6">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <input
+              type="email"
+              v-model="changeProfile.form.email"
+              id="email"
+              name="email"
+              :placeholder="auth.userEmail"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <ValidationError :errors="changeProfile.errors" field="email"/>
+          </div>
 
-        <!-- Save Changes Button -->
-        <div class="flex justify-end">
-          <button
-            type="submit"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Save Changes
-          </button>
-        </div>
+          <!-- Save Changes Button -->
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              :disabled="isChangeProfileDisabled"
+              :class="[
+                  'px-4 py-2 flex items-center justify-center gap-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                  isChangeProfileDisabled ? 'bg-indigo-400' : 'hover:bg-indigo-700 bg-indigo-600'
+              ]"
+            >
+                <IconSpinner name="white-spinner" v-if="changeProfile.isUpdateProfileLoading"/>
+                Save Changes
+            </button>
+          </div>
+        </form>
       </div>
 
       <!-- Change Password Section -->
@@ -104,8 +122,11 @@ onBeforeUnmount(() => changePassword.resetForm())
           <div class="flex justify-end">
             <button
               type="submit"
-              :disabled="changePassword.isUpdatePasswordloading"
-              class="px-4 py-2 flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              :disabled="isChangePasswordDisabled"
+              :class="[
+                  'px-4 py-2 flex items-center justify-center gap-2  text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                  isChangePasswordDisabled ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
+              ]"
             >
               <IconSpinner name="white-spinner" v-if="changePassword.isUpdatePasswordloading"/>
                 Change Password
