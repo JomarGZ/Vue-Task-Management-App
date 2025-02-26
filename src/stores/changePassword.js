@@ -1,16 +1,23 @@
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { defineStore } from "pinia";
+import { handleAsyncRequestOperation } from "@/composables/useUtil";
+import { useSweetAlert } from "@/composables/useSweetAlert2";
  
 export const useChangePassword = defineStore("change-password", () => {
+  const { showToast } = useSweetAlert();
   const errors = reactive({});
   const status = ref("");
-  const loading = ref(false);
+  const isUpdatePasswordloading = ref(false);
+  const isUpdatePasswordError = ref(false);
   const form = reactive({
     current_password: "",
     password: "",
     password_confirmation: "",
   });
- 
+  
+  const isEmptyFields = computed(() => {
+    return form.current_password.trim() === '' || form.password.trim() === '' || form.password_confirmation.trim() === '';
+  })
   function resetForm() {
     form.current_password = "";
     form.password = "";
@@ -20,35 +27,25 @@ export const useChangePassword = defineStore("change-password", () => {
     status.value = "";
   }
  
-  async function updatePassword() {
-    loading.value = true;
-    errors.value = {};
-    status.value = "";
- 
-    return window.axios
-      .put("api/v1/password", form)
-      .then(() => {
-        status.value = "Password has been updated.";
-      })
-      .catch((error) => {
-        if (error.response.status === 422) {
-          errors.value = error.response.data.errors;
-        }
-      })
-      .finally(() => {
-        form.current_password = "";
-        form.password = "";
-        form.password_confirmation = "";
-        loading.value = false;
-      });
+  const handleUpdatePassword = async () => {
+    await handleAsyncRequestOperation(updatePassword, () => {
+      showToast('Password successfully updated');
+      resetForm();
+    }, isUpdatePasswordloading, isUpdatePasswordError, (error) => errors.value = error.response?.data?.errors);
+  }
+  const updatePassword = async () => {
+    return window.axios.put("api/v1/auth/password-update", form);
   }
  
   return {
     form,
-    loading,
+    isUpdatePasswordloading,
+    isUpdatePasswordError,
     errors,
-    resetForm,
     status,
+    isEmptyFields,
+    resetForm,
+    handleUpdatePassword,
     updatePassword,
   };
 });

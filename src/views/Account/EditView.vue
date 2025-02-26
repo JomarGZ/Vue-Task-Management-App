@@ -1,3 +1,19 @@
+<script setup>
+import { useAuth } from '@/stores/auth';
+import { useChangePassword } from '@/stores/changePassword';
+import { useChangeProfile } from '@/stores/changeProfile';
+import { computed, onBeforeUnmount } from 'vue';
+
+const changePassword = useChangePassword();
+const changeProfile = useChangeProfile();
+const auth = useAuth();
+const isChangeProfileDisabled = computed(() => changeProfile.isUpdateProfileLoading || changeProfile.isEmptyFields);
+const isChangePasswordDisabled = computed(() => changePassword.isUpdatePasswordloading || changePassword.isEmptyFields);
+onBeforeUnmount(() => {
+  changePassword.resetForm();
+  changeProfile.resetForm();
+})
+</script>
 <template>
     <nav class="mb-8 text-sm">
         <ol class="flex items-center space-x-2">
@@ -12,95 +28,111 @@
       <div class="mx-auto bg-white p-8 rounded-lg shadow-md mb-8">
         <h3 class="text-xl font-semibold text-gray-800 mb-6">Update Account Details</h3>
 
-        <!-- Name Field -->
-        <div class="mb-6">
-          <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="John Doe"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-        </div>
+        <form @submit.prevent="changeProfile.handleUpdateProfile">
+                  <!-- Name Field -->
+          <div class="mb-6">
+            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+            <input
+              type="text"
+              v-model="changeProfile.form.name"
+              id="name"
+              name="name"
+              :placeholder="auth.userName"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <ValidationError :errors="changeProfile.errors" field="name"/>
+          </div>
 
-        <!-- Email Field -->
-        <div class="mb-6">
-          <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="john.doe@example.com"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-        </div>
+          <!-- Email Field -->
+          <div class="mb-6">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <input
+              type="email"
+              v-model="changeProfile.form.email"
+              id="email"
+              name="email"
+              :placeholder="auth.userEmail"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <ValidationError :errors="changeProfile.errors" field="email"/>
+          </div>
 
-        <!-- Save Changes Button -->
-        <div class="flex justify-end">
-          <button
-            type="submit"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Save Changes
-          </button>
-        </div>
+          <!-- Save Changes Button -->
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              :disabled="isChangeProfileDisabled"
+              :class="[
+                  'px-4 py-2 flex items-center justify-center gap-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                  isChangeProfileDisabled ? 'bg-indigo-400' : 'hover:bg-indigo-700 bg-indigo-600'
+              ]"
+            >
+                <IconSpinner name="white-spinner" v-if="changeProfile.isUpdateProfileLoading"/>
+                Save Changes
+            </button>
+          </div>
+        </form>
       </div>
 
       <!-- Change Password Section -->
       <div class="mx-auto bg-white p-8 rounded-lg shadow-md">
         <h3 class="text-xl font-semibold text-gray-800 mb-6">Change Password</h3>
+          <form @submit.prevent="changePassword.handleUpdatePassword">
+            <div class="mb-6">
+            <label for="current-password" class="block text-sm font-medium text-gray-700">Current Password</label>
+            <input
+              type="password"
+              v-model="changePassword.form.current_password"
+              id="current-password"
+              name="current-password"
+              placeholder="Enter current password"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <ValidationError :errors="changePassword.errors" field="current_password"/>
+          </div>
 
-        <!-- Current Password Field -->
-        <div class="mb-6">
-          <label for="current-password" class="block text-sm font-medium text-gray-700">Current Password</label>
-          <input
-            type="password"
-            id="current-password"
-            name="current-password"
-            placeholder="Enter current password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-        </div>
+          <!-- New Password Field -->
+          <div class="mb-6">
+            <label for="new-password" class="block text-sm font-medium text-gray-700">New Password</label>
+            <input
+              type="password"
+              v-model="changePassword.form.password"
+              id="new-password"
+              name="new-password"
+              placeholder="Enter new password"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <ValidationError :errors="changePassword.errors" field="password"/>
+          </div>
 
-        <!-- New Password Field -->
-        <div class="mb-6">
-          <label for="new-password" class="block text-sm font-medium text-gray-700">New Password</label>
-          <input
-            type="password"
-            id="new-password"
-            name="new-password"
-            placeholder="Enter new password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-        </div>
+          <!-- Confirm New Password Field -->
+          <div class="mb-6">
+            <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+            <input
+              type="password"
+              id="confirm-password"
+              v-model="changePassword.form.password_confirmation"
+              name="confirm-password"
+              placeholder="Confirm new password"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
 
-        <!-- Confirm New Password Field -->
-        <div class="mb-6">
-          <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
-          <input
-            type="password"
-            id="confirm-password"
-            name="confirm-password"
-            placeholder="Confirm new password"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            required
-          />
-        </div>
-
-        <!-- Change Password Button -->
-        <div class="flex justify-end">
-          <button
-            type="submit"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            Change Password
-          </button>
-        </div>
+          <!-- Change Password Button -->
+          <div class="flex justify-end">
+            <button
+              type="submit"
+              :disabled="isChangePasswordDisabled"
+              :class="[
+                  'px-4 py-2 flex items-center justify-center gap-2  text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500',
+                  isChangePasswordDisabled ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
+              ]"
+            >
+              <IconSpinner name="white-spinner" v-if="changePassword.isUpdatePasswordloading"/>
+                Change Password
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 </template>
