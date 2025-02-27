@@ -35,7 +35,9 @@ export const handleAsyncRequestOperation = async (operation, onSuccess, loadingS
         if (onError !== null && typeof onError === 'function'){
             onError(error);
         }
-        console.error("Error:", error);
+        if (error.response?.status !== 422) {
+            console.error("Error:", error);
+        }
     } finally {
         loadingState.value = false;
     }

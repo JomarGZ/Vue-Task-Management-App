@@ -10,9 +10,9 @@
           >
             <span class="sr-only">Open user menu</span>
             <img
-              v-if="false"
-              class="w-8 h-8 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+              v-if="auth.avatar?.['thumb-60']"
+              class="w-8 h-8 rounded-full  border-2 border-white outline outline-2 outline-blue-500"
+              :src="auth.avatar?.['thumb-60']"
               alt="user photo"
             >
             <DefaultUserPic v-else class="w-8 h-8 border-2" :name="auth.userName"/>

@@ -33,7 +33,7 @@ const isProfilePicModalVisible = ref(false);
                         <!-- Profile Image Section -->
                         <div class="flex flex-col items-center space-y-4">
                             <div class="relative">
-                                <img v-if="false" src="https://i.pravatar.cc/150" alt="Profile" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
+                                <img v-if="auth.avatar?.['thumb-200']" :src="auth.avatar?.['thumb-200']" alt="Profile" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
                                 <DefaultUserPic v-else :name="auth.userName" class="h-32 w-32 text-4xl"/>
                                 <button @click="isProfilePicModalVisible = true" class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border border-gray-200">
                                     <IconSVG name="pencil-svg"/>

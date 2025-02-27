@@ -2,12 +2,25 @@
 import { useAuth } from '@/stores/auth';
 import DefaultUserPic from './DefaultUserPic.vue';
 import Modal from './Modal.vue';
-import { ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import { usePhotoPreview } from '@/composables/usePhotoPreview';
+import { useChangeUserAvatar } from '@/stores/changeUserAvatar';
 const auth = useAuth();
-defineEmits(['close-modal']);
-const existingPhoto = null;
-const {previewPhoto, handlePhotoPreview} = usePhotoPreview(existingPhoto);
+const changeAvatar = useChangeUserAvatar();
+const emit = defineEmits(['close-modal']);
+const {previewPhoto, handlePhotoPreview} = usePhotoPreview(auth.avatar?.['thumb-200']);
+const uploadAvatarPrview = (event) => {
+    const file = event.target?.files[0];
+    handlePhotoPreview(event);
+    changeAvatar.form.avatar = file;
+}
+const handleSubmit = async () => {
+    const success = await changeAvatar.handleChangeAvatar();
+    if (success) {
+        emit('close-modal');
+    }
+}
+onBeforeUnmount(() => changeAvatar.resetForm());
 </script>
 <template>
     <teleport to="body">
@@ -25,13 +38,13 @@ const {previewPhoto, handlePhotoPreview} = usePhotoPreview(existingPhoto);
                     <div class="px-6 py-4">
                         <!-- Current Profile Picture -->
                         <div class="flex flex-col items-center mb-6">
-                            <img v-if="previewPhoto" :src="previewPhoto" alt="Current profile" class="h-32 w-32 md:h-52 md:w-52 rounded-full object-cover border-4 border-gray-200 mb-2" />
+                            <img v-if="previewPhoto" :src="previewPhoto" alt="Current profile" class="h-32 w-32 md:h-52 md:w-52 rounded-full object-cover border-4 border-white outline outline-2 outline-blue-500 mb-2" />
                             <DefaultUserPic v-else :name="auth.userName" class="h-32 w-32 md:h-52 md:w-52 text-6xl border-4"/>
                             <p class="text-sm text-gray-500">Current Photo</p>
                         </div>
                         
                         <!-- File Upload Form -->
-                        <form>
+                        <form @submit.prevent="handleSubmit">
                         <!-- Drag & Drop Area -->
                             <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors duration-300 mb-4">
                                 <svg class="mx-auto h-6 w-6 md:h-12 md:w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -44,7 +57,8 @@ const {previewPhoto, handlePhotoPreview} = usePhotoPreview(existingPhoto);
                                     or drag and drop
                                 </p>
                                 <p class="mt-1 text-xs text-gray-500">PNG, JPG up to 5MB</p>
-                                <input id="file-upload" name="file-upload" type="file" @change="handlePhotoPreview" class="sr-only" accept="image/*">
+                                <input id="file-upload" name="file-upload" type="file" @change="uploadAvatarPrview" class="sr-only" accept="image/*">
+                                <ValidationError :errors="changeAvatar.errors" field="avatar"/>
                             </div>
                             
                             <!-- Guidelines -->
@@ -53,18 +67,24 @@ const {previewPhoto, handlePhotoPreview} = usePhotoPreview(existingPhoto);
                                 <p class="mb-1">• Minimum recommended size: 400x400 pixels</p>
                                 <p>• For best results, upload a clear photo of your face</p>
                             </div>
-                        </form>
-                    </div>
-                    <!-- Modal Footer -->
-                    <div class="flex justify-center md:justify-end px-3 py-2 md:px-6 md:py-4 space-x-2 md:space-x-3">
+                            <div class="flex justify-center md:justify-end px-3 py-2 md:px-6 md:py-4 space-x-2 md:space-x-3">
                         <button @click="$emit('close-modal')" class="py-1 px-2 md:py-2 md:px-4 border border-gray-300 rounded-md text-xs md:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-300">
                             Cancel
                         </button>
-                        <button class="py-1 px-3 md:py-2 md:px-5 border border-transparent rounded-md shadow-sm text-xs md:text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 transition-colors duration-300">
-                            <IconSpinner v-if="false" name="white-spinner" class="h-3 w-3 md:h-5 md:w-5"/>
+                        <button
+                          :disabled="changeAvatar.isActionDisabled"
+                          :class="[
+                                'py-1 px-3 md:py-2 md:px-5 border border-transparent rounded-md shadow-sm text-xs md:text-sm font-medium text-white transition-colors duration-300',
+                                changeAvatar.isActionDisabled ? 'bg-blue-400' : 'bg-blue-500  hover:bg-blue-600'
+                          ]">
+                            <IconSpinner v-if="changeAvatar.isStoreAvatarLoading" name="white-spinner" class="h-3 w-3 md:h-5 md:w-5"/>
                             <span v-else>Save Changes</span>
                         </button>
                     </div>
+                        </form>
+                    </div>
+                    <!-- Modal Footer -->
+                   
                 </div>
             </div>
         </Modal>
