@@ -2,8 +2,12 @@
 import { useAuth } from '@/stores/auth';
 import DefaultUserPic from './DefaultUserPic.vue';
 import Modal from './Modal.vue';
+import { ref } from 'vue';
+import { usePhotoPreview } from '@/composables/usePhotoPreview';
 const auth = useAuth();
 defineEmits(['close-modal']);
+const existingPhoto = null;
+const {previewPhoto, handlePhotoPreview} = usePhotoPreview(existingPhoto);
 </script>
 <template>
     <teleport to="body">
@@ -21,7 +25,7 @@ defineEmits(['close-modal']);
                     <div class="px-6 py-4">
                         <!-- Current Profile Picture -->
                         <div class="flex flex-col items-center mb-6">
-                            <img v-if="false" src="https://i.pravatar.cc/250" alt="Current profile" class="h-32 w-32 md:h-52 md:w-52 rounded-full object-cover border-4 border-gray-200 mb-2" />
+                            <img v-if="previewPhoto" :src="previewPhoto" alt="Current profile" class="h-32 w-32 md:h-52 md:w-52 rounded-full object-cover border-4 border-gray-200 mb-2" />
                             <DefaultUserPic v-else :name="auth.userName" class="h-32 w-32 md:h-52 md:w-52 text-6xl border-4"/>
                             <p class="text-sm text-gray-500">Current Photo</p>
                         </div>
@@ -40,7 +44,7 @@ defineEmits(['close-modal']);
                                     or drag and drop
                                 </p>
                                 <p class="mt-1 text-xs text-gray-500">PNG, JPG up to 5MB</p>
-                                <input id="file-upload" name="file-upload" type="file" class="sr-only" accept="image/*">
+                                <input id="file-upload" name="file-upload" type="file" @change="handlePhotoPreview" class="sr-only" accept="image/*">
                             </div>
                             
                             <!-- Guidelines -->
