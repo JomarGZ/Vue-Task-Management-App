@@ -39,7 +39,7 @@ watch(() => taskCommentStore.isEditMode, refocusInput);
 </script>
 <template>
     <div>
-        <img v-if="false" src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
+        <img v-if="auth.avatar?.['thumb-60']" :src="auth.avatar?.['thumb-60']" class="w-10 h-10 rounded-full shadow-sm border-2 border-white outline outline-2 outline-blue-500" alt="User avatar"/>
         <DefaultUserPic v-else class="w-10 h-10 border-2" :name="auth.userName"/>
         <form @submit.prevent="handleSumbit" class="flex-grow">
 
