@@ -90,7 +90,7 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                 <!-- Description -->
                 <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <h2 class="text-lg font-semibold mb-4">Description</h2>
-                    <p class="text-gray-700">{{ taskStore?.taskData?.description }}</p>
+                    <p class="text-gray-700 break-words">{{ taskStore?.taskData?.description }}</p>
                 </div>
 
                 <!-- Links -->
