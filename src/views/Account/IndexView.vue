@@ -1,10 +1,14 @@
 <script setup>
+import DefaultUserPic from '@/components/DefaultUserPic.vue';
+import ProfilePictureFormModal from '@/components/ProfilePictureFormModal.vue';
 import { getInitials } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
 import { useAuth } from '@/stores/auth';
 import { format } from 'date-fns';
+import { ref } from 'vue';
 
 const auth = useAuth();
+const isProfilePicModalVisible = ref(false);
 </script>
 <template>
     <div class="p-8">
@@ -29,19 +33,14 @@ const auth = useAuth();
                         <!-- Profile Image Section -->
                         <div class="flex flex-col items-center space-y-4">
                             <div class="relative">
-                                <img v-if="false" src="https://i.pravatar.cc/150" alt="Profile" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
-                                <span 
-                                    v-else 
-                                    class="w-32 h-32 rounded-full border-4 border-white shadow-lg bg-blue-300 text-blue-600 flex items-center justify-center text-4xl font-bold"
-                                    >
-                                    {{ getInitials(auth.userName) }}
-                                </span>
-
-                                <button class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border border-gray-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                    </svg>
+                                <img v-if="auth.avatar?.['thumb-200']" :src="auth.avatar?.['thumb-200']" alt="Profile" class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"/>
+                                <DefaultUserPic v-else-if="auth.userName" :name="auth.userName" class="h-32 w-32 text-4xl"/>
+                                <button @click="isProfilePicModalVisible = true" class="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border border-gray-200">
+                                    <IconSVG name="pencil-svg"/>
                                 </button>
+                               <ProfilePictureFormModal
+                                    @close-modal="isProfilePicModalVisible = false"
+                                    v-if="isProfilePicModalVisible" />
                             </div>
                             <span class="text-sm text-gray-500">Click to change photo</span>
                         </div>

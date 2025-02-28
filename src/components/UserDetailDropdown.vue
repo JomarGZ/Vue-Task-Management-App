@@ -10,12 +10,12 @@
           >
             <span class="sr-only">Open user menu</span>
             <img
-              v-if="false"
-              class="w-8 h-8 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+              v-if="auth.avatar?.['thumb-60']"
+              class="w-8 h-8 rounded-full  border-2 border-white outline outline-2 outline-blue-500"
+              :src="auth.avatar?.['thumb-60']"
               alt="user photo"
             >
-            <span v-else class="w-8 h-8 rounded-full bg-blue-300 text-blue-800 font-bold flex items-center justify-center">{{ getInitials(auth.userName) }}</span>
+            <DefaultUserPic v-else-if="auth.userName" class="w-8 h-8 border-2" :name="auth.userName"/>
           </button>
         </div>
         
@@ -65,6 +65,7 @@
   import { getInitials } from '@/composables/useFormatters';
 import { useAuth } from '@/stores/auth'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import DefaultUserPic from './DefaultUserPic.vue';
   
   const isOpen = ref(false)
   const dropdownButton = ref(null)

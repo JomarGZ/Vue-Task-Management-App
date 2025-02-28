@@ -30,7 +30,7 @@ const formattedDeadline = computed(() => {
                     <!-- Assigned Dev -->
                    <template v-if="hasAssignees">
                         <div v-for="assignee in task?.assigned_users" :key="assignee?.id" class="flex items-center space-x-2">
-                            <img v-if="false" class="h-8 w-8 rounded-full" src="https://i.pravatar.cc/40" alt="">
+                            <img v-if="assignee.avatar?.['thumb-60']" class="h-8 w-8 rounded-full border-2 border-white outline outline-2 outline-blue-400" :src="assignee.avatar?.['thumb-60']" alt="">
                             <div v-else class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                                 <span class="text-blue-600 text-sm font-medium">{{ getInitials(assignee.name) }}</span>
                             </div>

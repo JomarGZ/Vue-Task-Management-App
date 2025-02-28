@@ -10,6 +10,7 @@ export const useAuth = defineStore("auth", () => {
   const user = useStorage("auth_user", {});
 
   const authId = computed(() => user.value?.id);
+  const avatar = computed(() => user.value?.avatar);
   const userName = computed(() => user.value?.name);
   const userEmail = computed(() => user.value?.email);
   const userPhoneNumber = computed(() => user.value?.phone_number);
@@ -44,7 +45,7 @@ export const useAuth = defineStore("auth", () => {
         headers: { Authorization: `Bearer ${accessToken.value}`},
       });
       if (response.status !== 200) throw new Error("Failed to fetch user");
-      setAuthUserData(response?.data || null) 
+      setAuthUserData(response?.data?.data || null) 
     } catch (error) {
       setAuthUserData(null);
       throw error
@@ -60,6 +61,7 @@ export const useAuth = defineStore("auth", () => {
     fetchAuthUser, 
     check, 
     userEmail,
+    avatar,
     authId,
     user,
     userName,

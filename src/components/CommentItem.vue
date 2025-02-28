@@ -6,6 +6,7 @@ import CommentBlock from './CommentBlock.vue';
 import CommentReplyForm from './forms/CommentReplyForm.vue';
 import { getInitials } from '@/composables/useFormatters';
 import { useAuth } from '@/stores/auth';
+import DefaultUserPic from './DefaultUserPic.vue';
 const props = defineProps({
     comment: Object,
     replies: Array
@@ -28,7 +29,7 @@ const replyclicked = () => {
 <template>
     <div class="flex gap-4 group">
         <img v-if="false" src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
-        <span v-else class="w-10 h-10 rounded-full bg-blue-300 text-blue-700 flex justify-center items-center">{{ getInitials(comment.author?.name) }}</span>
+        <DefaultUserPic v-else :name="comment.author?.name" class="w-10 h-10 border-2"/>
         <div class="flex-grow">
             <CommentBlock
               :comment="comment"
