@@ -236,7 +236,8 @@ onMounted(() => {
                             <h3 class="text-sm font-medium text-gray-500 mb-2">Project Manager</h3>
                             <div v-if="projectStore?.project?.manager" class="flex items-center space-x-3">
                                 <div class="flex-shrink-0">
-                                    <DefaultUserPic :name="projectStore?.project?.manager?.name" class="h-10 w-10 border-2"/>
+                                    <img v-if="projectStore?.project?.manager?.avatar?.['thumb-60']" :src="projectStore?.project?.manager?.avatar?.['thumb-60']" class="h-10 w-10  border-2 border-white outline outline-2 outline-blue-400 rounded-full" alt="">
+                                    <DefaultUserPic v-else :name="projectStore?.project?.manager?.name" class="h-10 w-10 border-2"/>
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-900">{{ projectStore?.project?.manager?.name }}</p>
@@ -256,7 +257,8 @@ onMounted(() => {
                             <div v-if="projectStore?.project?.assigned_members?.length > 0" class="space-y-3">
                                 <div v-for="member in projectStore?.project?.assigned_members" :key="member.id" class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
-                                        <DefaultUserPic :name="member.name" class="h-10 w-10 border-2"/>
+                                        <img v-if="member?.avatar?.['thumb-60']" :src="member?.avatar?.['thumb-60']" class="h-10 w-10  border-2 border-white outline outline-2 outline-blue-400 rounded-full" alt="">
+                                        <DefaultUserPic v-else-if="member.name" :name="member.name" class="h-10 w-10 border-2"/>
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-gray-900">{{ member.name }}</p>

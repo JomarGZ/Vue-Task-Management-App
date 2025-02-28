@@ -40,7 +40,7 @@ watch(() => taskCommentStore.isEditMode, refocusInput);
 <template>
     <div>
         <img v-if="auth.avatar?.['thumb-60']" :src="auth.avatar?.['thumb-60']" class="w-10 h-10 rounded-full shadow-sm border-2 border-white outline outline-2 outline-blue-500" alt="User avatar"/>
-        <DefaultUserPic v-else class="w-10 h-10 border-2" :name="auth.userName"/>
+        <DefaultUserPic v-else-if="auth.userName" class="w-10 h-10 border-2" :name="auth.userName"/>
         <form @submit.prevent="handleSumbit" class="flex-grow">
 
             <div class="bg-gray-100 rounded-2xl p-4">

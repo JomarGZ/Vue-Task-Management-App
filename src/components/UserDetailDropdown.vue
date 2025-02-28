@@ -15,7 +15,7 @@
               :src="auth.avatar?.['thumb-60']"
               alt="user photo"
             >
-            <DefaultUserPic v-else class="w-8 h-8 border-2" :name="auth.userName"/>
+            <DefaultUserPic v-else-if="auth.userName" class="w-8 h-8 border-2" :name="auth.userName"/>
           </button>
         </div>
         

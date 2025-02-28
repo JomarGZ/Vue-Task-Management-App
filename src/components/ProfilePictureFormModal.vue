@@ -47,7 +47,8 @@ const handleDrop = (event: DragEvent) => {
     }
 };
 
-const handleSubmit = async () => {
+const handleSubmit = async (event: Event) => {
+    event.preventDefault();
     const success = await changeAvatar.handleChangeAvatar();
     if (success) {
         emit('close-modal');
@@ -71,11 +72,11 @@ onBeforeUnmount(() => changeAvatar.resetForm());
                     <div class="px-6 py-4">
                         <div class="flex flex-col items-center mb-6">
                             <img v-if="previewPhoto" :src="previewPhoto" alt="Current profile" class="h-32 w-32 md:h-52 md:w-52 rounded-full object-cover border-4 border-white outline-2 outline-blue-500 mb-2" />
-                            <DefaultUserPic v-else :name="auth.userName" class="h-32 w-32 md:h-52 md:w-52 text-6xl border-4"/>
+                            <DefaultUserPic v-else-if="auth.userName" :name="auth.userName" class="h-32 w-32 md:h-52 md:w-52 text-6xl border-4"/>
                             <p class="text-sm text-gray-500">Current Photo</p>
                         </div>
 
-                        <form @submit.prevent="handleSubmit">
+                        <form @submit="handleSubmit">
                             <div
                                 class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors duration-300 mb-4"
                                 :class="{ 'bg-gray-200': isDragging }"
@@ -104,7 +105,7 @@ onBeforeUnmount(() => changeAvatar.resetForm());
                             </div>
 
                             <div class="flex justify-center md:justify-end px-3 py-2 md:px-6 md:py-4 space-x-2 md:space-x-3">
-                                <button @click="$emit('close-modal')" class="py-1 px-2 md:py-2 md:px-4 border border-gray-300 rounded-md text-xs md:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-300">
+                                <button @click="$emit('close-modal')" type="button" class="py-1 px-2 md:py-2 md:px-4 border border-gray-300 rounded-md text-xs md:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-300">
                                     Cancel
                                 </button>
                                 <button

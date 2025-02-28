@@ -177,7 +177,7 @@ watch(() =>[taskId.value, route.params.projectId], () => {
                             >
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Developer</label>
                                 <div class="flex items-center space-x-2">
-                                    <img v-if="false" src="https://i.pravatar.cc/32" class="w-8 h-8 rounded-full" alt="Developer avatar">
+                                    <img v-if="assignee.avatar?.['thumb-60']" :src="assignee.avatar?.['thumb-60']" class="w-8 h-8 rounded-full" alt="Developer avatar">
                                     <DefaultUserPic v-else :name="assignee.name" class="w-8 h-8 border-2 text-sm"/>
                                     <span class="text-gray-900">{{ assignee.name }}</span>
                                 </div>

@@ -80,7 +80,8 @@ onMounted(store.getMembers);
                         >
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <DefaultUserPic :name="member.name" class="h-10 w-10 border-2"/>
+                                    <img v-if="member.avatar?.['thumb-60']" :src="member.avatar?.['thumb-60']" class="h-10 w-10 border-2 rounded-full border-white outline outline-2 outline-blue-400" alt="">
+                                    <DefaultUserPic v-else :name="member.name" class="h-10 w-10 border-2 border-white outline outline-2 outline-blue-400"/>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
                                     </div>
