@@ -21,7 +21,7 @@
       />
       <!-- Client-Side Validation Errors -->
       <div v-if="clientErrors?.$error" class="text-sm text-red-500 mt-1">
-        <span v-for="error in clientErrors.$errors" :key="error.$message">
+        <span v-for="error in clientErrors.$errors" :key="error.$message" class="block">
           {{ error.$message }}
         </span>
       </div>
