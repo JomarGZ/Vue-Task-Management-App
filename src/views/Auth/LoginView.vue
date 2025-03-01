@@ -1,5 +1,6 @@
 <script setup>
 import Feature from '@/components/Feature.vue';
+import InputField from '@/components/forms/InputField.vue';
 import { useLogin } from '@/stores/login';
 import { onBeforeUnmount } from 'vue';
 
@@ -18,16 +19,28 @@ onBeforeUnmount(store.resetForm);
             Sign in to access your team's tasks, track progress, and collaborate seamlessly.
         </p>
         <form @submit.prevent="store.handleSubmit()" class="space-y-4 max-w-md">
-            <div>
-                <label class="block text-gray-700 mb-2">Email</label>
-                <input v-model="store.form.email" type="email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your work email" required>
-                <ValidationError :errors="store.errors" field="email"/>
-            </div>
-            <div>
-                <label class="block text-gray-700 mb-2">Password</label>
-                <input v-model="store.form.password" type="password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your password" required>
-                <ValidationError :errors="store.errors" field="password"/>
-            </div>
+            <InputField
+                name="email"
+                label="Work Email"
+                type="email"
+                placeholder="Enter your valid email"
+                v-model="store.form.email"
+                :errors="store.errors"
+                :clientErrors="store.v$.email"
+                @input="store.v$.email.$touch()"
+                required
+                />
+            <InputField
+                name="password"
+                label="Password"
+                type="password"
+                placeholder="Enter your password"
+                v-model="store.form.password"
+                :errors="store.errors"
+                :clientErrors="store.v$.password"
+                @input="store.v$.password.$touch()"
+                required
+                />
             <div class="flex justify-between items-center">
                 <label class="flex items-center">
                     <input type="checkbox" class="mr-2">
@@ -37,11 +50,11 @@ onBeforeUnmount(store.resetForm);
             </div>
             <button
                 type="submit"
-                :disabled="store.loading"
+                :disabled="store.isActionDisabled"
                 :class="{
                     'w-full text-white px-8 py-3 rounded-lg transition flex items-center justify-center space-x-2 gap-3': true,
-                    'bg-blue-600 hover:bg-blue-700': ! store.loading,
-                    'bg-blue-300': store.loading
+                    'bg-blue-600 hover:bg-blue-700': ! store.isActionDisabled,
+                    'bg-blue-300': store.isActionDisabled
             }">
                 <IconSpinner name="white-spinner" v-show="store.loading" class="animate-spin h-5 w-5"/>
                 <span>Sign In</span>
