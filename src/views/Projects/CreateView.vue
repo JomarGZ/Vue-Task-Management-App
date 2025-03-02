@@ -4,6 +4,7 @@ import DateInputField from '@/components/forms/DateInputField.vue';
 import InputField from '@/components/forms/InputField.vue';
 import TextAreaField from '@/components/forms/TextAreaField.vue';
 import ValidationError from '@/components/ValidationError.vue';
+import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTeamStore } from '@/stores/projectTeamStore';
 import { onBeforeUnmount, onMounted } from 'vue';
@@ -100,7 +101,7 @@ onMounted(() => {
                             <select v-model="store.form.priority" id="priority" name="priority"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Select priority</option>
-                                <option v-for="priority in store.projectPriorityLevels" :key="priority" :value="priority">{{ priority }}</option>
+                                <option v-for="priority in store.projectPriorityLevels" :key="priority" :value="priority">{{ capWords(priority) }}</option>
                             </select>
                             <ValidationError :errors="store.errors" field="priority"/>
                         </div>
@@ -113,7 +114,7 @@ onMounted(() => {
                                   v-for="status in store.projectStatuses"
                                   :key="status"
                                   :value="status">
-                                    {{ status }}
+                                    {{ capWords(status) }}
                                 </option>
                                 <ValidationError :errors="store.errors" field="status"/>
                             </select>
