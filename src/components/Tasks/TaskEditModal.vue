@@ -2,6 +2,11 @@
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import Modal from '../Modal.vue';
 import { onBeforeUnmount, onMounted } from 'vue';
+import InputField from '../forms/InputField.vue';
+import TextAreaField from '../forms/TextAreaField.vue';
+import DateInputField from '../forms/DateInputField.vue';
+import { capWords } from '@/composables/useUtil';
+import BaseButton from '../forms/BaseButton.vue';
 const props = defineProps({
     isEditTaskModalShow: Boolean,
     task: Object
@@ -32,29 +37,39 @@ onBeforeUnmount(() => {
                     <!-- Rest of the form remains the same -->
                     <!-- Task Title -->
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div class="col-span-2">
-                            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
-                            <input v-model="taskStore.form.title" type="text" id="title" name="title"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <ValidationError :errors="taskStore.errors" field="title"/>
-                        </div>
-
-                        <!-- Description -->
-                        <div class="col-span-2">
-                            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea v-model="taskStore.form.description" id="description" name="description" rows="4"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-                            <ValidationError :errors="taskStore.errors" field="description"/>
-                        </div>
-
-                        <!-- Due Date -->
-                        <div>
-                            <label for="dueDate" class="block text-sm font-medium text-gray-700 mb-1">DeadLine</label>
-                            <input v-model="taskStore.form.deadline_at" type="date" id="dueDate" name="dueDate"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-
-                        <!-- Priority -->
+                        <InputField
+                            class="col-span-2"
+                            name="title"
+                            label="Task Title"
+                            type="text"
+                            placeholder="Enter task title"
+                            v-model="taskStore.form.title"
+                            :errors="taskStore.errors"
+                            :is-required="true"
+                            :clientErrors="taskStore.v$.title"
+                            @input="taskStore.v$.title.$touch()"
+                            required
+                        />
+                        <TextAreaField
+                            class="col-span-2"
+                            name="description"
+                            label="Description"
+                            v-model="taskStore.form.description"
+                            :is-required="true"
+                            :requird="true"
+                            :errors="taskStore.errors"
+                            :clientErrors="taskStore.v$.description"
+                            @input="taskStore.v$.description.$touch()"
+                        />
+                         <DateInputField
+                            name="deadline_at"
+                            label="DeadLine"
+                            v-model="taskStore.form.deadline_at"
+                            :restrictToCurrentAndFutureDates="true"
+                            :errors="taskStore.errors"
+                            :client-errors="taskStore.v$.deadline_at"
+                            @input="taskStore.v$.deadline_at.$touch()"
+                        />
                         <div>
                             <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                             <select v-model="taskStore.form.priority_level" id="priority" name="priority"
@@ -64,7 +79,7 @@ onBeforeUnmount(() => {
                                     v-for="level in taskStore?.priorityLevels"
                                     :key="level"
                                     :value="level">   
-                                        {{ level }}
+                                        {{ capWords(level) }}
                                 </option>
                             </select>
                         </div>
@@ -111,18 +126,13 @@ onBeforeUnmount(() => {
                               class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                 Cancel
                         </button>
-                        <button 
-                            :disabled="taskStore.loading" 
-                            type="submit" 
-                            :class="{
-                            'px-6 py-3 flex items-center justify-center gap-2 text-white rounded-lg font-medium': true,
-                            'hover:bg-indigo-700 bg-indigo-600':! taskStore.loading,
-                            'bg-indigo-300': taskStore.loading 
-                            }"
+                        <BaseButton
+                            :isActionDisabled="taskStore.isActionDisabled"
+                            type="submit"
+                            :isLoading="taskStore.loading"
                         >
-                            <IconSpinner name="white-spinner" v-if="taskStore.loading"/>
                             Update
-                        </button>
+                        </BaseButton>
                     </div>
                 </form>
             </div>

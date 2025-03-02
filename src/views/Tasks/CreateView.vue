@@ -1,4 +1,7 @@
 <script setup>
+import BaseButton from '@/components/forms/BaseButton.vue';
+import InputField from '@/components/forms/InputField.vue';
+import TextAreaField from '@/components/forms/TextAreaField.vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { onBeforeUnmount, watchEffect } from 'vue';
@@ -72,20 +75,32 @@ onBeforeUnmount(taskStore.resetForm)
                 <!-- Rest of the form remains the same -->
                 <!-- Task Title -->
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div class="col-span-2">
-                        <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
-                        <input v-model="taskStore.form.title" type="text" id="title" name="title"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <ValidationError :errors="taskStore.errors" field="title"/>
-                    </div>
-
+                    <InputField
+                        class="col-span-2"
+                        name="title"
+                        label="Task Title"
+                        type="text"
+                        placeholder="Enter task title"
+                        v-model="taskStore.form.title"
+                        :errors="taskStore.errors"
+                        :is-required="true"
+                        :clientErrors="taskStore.v$.title"
+                        @input="taskStore.v$.title.$touch()"
+                        required
+                    />
+                    <TextAreaField
+                        class="col-span-2"
+                        name="description"
+                        label="Description"
+                        v-model="taskStore.form.description"
+                        :is-required="true"
+                        :requird="true"
+                        :errors="taskStore.errors"
+                        :clientErrors="taskStore.v$.description"
+                        @input="taskStore.v$.description.$touch()"
+                    />
                     <!-- Description -->
-                    <div class="col-span-2">
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea v-model="taskStore.form.description" id="description" name="description" rows="4"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-                        <ValidationError :errors="taskStore.errors" field="description"/>
-                    </div>
+                   
 
                     <!-- Due Date -->
                     <!-- <div>
@@ -154,18 +169,14 @@ onBeforeUnmount(taskStore.resetForm)
                     <RouterLink :to="{name: 'projects.show', params: {projectId: projectStore?.project?.id}}" type="button" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
                         Cancel
                     </RouterLink>
-                    <button 
-                        :disabled="taskStore.loading" 
-                        type="submit" 
-                        :class="{
-                        'px-6 py-3 flex items-center justify-center gap-2 text-white rounded-lg font-medium': true,
-                        'hover:bg-indigo-700 bg-indigo-600':! taskStore.loading,
-                        'bg-indigo-300': taskStore.loading 
-                        }"
+                    <BaseButton
+                        type="submit"
+                        :is-action-disabled="taskStore.isActionDisabled"
+                        :isLoading="taskStore.loading"
                     >
-                        <IconSpinner name="white-spinner" v-if="taskStore.loading"/>
                         Create Task
-                    </button>
+                    </BaseButton>
+                    
                 </div>
             </form>
         </div>

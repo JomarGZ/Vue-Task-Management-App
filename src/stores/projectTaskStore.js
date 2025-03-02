@@ -1,7 +1,9 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
+import useVuelidate from "@vuelidate/core";
+import { helpers, maxLength, required } from "@vuelidate/validators";
 import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 export const useProjectTaskStore = defineStore("project-tasks", () => {
@@ -27,7 +29,20 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         status: "",
 
     });
+    
+    const rules = computed(() => ({
+        title: {
+          required: helpers.withMessage('Title is required.', required),
+          maxLength: helpers.withMessage('Title must not exceed 255 characters.', maxLength(255)),
+        },
+        description: {
+          required: helpers.withMessage('Description is required.', required),
+          maxLength: helpers.withMessage('Description must not exceed 500 characters.', maxLength(500)),
+        },
+    }));
 
+    const v$ = useVuelidate(rules, form);
+    const isActionDisabled = computed(() => loading.value || v$.value.$invalid);
     const pagination = reactive({
         current_page: 1,
         last_page: 0,
@@ -111,7 +126,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         form.deadline_at = "";
         form.category_id = "";
         form.completed_at = "";
-        
+        v$.value.$reset();
         errors.value = {};
     }
 
@@ -120,6 +135,8 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     }
 
     async function storeTask (project) {
+        const isFormValidated = await v$.value.$validate();
+        if (!isFormValidated) return;
         if (loading.value) return;
         errors.value = {};
         loading.value = true;
@@ -128,6 +145,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
             .then((response) => {
                 const data = response.data.data;
                 showToast("Task added successfully")
+                resetForm();
                 router.push({ name : 'tasks.show', params: {projectId: data.project.id, taskId: data.id} })
             })
             .catch(error => {
@@ -143,6 +161,8 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     }
 
     async function updateTask (task) {
+        const isFormValidated = await v$.value.$validate();
+        if (!isFormValidated) return;
         if (loading.value) return;
         errors.value = {};
         loading.value = true;
@@ -249,6 +269,8 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         resetForm,
         resetTaskData,
         updateParams,
+        v$,
+        isActionDisabled,
         selectedPriority,
         selectedStatus,
         debounceSearch,
