@@ -1,7 +1,9 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
+import useVuelidate from "@vuelidate/core";
+import { helpers, maxLength, numeric, required } from "@vuelidate/validators";
 import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 export const useProjectStore = defineStore("project", () => {
@@ -31,6 +33,30 @@ export const useProjectStore = defineStore("project", () => {
         budget: ''
     });
 
+    const rules = computed(() => ({
+        name: {
+          required: helpers.withMessage('Name is required.', required),
+          maxLength: helpers.withMessage('Name must not exceed 255 characters.', maxLength(255)),
+        },
+        description: {
+          required: helpers.withMessage('Description is required.', required),
+          maxLength: helpers.withMessage('Description must not exceed 500 characters.', maxLength(500)),
+        },
+        client_name: {
+          required: helpers.withMessage('Client name is required.', required),
+          maxLength: helpers.withMessage('Client name must not exceed 255 characters.', maxLength(255)),
+        },
+       
+        budget: {
+          numeric: helpers.withMessage('Budget must be a number.', numeric),
+          maxDigits: helpers.withMessage('Budget must not exceed 10 digits.', (value) => {
+            return String(value).length <= 10;
+          }),
+        },
+      }));
+
+    const v$ = useVuelidate(rules, form);
+    const isActionDisabled = computed(() => loading.value || v$.value.$invalid);
     const resetForm = () => {
         form.name = '';
         form.description = '';
@@ -41,7 +67,7 @@ export const useProjectStore = defineStore("project", () => {
         form.started_at = '';
         form.ended_at = '';
         form.budget = '';
-
+        v$.value.$reset();
         errors.value = {}
     }
 
@@ -155,6 +181,8 @@ export const useProjectStore = defineStore("project", () => {
     }
 
     const handleSubmit = async () => {
+        const isFormValidated = v$.value.$validate();
+        if (!isFormValidated) return;
         if(loading.value) return;
 
         loading.value = true;
@@ -229,6 +257,8 @@ export const useProjectStore = defineStore("project", () => {
         filterProjects,
         getPriorityLevels,
         project,
+        v$,
+        isActionDisabled,
         selectedPriority,
         selectedStatus,
         hasFetchProjectsError,
