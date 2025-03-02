@@ -1,4 +1,5 @@
 <script setup>
+import InputField from '@/components/forms/InputField.vue';
 import { useMemberStore } from '@/stores/memberStore';
 import { onBeforeUnmount } from 'vue';
 
@@ -23,16 +24,17 @@ onBeforeUnmount(store.resetForm)
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- First Name -->
-                        <div>
-                            <label for="first_name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                            <input 
-                                v-model="store.form.name" 
-                                type="text" 
-                                id="first_name" 
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <ValidationError :errors="store.errors" field="name"/>
-                        </div>
-
+                         <InputField 
+                            name="name"
+                            type="text"
+                            label="Full Name"
+                            placeholder="Enter name"
+                            v-model="store.form.name"
+                            :errors="store.errors"
+                            :clientErrors="store.v$.name"
+                            @input="store.v$.name.$touch()"
+                            required
+                         />
                         <!-- Last Name -->
                         <!-- <div>
                             <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
@@ -42,17 +44,17 @@ onBeforeUnmount(store.resetForm)
                     </div>
 
                     <!-- Email -->
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input
-                            v-model="store.form.email" 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <ValidationError :errors="store.errors" field="email"/>
-                    </div>
-
+                        <InputField 
+                            name="email"
+                            type="email"
+                            label="Email Address"
+                            placeholder="Enter email address"
+                            v-model="store.form.email"
+                            :errors="store.errors"
+                            :clientErrors="store.v$.email"
+                            @input="store.v$.email.$touch()"
+                            required
+                         />
                     <!-- Phone -->
                     <!-- <div>
                         <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
@@ -154,12 +156,12 @@ onBeforeUnmount(store.resetForm)
                         Cancel
                     </RouterLink>
                     <button 
-                        :disabled="store.loading" 
+                        :disabled="store.isActionDisabled" 
                         type="submit" 
                         :class="{
                         'px-6 py-3 flex items-center justify-center gap-2 text-white rounded-lg font-medium': true,
-                        'hover:bg-indigo-700 bg-indigo-600':! store.loading,
-                        'bg-indigo-300': store.loading 
+                        'hover:bg-indigo-700 bg-indigo-600':! store.isActionDisabled,
+                        'bg-indigo-300': store.isActionDisabled 
                         }"
                     >
                         <IconSpinner name="white-spinner" v-if="store.loading"/>
