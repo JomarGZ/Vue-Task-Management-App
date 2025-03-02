@@ -1,24 +1,23 @@
 <template>
     <div>
-      <label :for="name" class="block text-gray-700 mb-2">{{ label }} <span v-if="isRequired" class="text-red-500">*</span></label>
-      <input
+      <label :for="name" class="block text-sm font-medium text-gray-700">
+        {{ label }} <span v-if="isRequired" class="text-red-500">*</span>
+      </label>
+      <textarea
         :id="name"
-        :type="type"
-        :placeholder="placeholder"
+        :name="name"
+        :rows="rows"
         :value="modelValue"
         @input="handleInput"
         :class="[
-          'w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2',
-          hasError ? 'ring-red-500 border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'
+          'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500',
+          hasError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : ''
         ]"
+        :placeholder="placeholder"
         :required="required"
-      />
+      ></textarea>
       <!-- Server-Side Validation Errors -->
-      <ValidationError
-        v-if="errors"
-        :errors="errors"
-        :field="name"
-      />
+      <ValidationError :errors="errors" :field="name" />
       <!-- Client-Side Validation Errors -->
       <div v-if="clientErrors?.$error" class="text-sm text-red-500 mt-1">
         <span v-for="error in clientErrors.$errors" :key="error.$message" class="block">
@@ -30,7 +29,7 @@
   
   <script setup>
   import { computed } from 'vue';
-import ValidationError from '../ValidationError.vue';
+  import ValidationError from '../ValidationError.vue';
   
   const props = defineProps({
     name: {
@@ -40,10 +39,6 @@ import ValidationError from '../ValidationError.vue';
     label: {
       type: String,
       required: true,
-    },
-    type: {
-      type: String,
-      default: 'text',
     },
     placeholder: {
       type: String,
@@ -57,6 +52,10 @@ import ValidationError from '../ValidationError.vue';
       type: Boolean,
       default: false,
     },
+    isRequired: {
+      type: Boolean,
+      default: false,
+    },
     errors: {
       type: Object,
       default: null,
@@ -65,10 +64,10 @@ import ValidationError from '../ValidationError.vue';
       type: Object,
       default: null,
     },
-    isRequired: {
-      type: Boolean,
-      default: false
-    }
+    rows: {
+      type: Number,
+      default: 4,
+    },
   });
   
   const emit = defineEmits(['update:modelValue', 'input']);
@@ -78,7 +77,7 @@ import ValidationError from '../ValidationError.vue';
   });
   
   const handleInput = (event) => {
-    emit('update:modelValue', event.target.value); 
-    emit('input', event); 
+    emit('update:modelValue', event.target.value);
+    emit('input', event);
   };
   </script>

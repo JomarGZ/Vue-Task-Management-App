@@ -1,4 +1,9 @@
 <script setup>
+import BaseButton from '@/components/forms/BaseButton.vue';
+import DateInputField from '@/components/forms/DateInputField.vue';
+import InputField from '@/components/forms/InputField.vue';
+import TextAreaField from '@/components/forms/TextAreaField.vue';
+import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTeamStore } from '@/stores/projectTeamStore';
 import { onBeforeUnmount, onMounted, watchEffect } from 'vue';
@@ -35,29 +40,40 @@ onMounted(() => {
                     <h2 class="text-lg font-medium text-gray-900">Basic Information</h2>
                     
                     <!-- Project Name -->
-                    <div>
-                        <label for="project_name" class="block text-sm font-medium text-gray-700">Project Name *</label>
-                        <input v-model="projectStore.form.name" type="text" id="project_name" name="project_name"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <ValidationError :errors="projectStore.errors" field="name"/>    
-                    </div>
-
-                    <!-- Client -->
-                    <div>
-                        <label for="client" class="block text-sm font-medium text-gray-700">Client Name *</label>
-                        <input v-model="projectStore.form.client_name" type="text" id="client" name="client"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <ValidationError :errors="projectStore.errors" field="client_name"/>
-                    </div>
-
-                    <!-- Description -->
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">Project Description</label>
-                        <textarea v-model="projectStore.form.description" id="description" name="description" rows="4"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Describe the project objectives and scope..."></textarea>
-                        <ValidationError :errors="projectStore.errors" field="description"/>    
-                    </div>
+                    <InputField
+                        name="name"
+                        label="Project Name"
+                        type="text"
+                        :isRequired="true"
+                        v-model="projectStore.form.name"
+                        :errors="projectStore.errors"
+                        :clientErrors="projectStore.v$.name"
+                        @input="projectStore.v$.name.$touch()"
+                        required
+                     />
+                     <InputField
+                        name="client_name"
+                        label="Client Name"
+                        type="text"
+                        :isRequired="true"
+                        v-model="projectStore.form.client_name"
+                        :errors="projectStore.errors"
+                        :clientErrors="projectStore.v$.client_name"
+                        @input="projectStore.v$.client_name.$touch()"
+                        required
+                     />
+                     <TextAreaField
+                        name="description"
+                        label="Description"
+                        placeholder="Describe the project objectives and scope..."
+                        v-model="projectStore.form.description"
+                        :required="true"
+                        :is-required="true"
+                        :errors="projectStore.errors"
+                        :client-errors="projectStore.v$.description"
+                        @input="projectStore.v$.description.$touch()"
+                        rows="6"
+                    />
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Project Manager</label>
                         <select v-model="projectStore.form.manager" class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-blue-500 focus:border-blue-500">
@@ -67,29 +83,35 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <!-- Project Details -->
                 <div class="space-y-4 pt-6 border-t">
                     <h2 class="text-lg font-medium text-gray-900">Project Details</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date *</label>
-                            <input v-model="projectStore.form.started_at" type="date" id="start_date" name="start_date"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <ValidationError :errors="projectStore.errors" field="started_at"/>
-                        </div>
-
-                        <div>
-                            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date *</label>
-                            <input v-model="projectStore.form.ended_at" type="date" id="end_date" name="end_date"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <ValidationError :errors="projectStore.errors" field="ended_at"/>
-                        </div>
+                        <DateInputField
+                            name="start_date"
+                            label="Start Date"
+                            v-model="projectStore.form.started_at"
+                            :restrictToCurrentAndFutureDates="true"
+                            :required="true"
+                            :errors="projectStore.errors"
+                            :client-errors="projectStore.v$.started_at"
+                            @input="projectStore.v$.started_at.$touch()"
+                        />
+                        <DateInputField
+                            name="ended_at"
+                            label="End Date"
+                            v-model="projectStore.form.ended_at"
+                            :restrictToCurrentAndFutureDates="true"
+                            :required="true"
+                            :errors="projectStore.errors"
+                            :client-errors="projectStore.v$.ended_at"
+                            @input="projectStore.v$.ended_at.$touch()"
+                        />
                         <div>
                             <label for="priority" class="block text-sm font-medium text-gray-700">Priority *</label>
                             <select v-model="projectStore.form.priority" id="priority" name="priority"
                                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Select priority</option>
-                                <option v-for="priority in projectStore.projectPriorityLevels" :key="priority" :value="priority">{{ priority }}</option>
+                                <option v-for="priority in projectStore.projectPriorityLevels" :key="priority" :value="priority">{{ capWords(priority) }}</option>
                             </select>
                             <ValidationError :errors="projectStore.errors" field="priority"/>
                         </div>
@@ -102,7 +124,7 @@ onMounted(() => {
                                   v-for="status in projectStore.projectStatuses"
                                   :key="status"
                                   :value="status">
-                                    {{ status }}
+                                    {{ capWords(status) }}
                                 </option>
                                 <ValidationError :errors="projectStore.errors" field="status"/>
                             </select>
@@ -136,17 +158,13 @@ onMounted(() => {
                         class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Cancel
                     </RouterLink>
-                    <button
-                        :disabled="projectStore.loading" 
-                        type="submit" 
-                        :class="{
-                            'px-4 py-2 border border-transparent flex items-center gap-2 justify-center rounded-md shadow-sm text-sm font-medium text-white focus:outline-none': true,
-                            'bg-blue-600 hover:bg-blue-700':! projectStore.loading,
-                            'bg-blue-300': projectStore.loading,
-                        }">
-                        <IconSpinner name="white-spinner" v-if="projectStore.loading"/>
+                    <BaseButton
+                        :isActionDisabled="projectStore.isActionDisabled"
+                        :isLoading="projectStore.loading"
+                        type="submit"
+                    >
                         Update Project
-                    </button>
+                    </BaseButton>
                 </div>
             </form>
         </div>
