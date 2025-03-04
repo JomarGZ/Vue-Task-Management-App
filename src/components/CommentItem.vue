@@ -28,7 +28,7 @@ const replyclicked = () => {
 </script>
 <template>
     <div class="flex gap-4 group">
-        <img v-if="false" src="https://i.pravatar.cc/40" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
+        <img v-if="comment.author?.avatar?.['thumb-60']" :src="comment.author?.avatar?.['thumb-60']" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
         <DefaultUserPic v-else :name="comment.author?.name" class="w-10 h-10 border-2"/>
         <div class="flex-grow">
             <CommentBlock
