@@ -106,7 +106,7 @@ const selectedPriorityModel = computed({
 </script>
 <template>
     <div class="rounded-xl bg-white p-6 shadow-sm">
-      <h2 class="mb-4 text-xl font-semibold">Recent Activity</h2>
+      <h2 class="mb-4 text-xl font-semibold">My Tasks</h2>
   
       <!-- Search and Filters -->
       <div class="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
