@@ -62,7 +62,7 @@ onBeforeUnmount(store.resetForm)
                         <h2 class="font-bold">The login credentials will be sent to the user's email.</h2>
                         <p><strong>For demonstration purposes:</strong></p>
                         <p>If you don't have another email, you can use your existing Gmail address with a <code>+anyword</code> suffix. Gmail will still deliver the email to your original inbox.</p>
-                        <p><strong>Example:</strong> <code>johndoe+test@gmail.com</code></p>
+                        <p><strong>Example:</strong> <code>johndoe+test@example.com</code></p>
                     </div>
 
               
