@@ -58,11 +58,13 @@ onBeforeUnmount(store.resetForm)
                 <!-- Role & Access Section -->
                 <div class="space-y-4 pt-4 border-t">
                     <!-- <h2 class="text-lg font-medium text-gray-900">Role & Access</h2> -->
-                     <div class="bg-yellow-50 border p-2 rounded-md">
-                        <p><strong>Temporarily!</strong></p>
-                        <p>Password of the added member account</p>
-                        <p>Password: <strong>password</strong></p>
-                     </div>
+                    <div class="bg-yellow-50 border p-2 rounded-md">
+                        <h2 class="font-bold">The login credentials will be sent to the user's email.</h2>
+                        <p><strong>For demonstration purposes:</strong></p>
+                        <p>If you don't have another email, you can use your existing Gmail address with a <code>+anyword</code> suffix. Gmail will still deliver the email to your original inbox.</p>
+                        <p><strong>Example:</strong> <code>johndoe+test@gmail.com</code></p>
+                    </div>
+
               
                     <!-- Role -->
                     <div>
