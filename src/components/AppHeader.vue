@@ -19,7 +19,6 @@ const props = defineProps({
 
 const notificationStore = useNotifications();
 const hasNotifications = computed(() => notificationStore.notifications?.length > 0);
-// Notification state
 const isNotificationsOpen = ref(false)
 const notificationButton = ref(null)
 
@@ -37,15 +36,6 @@ if (notificationElement && !notificationElement.contains(event.target)) {
   isNotificationsOpen.value = false
 }
 }
-
-const setNotificationRedirection = (entityId, entityType, otherEntity = {}) => {
-  if (!entityId || !entityType) return '#';
-  const redirectionMap = {
-    task: () => ({ name: 'tasks.show', params: { projectId: otherEntity.id, taskId: entityId } }),
-    project: () => ({ name: 'projects.show', params: { projectId: entityId } }),
-  };
-  return redirectionMap[entityType]?.() || '#';
-};
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
@@ -126,11 +116,7 @@ onBeforeUnmount(() => {
                     v-for="notification in notificationStore.notifications"
                     :key="notification.id"
                     @click="notificationStore.handleMarkAsReadNotification(notification)"
-                    :to="setNotificationRedirection(
-                      notification.data?.main_entity?.entity_id,
-                      notification.data?.main_entity?.entity_type,
-                      { id: notification.data?.related_entity?.entity_id }
-                    )"
+                    :to="notification.data?.link || '#'"
                     class="flex px-4 py-3 items-center hover:bg-gray-100 dark:hover:bg-gray-600"
                     :class="notification.read_at ? 'bg-gray-800' : ''"
                   >
