@@ -3,7 +3,7 @@ import TaskActivityFeed from "@/components/TaskActivityFeed.vue";
 import UpcomingTaskDeadlines from "@/components/UpcomingTaskDeadlines.vue";
 import { useUserTasks } from "@/stores/userTaskStore";
 import debounce from "lodash.debounce";
-import { onMounted, watch, provide } from "vue";
+import { onMounted, watch, provide, onBeforeUnmount } from "vue";
 
 const userTaskStore = useUserTasks();
 onMounted(async () => {
@@ -40,6 +40,9 @@ watch(() => userTaskStore.searchQuery,
 
 provide('pagination', userTaskStore.pagination);
 provide('handlePageChange', userTaskStore.handlePageChange);
+onBeforeUnmount(() => {
+  userTaskStore.clearFilters();
+})
 </script>
 <template>
     <div class="grid md:grid-cols-4 gap-4 mb-4">

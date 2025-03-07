@@ -1,4 +1,5 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
+import { handleAsyncRequestOperation } from "@/composables/useUtil";
 import useVuelidate from "@vuelidate/core";
 import { email, helpers, maxLength, minLength, required } from "@vuelidate/validators";
 import debounce from "lodash.debounce";
@@ -15,6 +16,7 @@ export const useMemberStore = defineStore("memberStore", () => {
   const isFetchError = ref(false);
   const route = useRoute();
   const memberList = ref(null);
+  const member = ref({});
   const members = ref(null);
   const searchInput = ref(route.query.search || '')
   const form = reactive({
@@ -30,7 +32,10 @@ export const useMemberStore = defineStore("memberStore", () => {
       to: 0,
       total: 0,
   })
-
+  const setMember = (data) => {
+    if (!data) return;
+    member.value = data;
+  }
   const rules = computed(() => ({
       name: {
         required: helpers.withMessage('Name is required', required),
@@ -52,6 +57,9 @@ export const useMemberStore = defineStore("memberStore", () => {
       form.role = "member";
       v$.value.$reset();
       errors.value = {};
+  }
+  const resetMember = () => {
+    member.value = {};
   }
   const debounceSearch = debounce((newSearch) => {
       router
@@ -138,6 +146,12 @@ export const useMemberStore = defineStore("memberStore", () => {
             console.error('Error on fetching members', error)
         }).finally(() => isFetchLoading.value = false);
   }
+  const fetchMember = async (member) => {
+    await handleAsyncRequestOperation(() => getMember(member), (response) => {
+      setMember(response.data?.data);
+    },isFetchLoading, isFetchError);
+  }
+
 
   const getMemberListWithoutPagination = async () => {
     return window.axios
@@ -149,6 +163,14 @@ export const useMemberStore = defineStore("memberStore", () => {
         console.error('Error on fetching member list', error)
       })
       
+  }
+
+  const getMember = async (member) => {
+    if (!member) {
+      console.warn(`ID for user is required but ${member} is given`);
+      return;
+    }
+    return window.axios.get(`api/v1/tenant/members/${member?.id}`);
   }
 
   const deleteMember = async (member) => {
@@ -182,9 +204,12 @@ export const useMemberStore = defineStore("memberStore", () => {
       changePage,
       orderBy,
       deleteMember,
+      fetchMember,
       getMemberListWithoutPagination,
+      member,
       isActionDisabled,
       v$,
+      resetMember,
       debounceSearch,
       loading,
       isFetchLoading,

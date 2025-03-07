@@ -1,52 +1,84 @@
+<script setup>
+import DefaultUserPic from '@/components/DefaultUserPic.vue';
+import TaskActivityFeed from '@/components/TaskActivityFeed.vue';
+import { capWords } from '@/composables/useUtil';
+import { useAuth } from '@/stores/auth';
+import { useMemberStore } from '@/stores/memberStore';
+import { useUserTasks } from '@/stores/userTaskStore';
+import { onBeforeUnmount, onMounted, provide } from 'vue';
+import { useRoute } from 'vue-router';
+
+const auth = useAuth();
+const useMember = useMemberStore();
+const userTaskStore = useUserTasks();
+const route = useRoute();
+onBeforeUnmount(() => {
+    userTaskStore.clearFilters();
+    useMember.resetMember();
+})
+
+onMounted(() => {
+    userTaskStore.fetchAssignedTasks({user_id: route.params?.id});
+    useMember.fetchMember({id: route.params?.id});
+})
+provide('pagination', userTaskStore.pagination);
+provide('handlePageChange', userTaskStore.handlePageChange);
+</script>
 <template>
     <div class="container mx-auto px-4 py-8">
      <!-- Profile Header -->
      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-         <div class="flex items-center space-x-4">
-             <img src="" alt="Profile Picture" class="rounded-full w-16 h-16"/>
-             <div>
-                 <h1 class="text-2xl font-bold text-gray-800">John Doe</h1>
-                 <p class="text-gray-600">Senior Developer</p>
-             </div>
-             <div class="ml-auto">
-                 <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Active</span>
-             </div>
-         </div>
+        <div class="flex items-center space-x-6">
+            <!-- Profile Picture -->
+            <img v-if="useMember.member?.avatar?.['thumb-200']" :src="useMember.member?.avatar?.['thumb-200']" alt="Profile Picture" class="w-24 h-24 border-4 border-white outline outline-4 outline-blue-500 rounded-full">
+            <DefaultUserPic v-else class="w-24 h-24 border-white border-4 text-3xl" :name="useMember.member?.name"/>
+            <!-- Profile Details -->
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800">{{ capWords(useMember.member?.name) }}</h2>
+                <p class="text-gray-600">Software Engineer</p>
+                <p class="text-gray-500">{{ useMember.member?.email }}</p>
+            </div>
+        </div>
      </div>
 
      <!-- Team Section -->
-     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <!-- <div class="bg-white rounded-lg shadow-md p-6 mb-6">
          <h2 class="text-xl font-semibold mb-4">Assigned Teams</h2>
          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-             <!-- Team Card 1 -->
              <div class="border rounded-lg p-4">
                  <div class="flex items-center justify-between mb-2">
                      <h3 class="font-medium">Frontend Team</h3>
                      <span class="text-sm text-gray-500">Lead Developer</span>
                  </div>
                  <div class="flex -space-x-2">
-                     <img src="" alt="Team Member" class="w-8 h-8 rounded-full border-2 border-white"/>
-                     <img src="" alt="Team Member" class="w-8 h-8 rounded-full border-2 border-white"/>
-                     <img src="" alt="Team Member" class="w-8 h-8 rounded-full /api/placeholder/32/3-2 border-white"/>
+                     <img src="https://i.pravatar.cc/50" alt="Team Member" class="w-8 h-8 rounded-full border-2 border-white"/>
+                     <img src="https://i.pravatar.cc/50" alt="Team Member" class="w-8 h-8 rounded-full border-2 border-white"/>
+                     <img src="https://i.pravatar.cc/50" alt="Team Member" class="w-8 h-8 rounded-full /api/placeholder/32/3-2 border-white"/>
                  </div>
              </div>
-             <!-- Team Card 2 -->
              <div class="border rounded-lg p-4">
                  <div class="flex items-center justify-between mb-2">
                      <h3 class="font-medium">UI/UX Team</h3>
                      <span class="text-sm text-gray-500">Member</span>
                  </div>
                  <div class="flex -space-x-2">
-                     <img src="" alt="Team Member" class="w-8 h-8 rounded-full border-2 border-white"/>
-                     <img src="" alt="Team Member" class="w-8 h-8 rounded-full border-2 border-white"/>
+                     <img src="https://i.pravatar.cc/50" alt="Team Member" class="w-8 h-8 rounded-full border-2 border-white"/>
+                     <img src="https://i.pravatar.cc/50" alt="Team Member" class="w-8 h-8 rounded-full border-2 border-white"/>
                  </div>
              </div>
          </div>
-     </div>
+     </div> -->
+     <TaskActivityFeed
+        :activities="userTaskStore.assignedTasks"
+        :isLoading="userTaskStore.isAssignedTasksLoading"
+        :isError="userTaskStore.isAssignedTasksError"
+        v-model:searchQuery="userTaskStore.searchQuery"
+        v-model:selectedStatus="userTaskStore.selectedStatus"
+        v-model:selectedPriority="userTaskStore.selectedPriority"
+    />
 
      <!-- Tasks Section -->
-     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-         <!-- Not Started Tasks -->
+    <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
          <div class="bg-white rounded-lg shadow-md p-6">
              <div class="flex items-center justify-between mb-4">
                  <h2 class="text-xl font-semibold">Not Started</h2>
@@ -72,7 +104,6 @@
              </div>
          </div>
 
-         <!-- In Progress Tasks -->
          <div class="bg-white rounded-lg shadow-md p-6">
              <div class="flex items-center justify-between mb-4">
                  <h2 class="text-xl font-semibold">In Progress</h2>
@@ -92,7 +123,6 @@
              </div>
          </div>
 
-         <!-- Completed Tasks -->
          <div class="bg-white rounded-lg shadow-md p-6">
              <div class="flex items-center justify-between mb-4">
                  <h2 class="text-xl font-semibold">Completed</h2>
@@ -111,6 +141,17 @@
                  </div>
              </div>
          </div>
-     </div>
+     </div> -->
+     <!-- <div class="bg-white shadow-md rounded-lg p-6 mt-5">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">Activity History</h3>
+      <div class="space-y-4">
+        <div class="p-4 border border-gray-200 rounded-lg">
+          <p class="text-gray-800">Assigned to <strong>Task #123</strong> on 2023-10-10.</p>
+        </div>
+        <div class="p-4 border border-gray-200 rounded-lg">
+          <p class="text-gray-800">Completed <strong>Task #124</strong> on 2023-10-12.</p>
+        </div>
+      </div>
+    </div> -->
  </div>
 </template>
