@@ -9,7 +9,6 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const isUpcomingDeadlinesError = ref(false);
     const isAssignedTasksLoading = ref(false);
     const isAssignedTasksError = ref(false);
-   
     const searchQuery = ref("");
     const selectedStatus = ref("");
     const selectedPriority = ref("");
@@ -84,7 +83,6 @@ export const useUserTasks = defineStore('user-tasks', () => {
     }
 
     const fetchAssignedTasks = async (params = {page: 1}) => {
-
         await handleAsyncRequestOperation(
             () => getAssignedTasks(params), (response) => {
             setAssignedTasks(response.data?.data)

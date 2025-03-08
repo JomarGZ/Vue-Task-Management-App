@@ -108,9 +108,9 @@ onMounted(store.getMembers);
                                 >
                                     <IconSVG name="trash-svg"/>
                                 </button> -->
-                                <button class="text-purple-600 hover:text-purple-900" title="Impersonate">
+                                <RouterLink :to="{name: 'members.show', params: {id: member.id}}" class="text-purple-600 hover:text-purple-900">
                                     <IconSVG name="user-svg"/>
-                                </button>
+                                </RouterLink>
                             </td>
                         </tr>
                      </template>
