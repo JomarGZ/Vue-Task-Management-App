@@ -5,18 +5,37 @@ import { capWords } from '@/composables/useUtil';
 import { useAuth } from '@/stores/auth';
 import { useMemberStore } from '@/stores/memberStore';
 import { useUserTasks } from '@/stores/userTaskStore';
-import { onBeforeUnmount, onMounted, provide } from 'vue';
+import debounce from 'lodash.debounce';
+import { onBeforeUnmount, onMounted, provide, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const auth = useAuth();
 const useMember = useMemberStore();
 const userTaskStore = useUserTasks();
 const route = useRoute();
+
+const handleDebounceSearch = debounce(async(search) => {
+    userTaskStore.clearFilters();
+    await userTaskStore.fetchAssignedTasks({
+        search: search
+    })
+}, 300)
+
+const handleAssignedTaskFilter =  ([selectedStatus, selectedPriority]) => {
+    userTaskStore.fetchAssignedTasks({
+        status: selectedStatus,
+        priority_level: selectedPriority,
+    })
+
+}
+
+watch(() => userTaskStore.searchQuery, handleDebounceSearch)
+watch(() => [userTaskStore.selectedStatus, userTaskStore.selectedPriority], handleAssignedTaskFilter);
+
 onBeforeUnmount(() => {
     userTaskStore.clearFilters();
     useMember.resetMember();
 })
-
 onMounted(() => {
     userTaskStore.fetchAssignedTasks({user_id: route.params?.id});
     useMember.fetchMember({id: route.params?.id});
@@ -31,7 +50,7 @@ provide('handlePageChange', userTaskStore.handlePageChange);
         <div class="flex items-center space-x-6">
             <!-- Profile Picture -->
             <img v-if="useMember.member?.avatar?.['thumb-200']" :src="useMember.member?.avatar?.['thumb-200']" alt="Profile Picture" class="w-24 h-24 border-4 border-white outline outline-4 outline-blue-500 rounded-full">
-            <DefaultUserPic v-else class="w-24 h-24 border-white border-4 text-3xl" :name="useMember.member?.name"/>
+            <DefaultUserPic v-else class="w-24 h-24 border-white border-4 text-3xl" :name="useMember?.member?.name ?? ''"/>
             <!-- Profile Details -->
             <div>
                 <h2 class="text-2xl font-semibold text-gray-800">{{ capWords(useMember.member?.name) }}</h2>
