@@ -5,21 +5,20 @@
         :id="name"
         :type="type"
         :placeholder="placeholder"
+        autocomplete="off"
         :value="modelValue"
         @input="handleInput"
         :class="[
-          'w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2',
+          'w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 bg-white',
           hasError ? 'ring-red-500 border-red-500 focus:ring-red-500' : 'focus:ring-blue-500'
         ]"
         :required="required"
       />
-      <!-- Server-Side Validation Errors -->
       <ValidationError
         v-if="errors"
         :errors="errors"
         :field="name"
       />
-      <!-- Client-Side Validation Errors -->
       <div v-if="clientErrors?.$error" class="text-sm text-red-500 mt-1">
         <span v-for="error in clientErrors.$errors" :key="error.$message" class="block">
           {{ error.$message }}

@@ -189,14 +189,14 @@ onMounted(() => {
                     <div class="space-y-4">
                         <div v-for="task in projectTaskStore?.tasks" :key="task.id" class="cursor-pointer rounded-lg border border-gray-100 bg-white p-4 transition-shadow hover:shadow-md">
                             <RouterLink :to="{name: 'tasks.show', params: {taskId: task.id, projectId: projectStore?.project?.id}}" class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
+                                <div class="flex items-center space-x-4 min-w-0">
+                                    <span class="flex h-8 w-8 items-center shrink-0 justify-center rounded-full bg-blue-500 ring-4 ring-blue-100">
                                         <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </span>
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-900">{{ task.title }}</h3>
+                                    <div class="flex-grow min-w-0">
+                                        <h3 class="text-sm font-medium text-gray-900 truncate">{{ task.title }}</h3>
                                         <span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">{{ capWords(task.status) }}</span>
                                     </div>
                                 </div>

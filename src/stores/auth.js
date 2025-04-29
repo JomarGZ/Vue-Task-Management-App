@@ -7,7 +7,7 @@ export const useAuth = defineStore("auth", () => {
   const router = useRouter();
   const accessToken = useStorage("access_token", "");
   const check = computed(() => !!accessToken.value);
-  const user = useStorage("auth_user", {});
+  const user = ref(null);
 
   const authId = computed(() => user.value?.id);
   const avatar = computed(() => user.value?.avatar);
@@ -68,4 +68,9 @@ export const useAuth = defineStore("auth", () => {
     userPhoneNumber,
     destroyTokenAndRedirectTo 
   };
+}, {
+  persist: {
+    storage: sessionStorage,
+    pick: ['user'],
+  },
 });

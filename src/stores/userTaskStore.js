@@ -14,7 +14,8 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const selectedPriority = ref("");
     const upcomingTasksDeadline = ref([]);
     const assignedTasks = ref([]);
-
+    const priorityTimeline = ref([]);
+    
     const taskCounts = reactive({
         total: 0,
         in_progress: 0,
@@ -102,11 +103,21 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const getUpcomingTaskDeadlines  = async () => {
         return window.axios.get("api/v1/user/upcoming-tasks-deadlines");
     }
+
+    const fetchPriorityTimeline = async () => {
+        try {
+            const response = await window.axios.get('api/v1/user/priority-timeline');
+            priorityTimeline.value = response?.data || [];
+        } catch(error) {
+            console.error("Error fetching priority timeline:", error);
+        }
+    }
     return {
         total_tasks,
         in_progress_tasks,
         completed_tasks,
         over_due_tasks,
+        priorityTimeline,
         taskCounts,
         assignedTasks,
         isAssignedTasksLoading,
@@ -121,6 +132,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
         pagination,
         selectedPriority,
         handlePageChange,
+        fetchPriorityTimeline,
         fetchAssignedTasks,
         fetchUpcomingTaskDeadlines,
         fetchTaskCounts,

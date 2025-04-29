@@ -41,13 +41,6 @@ onBeforeUnmount(store.resetForm);
                 @input="store.v$.password.$touch()"
                 required
                 />
-            <div class="flex justify-between items-center">
-                <label class="flex items-center">
-                    <input type="checkbox" class="mr-2">
-                    <span class="text-gray-600">Remember me</span>
-                </label>
-                <a href="#" class="text-blue-600 hover:underline">Forgot password?</a>
-            </div>
             <button
                 type="submit"
                 :disabled="store.isActionDisabled"

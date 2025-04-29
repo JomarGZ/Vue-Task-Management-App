@@ -153,14 +153,14 @@ const selectedPriorityModel = computed({
         </div>
         <template v-else-if="hasActivities">
           <div class="flex justify-between items-center border px-4 py-2 rounded-md" v-for="activity in activities" :key="activity.id">
-              <div class="flex items-center gap-4 ">
-                  <div class="flex h-8 w-8 items-center justify-center rounded-full" :class="getStatusBgColor(activity.status)">
+              <div class="flex items-center gap-4 min-w-0">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-full shrink-0" :class="getStatusBgColor(activity.status)">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="setIcon(activity.status)" />
                     </svg>
                   </div>
-                  <div>
-                    <p class="font-medium">{{ activity.title }}</p>
+                  <div class="min-w-0 flex-1">
+                    <p class="font-medium truncate min-w-0">{{ activity.title }}</p>
                     <p class="text-sm text-gray-500">{{ activity?.project?.name }}</p>
                     <div class="mt-1 flex space-x-2">
                         <span class="rounded-full px-2 py-1 text-xs" :class="getStatusBgColor(activity.status)">{{ capWords(activity.status) }}</span>

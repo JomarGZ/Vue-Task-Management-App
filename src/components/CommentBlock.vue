@@ -38,7 +38,6 @@ onBeforeUnmount(() => {
         <div class="flex items-start justify-between">
             <div class="flex items-center gap-2">
                 <h4 class="font-medium text-gray-800">{{ author?.name }}</h4>
-                <span class="text-sm text-gray-500">Product Manager</span>
                 <span class="text-sm text-gray-400">• {{ formatDateDistance(comment?.created_at) }}</span>
             </div>
             <div v-if="isCommentOwnerOptionsVisible" class="relative inline-block" ref="dropdownRef">
