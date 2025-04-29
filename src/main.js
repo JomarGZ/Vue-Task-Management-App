@@ -13,10 +13,11 @@ import './assets/style.css';
 import Icon from "./components/icons/Icon.vue";
 import VueSweetalert2 from "vue-sweetalert2";
 import Pagination from "./components/Pagination.vue";
-
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 const app = createApp(App)
-
-app.use(createPinia())
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
 app.use(router)
 app.use(VueSweetalert2)
 app.component("ValidationError", ValidationError)

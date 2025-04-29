@@ -21,8 +21,13 @@ export const useNotifications = defineStore("notifications", () => {
             console.warn(`Expecting user id but ${userId} given`)
             return;
         };
+        if (!window.Echo || !window.Echo.connector) {
+            console.error('Echo not properly initialized');
+            return;
+        }
         window.Echo.private(`App.Models.User.${userId}`)
           .notification((notification) => {
+            console.log('trigger');
             fetchNotifications()
           });
     };

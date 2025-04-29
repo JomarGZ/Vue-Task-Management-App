@@ -14,12 +14,12 @@
                   v-for="task in upcomingTasksDeadline"
                   :key="task.id"
                   class="flex items-center gap-4 p-3 bg-red-50 rounded-lg">
-                    <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg">
+                    <div class="w-12 h-12 flex flex-col items-center justify-center bg-white rounded-lg shrink-0">
                         <span class="text-sm font-medium">{{ getMonth(task.deadline_at) }}</span>
                         <span class="text-lg font-bold text-red-500">{{ getDay(task.deadline_at) }}</span>
                     </div>
-                    <div>
-                        <h4 class="font-medium">{{ task.title }}</h4>
+                    <div class="flex-grow min-w-0">
+                        <h4 class="truncate font-medium">{{ task.title }}</h4>
                         <p class="text-sm text-gray-500">{{ formatDateOnly(task.deadline_at) }}</p>
                     </div>
                 </RouterLink>

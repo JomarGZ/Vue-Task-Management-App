@@ -65,6 +65,7 @@ export const subscribeToChannel = (channelName, eventName, callback) => {
     try {
         const channel = window.Echo.channel(channelName); 
         channel.listen(eventName, (event) => {
+            console.log(`Event received: ${eventName}`, event);
             callback(event);
         });
 

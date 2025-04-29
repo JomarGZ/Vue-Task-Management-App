@@ -1,11 +1,12 @@
 <script setup>
 import DefaultUserPic from '@/components/DefaultUserPic.vue';
 import { getInitials } from '@/composables/useFormatters';
+import { useAuth } from '@/stores/auth';
 import { useMemberStore } from '@/stores/memberStore';
 import { onMounted, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 const store = useMemberStore();
-
+const auth = useAuth();
 watch(
   () => store.searchInput,
   (newSearch) => {
@@ -41,7 +42,6 @@ onMounted(store.getMembers);
                     <tr class="bg-gray-50">
                         <th @click="store.orderBy('name')" class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th @click="store.orderBy('email')" class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th @click="store.orderBy('role')" class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -78,12 +78,12 @@ onMounted(store.getMembers);
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ member.email }}</div>
                             </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <!-- <button 
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 flex">
+                                <RouterLink :to="{name: 'members.show', params: {id: member.id}}" class="text-purple-600 hover:text-purple-900">
+                                    <IconSVG name="user-svg"/>
+                                </RouterLink>
+                                <button 
+                                    v-if="auth.user?.role == 'admin'"
                                     @click="store.deleteMember(member)" 
                                     :class="{
                                         'text-red-600 hover:text-red-900':! store.loading,
@@ -93,10 +93,7 @@ onMounted(store.getMembers);
                                     :disabled="store.loading"
                                 >
                                     <IconSVG name="trash-svg"/>
-                                </button> -->
-                                <RouterLink :to="{name: 'members.show', params: {id: member.id}}" class="text-purple-600 hover:text-purple-900">
-                                    <IconSVG name="user-svg"/>
-                                </RouterLink>
+                                </button>
                             </td>
                         </tr>
                      </template>

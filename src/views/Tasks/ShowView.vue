@@ -9,7 +9,7 @@ import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { useTaskComments } from '@/stores/taskCommentStore';
-import { computed, onMounted, provide, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const isUnassignModalShow = ref(false);
@@ -37,6 +37,9 @@ watch(() =>[taskId.value, route.params.projectId], () => {
     taskStore.getTask({ id: taskId.value });
     projectStore.getProject({ id: route.params.projectId });
 })
+onBeforeUnmount(() => {
+    taskStore.taskData = {}
+});
 </script>
 <template>
         <!-- Breadcrumb -->
@@ -61,10 +64,12 @@ watch(() =>[taskId.value, route.params.projectId], () => {
         <!-- Task Header -->
         <div class="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-6">
             <div class="flex flex-col md:flex-row items-center md:items-start justify-between mb-4 text-center md:text-left">
-                <div class="mb-4 md:mb-0">
-                    <h1 class="text-xl md:text-2xl font-bold text-gray-900">{{ taskStore?.taskData?.title }}</h1>
+                <div class="mb-4 md:mb-0 flex-grow min-w-0">
+                    <h1 class="text-xl md:text-2xl font-bold min-w-0 text-gray-900 break-words whitespace-normal">
+                        {{ taskStore?.taskData?.title }}
+                    </h1>
                 </div>
-                <span class="px-3 py-1 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                <span class="px-3 py-1 shrink-0 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
                     {{ capWords(taskStore?.taskData?.status) }}
                 </span>
             </div>
