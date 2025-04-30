@@ -60,7 +60,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
         taskCounts.total = data?.total_tasks || 0;
         taskCounts.in_progress = data?.in_progress || 0;
         taskCounts.completed = data?.completed || 0;
-        taskCounts.over_due = data?.over_due || 0;
+        taskCounts.over_due = data?.overdue || 0;
     }
     const setUpcomingTaskDeadlines = (data) => {
         if (!data) return;

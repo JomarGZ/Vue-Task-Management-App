@@ -55,7 +55,7 @@ onBeforeUnmount(() => {
                 </svg>
             </div>
             <div class="text-3xl font-bold">{{ userTaskStore.total_tasks }}</div>
-            <div class="text-purple-100 text-sm mt-2">↑ 12% from last month</div>
+            <!-- <div class="text-purple-100 text-sm mt-2">↑ 12% from last month</div> -->
         </div>
         <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-sm p-6 text-white">
             <div class="flex items-center justify-between mb-4">
@@ -65,7 +65,7 @@ onBeforeUnmount(() => {
                 </svg>
             </div>
             <div class="text-3xl font-bold">{{ userTaskStore.in_progress_tasks }}</div>
-            <div class="text-blue-100 text-sm mt-2">Active tasks this week</div>
+            <!-- <div class="text-blue-100 text-sm mt-2">Active tasks this week</div> -->
         </div>
         <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-sm p-6 text-white">
             <div class="flex items-center justify-between mb-4">
@@ -75,7 +75,7 @@ onBeforeUnmount(() => {
                 </svg>
             </div>
             <div class="text-3xl font-bold">{{ userTaskStore.completed_tasks }}</div>
-            <div class="text-green-100 text-sm mt-2">↑ 8% completion rate</div>
+            <!-- <div class="text-green-100 text-sm mt-2">↑ 8% completion rate</div> -->
         </div>
         <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-sm p-6 text-white">
             <div class="flex items-center justify-between mb-4">
@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
                 </svg>
             </div>
             <div class="text-3xl font-bold">{{ userTaskStore.over_due_tasks }}</div>
-            <div class="text-red-100 text-sm mt-2">Requires immediate attention</div>
+            <!-- <div class="text-red-100 text-sm mt-2">Requires immediate attention</div> -->
         </div>
     </div>
     <div class="grid grid-cols-12 gap-6">
