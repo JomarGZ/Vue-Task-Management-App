@@ -91,10 +91,9 @@ onMounted(() => {
                 </div>
 
                 <!-- Progress Card -->
-                <div class="bg-white rounded-lg shadow p-6">
+                <!-- <div class="bg-white rounded-lg shadow p-6">
                     <h2 class="text-lg font-medium text-gray-900 mb-4">Progress</h2>
                     <div class="space-y-4">
-                        <!-- Overall Progress -->
                         <div>
                             <div class="flex justify-between mb-2">
                                 <span class="text-sm font-medium text-gray-700">Overall Progress</span>
@@ -105,7 +104,6 @@ onMounted(() => {
                             </div>
                         </div>
 
-                        <!-- Phase Progress -->
                         <div class="space-y-3">
                             <h3 class="text-sm font-medium text-gray-700">Phases</h3>
                             <div>
@@ -146,7 +144,7 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Timeline Card -->
                 <div class="bg-white rounded-lg shadow p-6">
@@ -246,7 +244,7 @@ onMounted(() => {
                             </div>
                             <div v-else class="flex items-center space-x-3 ml-2">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">Not Assigned</p>
+                                    <p class="text-sm font-medium text-gray-900">No Manager have been assigned</p>
                                 </div>
                             </div>
                         </div>
@@ -268,7 +266,7 @@ onMounted(() => {
                             </div>
                             <div v-else class="flex items-center space-x-3 ml-2">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">Not Assigned</p>
+                                    <p class="text-sm font-medium text-gray-900">No team members have been assigned</p>
                                 </div>
                             </div>
                         </div>
@@ -276,7 +274,7 @@ onMounted(() => {
                 </div>
 
                 <!-- Files & Resources -->
-                <div class="bg-white rounded-lg shadow p-6">
+                <!-- <div class="bg-white rounded-lg shadow p-6">
                     <h2 class="text-lg font-medium text-gray-900 mb-4">Files & Resources</h2>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -298,10 +296,10 @@ onMounted(() => {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Quick Stats -->
-                <div class="bg-white rounded-lg shadow p-6">
+                <!-- <div class="bg-white rounded-lg shadow p-6">
                     <h2 class="text-lg font-medium text-gray-900 mb-4">Quick Stats</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-blue-50 p-4 rounded-lg">
@@ -321,7 +319,7 @@ onMounted(() => {
                             <div class="text-sm text-gray-600">Updates</div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

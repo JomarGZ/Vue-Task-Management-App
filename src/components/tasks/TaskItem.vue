@@ -19,7 +19,7 @@ const formattedDeadline = computed(() => {
         <div class="p-4 hover:bg-blue-100">
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center space-x-3 flex-grow min-w-0">
-                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ task?.project?.name }}</span>
+                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded shrink-0">{{ task?.project?.name }}</span>
                     <h3 class=" min-w-0 text-lg truncate font-medium text-gray-900">{{ task?.title }}</h3>
                 </div>
                 <span class="bg-yellow-100 shrink-0 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ capWords(task?.status) }}</span>
