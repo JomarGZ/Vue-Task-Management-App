@@ -175,7 +175,7 @@ onMounted(() => {
                             <div class="flex gap-3">
                                 <select v-model="projectTaskStore.selectedStatus" class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
                                     <option value="">All Status</option>
-                                    <option v-for="(status, index) in taskStore.statuses" :key="index" :value="status">{{ capWords(status) }}</option>
+                                    <option v-for="(status, index) in taskStore.statuses" :key="index" :value="status" class="capitalize">{{ status }}</option>
                                 </select>
                                 <select v-model="projectTaskStore.selectedPriority" class="bg-white border-0 rounded-lg px-4 py-2.5 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500">
                                     <option value="">All Priority</option>

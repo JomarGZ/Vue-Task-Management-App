@@ -99,7 +99,7 @@ onBeforeUnmount(() => {
             <div class="block px-4 py-2 font-medium text-gray-700 dark:text-gray-200 border-b dark:border-gray-600">
               Notifications
             </div>
-            <div class="divide-y divide-gray-100 dark:divide-gray-600 max-h-60 overflow-y-auto custom-scrollbar">
+            <div class="divide-y min-w-0 divide-gray-100 dark:divide-gray-600 max-h-60 overflow-y-auto custom-scrollbar">
                 <a v-if="notificationStore.isFetchLoading" disabled class="text-center flex items-center justify-center p-2">
                   <IconSpinner name="white-spinner" />
                 </a>
@@ -121,7 +121,7 @@ onBeforeUnmount(() => {
                     :class="notification.read_at ? 'bg-gray-800' : ''"
                   >
                     <div class="w-full">
-                      <p class="text-sm text-gray-900 dark:text-white">{{ notification.data?.message }}</p>
+                      <p class="text-sm text-gray-900 dark:text-white truncate">{{ notification.data?.message }}</p>
                       <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatDateDistance(notification.created_at) }}</p>
                     </div>
                   </RouterLink>

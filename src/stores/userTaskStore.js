@@ -1,3 +1,4 @@
+import { useSweetAlert } from "@/composables/useSweetAlert2";
 import { handleAsyncRequestOperation } from "@/composables/useUtil";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
@@ -16,6 +17,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const assignedTasks = ref([]);
     const priorityTimeline = ref([]);
     
+    const {showToast} = useSweetAlert();
     const taskCounts = reactive({
         total: 0,
         in_progress: 0,
@@ -111,6 +113,17 @@ export const useUserTasks = defineStore('user-tasks', () => {
         } catch(error) {
             console.error("Error fetching priority timeline:", error);
         }
+    }
+
+    const addLinks = async (task, links) => {
+
+        try {
+            const response = await window.axios.post(`api/v1/tasks/${task.id}}/links`, links);
+        } catch (error) {
+            console.error("Error adding links:", error);
+            showToast("Error adding links", "error");
+        }
+
     }
     return {
         total_tasks,
