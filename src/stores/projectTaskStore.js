@@ -253,9 +253,19 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
                 categories.value = response.data;
             })
     }
+    const updateTaskLinks = async (task, links) => {
+        try {
+            const response = await window.axios.post(`api/v1/tasks/${task.id}}/links`, links);
+            showToast("Links has been added successfully");
+        } catch (error) {
+            console.error("Error adding links:", error);
+            showToast("Error adding links", "error");
+        } 
+    }
 
     return {
         fetchStatuses,
+        updateTaskLinks,
         updateTask,
         storeTask,
         deleteTask,

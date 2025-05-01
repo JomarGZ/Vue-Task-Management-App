@@ -41,6 +41,15 @@ watch(() =>[taskId.value, route.params.projectId], () => {
 onBeforeUnmount(() => {
     taskStore.taskData = {}
 });
+
+const taskLinks = computed(() => {
+    return {
+        pr_link: taskStore?.taskData?.pr_link,
+        issue_link: taskStore?.taskData?.issue_link,
+        doc_link: taskStore?.taskData?.doc_link,
+        other_link: taskStore?.taskData?.other_link
+    }
+});
 </script>
 <template>
         <!-- Breadcrumb -->
@@ -70,8 +79,8 @@ onBeforeUnmount(() => {
                         {{ taskStore?.taskData?.title }}
                     </h1>
                 </div>
-                <span class="px-3 py-1 shrink-0 text-sm font-medium bg-yellow-100 text-yellow-800 rounded-full">
-                    {{ capWords(taskStore?.taskData?.status) }}
+                <span class="px-3 py-1 shrink-0 text-sm capitalize font-medium bg-yellow-100 text-yellow-800 rounded-full">
+                    {{ taskStore?.taskData?.status }}
                 </span>
             </div>
 
@@ -102,7 +111,7 @@ onBeforeUnmount(() => {
                 <!-- Links -->
                 <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <h2 class="text-lg font-semibold mb-4">Related Links</h2>
-                   <TaskLinksForm/>
+                   <TaskLinksForm :task="taskLinks"/>
                 </div>
 
                 <!-- Comments -->
@@ -120,12 +129,13 @@ onBeforeUnmount(() => {
                 <!-- Status -->
                 <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <h2 class="text-lg font-semibold mb-4">Status</h2>
-                    <select @change="onStatusChange" v-model="taskStore.selectedStatus" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select @change="onStatusChange" v-model="taskStore.selectedStatus" class="w-full capitalize p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option
+                            class="capitalize"
                             :key="status"
                             :value="status"
                             v-for="status in taskStore?.statuses">
-                                {{ capWords(status) }}
+                                {{ status }}
                         </option>
                     </select>
                 </div>
@@ -167,7 +177,7 @@ onBeforeUnmount(() => {
                                 <div class="flex items-center space-x-2">
                                     <img v-if="assignee.avatar?.['thumb-60']" :src="assignee.avatar?.['thumb-60']" class="w-8 h-8 rounded-full" alt="Developer avatar">
                                     <DefaultUserPic v-else :name="assignee.name" class="w-8 h-8 border-2 text-sm"/>
-                                    <span class="text-gray-900">{{ assignee.name }}</span>
+                                    <span class="text-gray-900 capitalize">{{ assignee.name }}</span>
                                 </div>
                             </div>
                         </template>
