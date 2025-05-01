@@ -29,11 +29,11 @@ const router = [
         link: {name: 'members.index'},
         icon: 'persons'
     },
-    // {
-    //     name: 'Teams',
-    //     link: {name: 'teams.index'},
-    //     icon: 'list'
-    // },
+    {
+        name: 'Positions',
+        link: {name: 'positions.index'},
+        icon: 'list'
+    },
 ];
 
 const handleSidebarToggle = () => {
