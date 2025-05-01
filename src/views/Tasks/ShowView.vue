@@ -170,10 +170,10 @@ const taskLinks = computed(() => {
                     <div class="space-y-4">
                         <template v-if="taskStore?.taskData?.assigned_users?.length > 0">
                             <div 
-                                v-for="assignee in taskStore?.taskData?.assigned_users"
+                                v-for="assignee in taskoStore?.taskData?.assigned_users"
                                 :key="assignee.id"
                             >
-                                <!-- <label class="block text-sm font-medium text-gray-700 mb-2">Developer</label> -->
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Developer</label>
                                 <div class="flex items-center space-x-2">
                                     <img v-if="assignee.avatar?.['thumb-60']" :src="assignee.avatar?.['thumb-60']" class="w-8 h-8 rounded-full" alt="Developer avatar">
                                     <DefaultUserPic v-else :name="assignee.name" class="w-8 h-8 border-2 text-sm"/>

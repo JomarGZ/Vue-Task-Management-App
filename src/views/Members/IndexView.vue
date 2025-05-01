@@ -28,6 +28,7 @@ onMounted(store.getMembers);
                 <input v-model="store.searchInput" type="text" placeholder="Search members..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
             <RouterLink
+                v-if="auth.user?.role == 'admin'"
                 :to="{ name: 'members.create' }"
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
             >
