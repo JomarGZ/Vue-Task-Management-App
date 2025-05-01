@@ -3,6 +3,7 @@ import CommentsSection from '@/components/CommentsSection.vue';
 import DefaultUserPic from '@/components/DefaultUserPic.vue';
 import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
 import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
+import TaskLinksForm from '@/components/tasks/TaskLinksForm.vue';
 import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
 import { formatDateWithTime, getInitials } from '@/composables/useFormatters';
 import { capWords } from '@/composables/useUtil';
@@ -101,25 +102,7 @@ onBeforeUnmount(() => {
                 <!-- Links -->
                 <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                     <h2 class="text-lg font-semibold mb-4">Related Links</h2>
-                    <div class="space-y-3">
-                        <a href="#" class="block text-blue-600 hover:text-blue-800">
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
-                                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
-                                </svg>
-                                Pull Request #456
-                            </div>
-                        </a>
-                        <a href="#" class="block text-blue-600 hover:text-blue-800">
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
-                                </svg>
-                                Documentation
-                            </div>
-                        </a>
-                    </div>
+                   <TaskLinksForm/>
                 </div>
 
                 <!-- Comments -->
