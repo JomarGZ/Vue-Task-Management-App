@@ -84,7 +84,7 @@ onMounted(() => {
                             </div>
                             <div>
                                 <div class="text-sm text-gray-500">Priority</div>
-                                <div class="font-medium text-red-600">{{ projectStore?.project?.priority }}</div>
+                                <div class="font-medium text-red-600 capitalize">{{ projectStore?.project?.priority }}</div>
                             </div>
                         </div>
                     </div>
