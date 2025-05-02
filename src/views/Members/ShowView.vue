@@ -8,7 +8,7 @@ import { useUserTasks } from '@/stores/userTaskStore';
 import debounce from 'lodash.debounce';
 import { onBeforeUnmount, onMounted, provide, watch } from 'vue';
 import { useRoute } from 'vue-router';
-
+import SelectMemberPosition from '@/components/SelectMemberPosition.vue';
 const auth = useAuth();
 const useMember = useMemberStore();
 const userTaskStore = useUserTasks();
@@ -46,7 +46,7 @@ provide('handlePageChange', userTaskStore.handlePageChange);
 <template>
     <div class="container mx-auto px-4 py-8">
      <!-- Profile Header -->
-     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+     <div class=" flex  justify-between bg-white rounded-lg shadow-md p-6 mb-6">
         <div class="flex items-center space-x-6">
             <!-- Profile Picture -->
             <img v-if="useMember.member?.avatar?.['thumb-200']" :src="useMember.member?.avatar?.['thumb-200']" alt="Profile Picture" class="w-24 h-24 border-4 border-white outline outline-4 outline-blue-500 rounded-full">
@@ -57,6 +57,9 @@ provide('handlePageChange', userTaskStore.handlePageChange);
                 <p class="text-gray-600">Software Engineer</p>
                 <p class="text-gray-500">{{ useMember.member?.email }}</p>
             </div>
+        </div>
+        <div>
+            <SelectMemberPosition/>
         </div>
      </div>
 

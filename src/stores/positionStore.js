@@ -6,6 +6,7 @@ export const usePosition = defineStore("position", () => {
     const isFetchLoading = ref(false);
     const positions = ref({});
     const position = ref({});
+    const unpaginatedPositions = ref([]);
     const { showToast, showConfirmDialog } = useSweetAlert();
     const fetchPositions = async (page = 1) => {
         if (isFetchLoading.value) return;
@@ -27,6 +28,19 @@ export const usePosition = defineStore("position", () => {
             position.value = response.data?.data || {};
         } catch (error) {
             console.error("Error fetching position:", error);
+        }
+    }
+
+    const fetchUnpaginatedPositions = async () => {
+        if (isFetchLoading.value) return;
+        isFetchLoading.value = true;
+        try {
+            const response = await window.axios.get(`api/v1/positions/unpaginated`);
+            unpaginatedPositions.value = response.data?.data || {};
+        } catch (error) {
+            console.error("Error fetching positions:", error);
+        } finally {
+            isFetchLoading.value = false;
         }
     }
 
@@ -84,6 +98,8 @@ export const usePosition = defineStore("position", () => {
         deletePosition,
         updatePosition,
         isFetchLoading,
+        fetchUnpaginatedPositions,
+        unpaginatedPositions,
         fetchPosition,
         position,
         storePosition,

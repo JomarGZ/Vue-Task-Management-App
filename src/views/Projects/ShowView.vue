@@ -239,7 +239,7 @@ onMounted(() => {
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-900">{{ projectStore?.project?.manager?.name }}</p>
-                                    <p class="text-sm text-gray-500">{{ projectStore?.project?.manager?.email }}</p>
+                                    <p class="text-sm text-gray-500">{{ projectStore?.project?.manager?.position?.name }}</p>
                                 </div>
                             </div>
                             <div v-else class="flex items-center space-x-3 ml-2">
@@ -260,7 +260,7 @@ onMounted(() => {
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-gray-900">{{ member.name }}</p>
-                                        <p class="text-xs text-gray-500">{{ member.role }}</p>
+                                        <p class="text-xs text-gray-500">{{ member.position?.name }}</p>
                                     </div>
                                 </div>
                             </div>

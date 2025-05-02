@@ -74,7 +74,7 @@ onBeforeUnmount(() => {
                             <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                             <select v-model="taskStore.form.priority_level" id="priority" name="priority"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <option value="low">Select Priority</option>
+                                <option value="">Select Priority</option>
                                 <option
                                     v-for="level in taskStore?.priorityLevels"
                                     :key="level"
