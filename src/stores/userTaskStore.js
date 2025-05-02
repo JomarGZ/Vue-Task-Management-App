@@ -115,16 +115,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
         }
     }
 
-    const addLinks = async (task, links) => {
 
-        try {
-            const response = await window.axios.post(`api/v1/tasks/${task.id}}/links`, links);
-        } catch (error) {
-            console.error("Error adding links:", error);
-            showToast("Error adding links", "error");
-        }
-
-    }
     return {
         total_tasks,
         in_progress_tasks,
