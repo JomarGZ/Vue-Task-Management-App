@@ -62,7 +62,13 @@ export const useNotifications = defineStore("notifications", () => {
     }
 
     const markAsReadNotification = async (id) => {
-        return window.axios.patch(`api/v1/user/notifications/${id}/mark-as-read`)
+        try {
+            const response = await window.axios.patch(`api/v1/user/notifications/${id}/mark-as-read`)
+            getNotifications();
+        } catch (e) {
+            console.error("Failed to mark notification as read:", e);
+            throw e;
+        }
     }
    
     const getNotifications = async () => {
@@ -85,7 +91,7 @@ export const useNotifications = defineStore("notifications", () => {
         fetchNotifications,
         getNotifications,
         setupEcho,
-        handleMarkAsReadNotification,
+        markAsReadNotification,
         unreadCount,
         notifications,
         isFetchLoading,

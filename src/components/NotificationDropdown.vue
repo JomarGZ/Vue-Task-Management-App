@@ -39,18 +39,28 @@ onMounted(() => {
 
           <!-- Notification List -->
           <div class="max-h-96 overflow-y-auto px-3">
-            <router-link :to="item.data.link" v-for="item in notificationStore.notifications" :key="item.id" class="p-3">
-              <div class="flex gap-3">
-                <div class="flex-shrink-0">
-                  <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Icon icon="lucide:message-circle" class="text-blue-600" />
+            <router-link 
+              :to="item.data.link" 
+              v-for="item in notificationStore.notifications" 
+              :key="item.id" 
+              class="p-3 block hover:bg-gray-200"
+              @click.prevent="notificationStore.markAsReadNotification(item.id)"
+              :class="{
+                'bg-gray-100': !item.read_at,
+                'bg-white': item.read_at,
+              }"
+            >
+              <div class="flex items-center justify-start">
+                  <div>
+                    <div class="rounded-full h-10 w-10 bg-blue-50 flex items-center justify-center mr-3">
+                      <Icon icon="lucide:message-circle" width="24" height="24" class="text-blue-600" />
+                    </div>
                   </div>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-sm font-medium">John Doe</p>
-                  <p class="text-xs text-gray-500 truncate">{{ item.data?.message }}</p>
-                  <p class="text-xs text-gray-400 mt-1">{{ formatDateDistance(item.created_at) }}</p>
-                </div>
+                  <div class="min-w-0">
+                    <!-- <p class="text-sm font-medium">John Doe</p> -->
+                    <p class="text-xs text-gray-500 truncate">{{ item.data?.message }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ formatDateDistance(item.created_at) }}</p>
+                  </div>
               </div>
             </router-link>
           </div>
