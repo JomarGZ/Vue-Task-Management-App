@@ -74,10 +74,8 @@ export const useNotifications = defineStore("notifications", () => {
     const getNotifications = async () => {
         if (isFetchLoading.value) return;
         isFetchLoading.value = true;
-        
         try {
             const response = await window.axios.get("api/v1/user/notifications");
-            console.log(response);
             notifications.value = response.data?.data || [];
         } catch (e) {
             console.error("Failed to fetch notifications:", e);
