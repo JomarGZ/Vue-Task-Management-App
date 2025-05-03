@@ -1,11 +1,94 @@
 <script setup>
-import CountCard from "@/components/CountCard.vue";
-
+import { Icon } from '@iconify/vue';
 </script>
 <template>
      <div class="grid md:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 mb-4">
-        <CountCard title="Task Completed" :count="0" icon="line-md:star"/>
-        <CountCard title="New Task" :count="0" icon="streamline:task-list"/>
-        <CountCard title="Project Done" :count="0" icon="fluent:clipboard-task-list-16-regular" />
+        <div class="bg-gray-50 rounded-xl shadow-sm p-4 text-gray-900">
+            <div class="flex items-center justify-between px-2 py-4">
+                <div class="flex items-center justify-start gap-2">
+                    <div class="bg-gray-100 text-gray-500 rounded-full p-2 flex items-center justify-center">
+                        <Icon icon="line-md:star" width="20" height="20" />
+                    </div>
+                    <h2 class="font-bold text-gray-600">Task Completed</h2>
+                </div>
+                <div class="text-2xl font-bold text-gray-700">0</div>
+            </div>
+            <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
+            <div class="flex justify-between items-center">
+                <div class="">
+                    <svg viewBox="0 0 200 60" class="w-full">
+                        <defs>
+                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4" />
+                                <stop offset="100%" stop-color="#818cf8" stop-opacity="0.01" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10 V60 H0 Z" fill="url(#gradient1)" stroke="none"></path>
+                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10" fill="none" stroke="#818cf8" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <div class="ml-3 text-sm">
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">10+</span> More from last week</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray-50 rounded-xl shadow-sm p-4 text-gray-900">
+            <div class="flex items-center justify-between px-2 py-4">
+                <div class="flex items-center justify-start gap-2">
+                    <div class="bg-gray-100 text-gray-500 rounded-full p-2 flex items-center justify-center">
+                        <Icon icon="streamline:task-list" width="20" height="20" />
+                    </div>
+                    <h2 class="font-bold text-gray-600">New Task</h2>
+                </div>
+                <div class="text-2xl font-bold text-gray-700">0</div>
+            </div>
+            <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
+            <div class="flex justify-between items-center">
+                <div class="">
+                    <svg viewBox="0 0 200 60" class="w-full">
+                        <defs>
+                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4" />
+                                <stop offset="100%" stop-color="#818cf8" stop-opacity="0.01" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10 V60 H0 Z" fill="url(#gradient1)" stroke="none"></path>
+                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10" fill="none" stroke="#818cf8" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <div class="ml-3 text-sm">
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">10+</span> More from last week</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray-50 rounded-xl shadow-sm p-4 text-gray-900">
+            <div class="flex items-center justify-between px-2 py-4">
+                <div class="flex items-center justify-start gap-2">
+                    <div class="bg-gray-100 text-gray-500 rounded-full p-2 flex items-center justify-center">
+                        <Icon icon="fluent:clipboard-task-list-16-regular" width="20" height="20" />
+                    </div>
+                    <h2 class="font-bold text-gray-600">Project done</h2>
+                </div>
+                <div class="text-2xl font-bold text-gray-700">0</div>
+            </div>
+            <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
+            <div class="flex justify-between items-center">
+                <div class="">
+                    <svg viewBox="0 0 200 60" class="w-full">
+                        <defs>
+                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4" />
+                                <stop offset="100%" stop-color="#818cf8" stop-opacity="0.01" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10 V60 H0 Z" fill="url(#gradient1)" stroke="none"></path>
+                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10" fill="none" stroke="#818cf8" stroke-width="2"></path>
+                    </svg>
+                </div>
+                <div class="ml-3 text-sm">
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">10+</span> More from last week</p>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

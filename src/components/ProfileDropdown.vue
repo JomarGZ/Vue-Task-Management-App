@@ -6,7 +6,7 @@ import { useAuth } from '@/stores/auth'
 const auth = useAuth()
 </script>
 <template>
-    <div class="fixed top-3 right-10">
+    <div class="">
       <Menu as="div" class="relative inline-block text-left">
         <div>
           <MenuButton class="flex items-center focus:outline-none">

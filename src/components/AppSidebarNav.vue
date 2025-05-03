@@ -30,11 +30,7 @@ const navLinks = [
 ]
 </script>
 <template>
-    <div class="bg-gray-50 row-span-2 px-2 flex flex-col items-center py-4 space-y-6">
-        <router-link :to="{name: 'organization.dashboard'}" class="flex mb-16 items-center justify-center">
-            <img :src="Logo" class="h-7 w-8 me-2" alt="Logo" />
-        </router-link>
-        
+    <div class="bg-gray-50 row-span-2 px-2 flex flex-col items-center py-4 space-y-6 mt-16">
         <div v-for="link in navLinks" :key="link.name" class="relative group">
         <router-link 
             :to="link.to"
