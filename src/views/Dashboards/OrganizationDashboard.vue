@@ -6,6 +6,7 @@ import debounce from "lodash.debounce";
 import { onMounted, watch, provide, onBeforeUnmount, ref, computed } from "vue";
 import CountsPanel from "@/components/CountsPanel.vue";
 import TaskStatusDistributionChart from "@/components/PieChart.vue";
+import AreaChart from "@/components/AreaChart.vue";
 const userTaskStore = useUserTasks();
 
 const isLoading = ref(false);
@@ -62,6 +63,32 @@ onBeforeUnmount(() => {
     <CountsPanel :taskCounts="userTaskStore.taskCounts"/>
     <div class="grid grid-cols-12 gap-6">
         <div class="col-span-12 space-y-6 lg:col-span-8">
+          <div class="bg-gray-50 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-10">
+                <h2 class="text-2xl font-bold text-gray-800">Task Done</h2>
+                <ul class="flex items-center justify-center gap-2">
+                  <li>
+                    <div>
+                      <label for="daily">Daily</label>
+                      <input type="radio" id="daily" name="timeframe" checked>
+                    </div>
+                  </li>
+                  <li>
+                    <div>
+                      <label for="weekly">Weekly</label>
+                      <input type="radio" id="weekly" name="timeframe">
+                    </div>
+                  </li>
+                  <li>
+                    <div>
+                      <label for="monthly">Monthly</label>
+                      <input type="radio" id="monthly" name="timeframe">
+                    </div>
+                  </li>
+                </ul>
+            </div>
+            <AreaChart/>
+          </div>
           <div class="rounded-xl shadow-md bg-white p-6">
             <h2 class="mb-4 text-xl font-semibold">Priority Timeline</h2>
             <div class="space-y-4">
@@ -98,17 +125,17 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="col-span-12 space-y-6 lg:col-span-4">
-         <UpcomingTaskDeadlines
-            :isUpcomingDeadlinesLoading="userTaskStore.isUpcomingDeadlinesLoading"
-            :isUpcomingDeadlinesError="userTaskStore.isUpcomingDeadlinesError"
-            :upcomingTasksDeadline="userTaskStore.upcomingTasksDeadline"
-         />
-         <TaskStatusDistributionChart
-            v-if="!isLoading"
-            :chartData="taskCountSData" 
+          <UpcomingTaskDeadlines
+              :isUpcomingDeadlinesLoading="userTaskStore.isUpcomingDeadlinesLoading"
+              :isUpcomingDeadlinesError="userTaskStore.isUpcomingDeadlinesError"
+              :upcomingTasksDeadline="userTaskStore.upcomingTasksDeadline"
+          />
+          <TaskStatusDistributionChart
+              v-if="!isLoading"
+              :chartData="taskCountSData" 
               title="Task Status Distribution" 
               subtitle="January 2025"
-          />
+            />
         </div>
       </div>
 </template>
