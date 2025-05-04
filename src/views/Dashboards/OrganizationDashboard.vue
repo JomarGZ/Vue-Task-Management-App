@@ -9,7 +9,6 @@ const userTaskStore = useUserTasks();
 onMounted(async () => {
   await Promise.all([
     userTaskStore.fetchPriorityTimeline(),
-    userTaskStore.fetchTaskCounts(),
     userTaskStore.fetchAssignedTasks(),
     userTaskStore.fetchUpcomingTaskDeadlines(),
   ]);
