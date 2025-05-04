@@ -39,7 +39,7 @@ onMounted(async () => {
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
-                 <LineChart />
+                 <LineChart :colors="['#10B981']"/>
                 </div>
                 <div class="ml-3 text-sm">
                     <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.completed }}+</span> From last week</p>
@@ -60,8 +60,7 @@ onMounted(async () => {
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
-                        :strokeColor="['#8c03fc']"
-                        :fillColor="['#c203fc']"
+                       :colors="['#F59E0B']"
                     />
                 </div>
                 <div class="ml-3 text-sm">
@@ -83,8 +82,7 @@ onMounted(async () => {
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
-                        :strokeColor="['#fc030f']"
-                        :fillColor="['#fc03ba']"
+                        :colors="['#3B82F6']"
                     />
                 </div>
                 <div class="ml-3 text-sm">

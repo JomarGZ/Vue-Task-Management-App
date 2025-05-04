@@ -1,6 +1,6 @@
 <!-- PieChart.vue -->
 <template>
-    <div class="bg-gray-50 rounded-xl shadow-md p-2">
+    <div class="bg-gray-50 rounded-xl shadow-md p-2 flex items-center justify-center">
         <div ref="chartContainer" class="w-full h-60"></div>
     </div>
   </template>

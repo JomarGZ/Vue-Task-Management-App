@@ -20,8 +20,11 @@ const props = defineProps({
   weeklyData: {
     type: Array,
     default: () => [
-      { week: '2023-W01', value: 31 },
-      { week: '2023-W02', value: 40 },
+      { week: '2023-W01', value: 3 },
+      { week: '2023-W01', value: 10 },
+      { week: '2023-W01', value: 5 },
+      { week: '2023-W01', value: 3 },
+      { week: '2023-W02', value: 30 },
     ]
   }
 
