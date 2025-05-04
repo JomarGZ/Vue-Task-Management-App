@@ -2,6 +2,21 @@
 import { useUserTasks } from '@/stores/userTaskStore';
 import { Icon } from '@iconify/vue';
 import { onMounted } from 'vue';
+defineProps({
+    taskCounts: {
+        type: Object,
+        default: () => ({
+            completed: 0,
+            in_progress: 0,
+            total: 0,
+            last_week: {
+                completed: 0,
+                in_progress: 0,
+                total: 0
+            }
+        })
+    }
+})
 const userTaskStore = useUserTasks();
 
 onMounted(async () => {
@@ -18,7 +33,7 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Task Completed</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.completed || 0 }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ taskCounts.completed }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
@@ -35,7 +50,7 @@ onMounted(async () => {
                     </svg>
                 </div>
                 <div class="ml-3 text-sm">
-                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{userTaskStore.taskCounts?.last_week?.completed || 0}}+</span> From last week</p>
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.completed }}+</span> From last week</p>
                 </div>
             </div>
         </div>
@@ -47,7 +62,7 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Task In-progress</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.in_progress || 0 }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ taskCounts.in_progress }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
@@ -64,7 +79,7 @@ onMounted(async () => {
                     </svg>
                 </div>
                 <div class="ml-3 text-sm">
-                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{userTaskStore.taskCounts?.last_week?.in_progress || 0}}+</span> From last week</p>
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.in_progress }}+</span> From last week</p>
                 </div>
             </div>
         </div>
@@ -76,7 +91,7 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Total Tasks</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.total || 0 }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ taskCounts.total }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
@@ -93,7 +108,7 @@ onMounted(async () => {
                     </svg>
                 </div>
                 <div class="ml-3 text-sm">
-                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{userTaskStore.taskCounts?.last_week?.total }}+</span> From last week</p>
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.total }}+</span> From last week</p>
                 </div>
             </div>
         </div>

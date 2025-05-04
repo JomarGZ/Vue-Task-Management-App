@@ -1,5 +1,5 @@
 <template>
-     <div class="rounded-xl bg-white p-6 shadow-sm">
+     <div class="rounded-xl bg-white p-6 shadow-md">
         <h2 class="mb-4 text-xl font-semibold">Upcoming Deadlines</h2>
         <div class="space-y-4">
             <div v-if="isUpcomingDeadlinesLoading" class="flex items-center justify-center w-full p-4">

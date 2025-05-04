@@ -3,16 +3,30 @@ import TaskActivityFeed from "@/components/TaskActivityFeed.vue";
 import UpcomingTaskDeadlines from "@/components/UpcomingTaskDeadlines.vue";
 import { useUserTasks } from "@/stores/userTaskStore";
 import debounce from "lodash.debounce";
-import { onMounted, watch, provide, onBeforeUnmount } from "vue";
+import { onMounted, watch, provide, onBeforeUnmount, ref, computed } from "vue";
 import CountsPanel from "@/components/CountsPanel.vue";
+import TaskStatusDistributionChart from "@/components/PieChart.vue";
 const userTaskStore = useUserTasks();
+
+const isLoading = ref(false);
+
 onMounted(async () => {
+  isLoading.value = true
   await Promise.all([
+    userTaskStore.getTaskCounts(),
     userTaskStore.fetchPriorityTimeline(),
     userTaskStore.fetchAssignedTasks(),
     userTaskStore.fetchUpcomingTaskDeadlines(),
   ]);
+  isLoading.value = false
 });
+
+const taskCountSData = computed(() => {
+  return [
+    { value: userTaskStore.taskCounts.completed || 0, name: 'Task Completed' },
+    { value: userTaskStore.taskCounts.in_progress || 0, name: 'Task In Progress' },
+  ]
+})
 
 const handleDebounceSearch = debounce(async(search) => {
   userTaskStore.clearFilters()
@@ -45,10 +59,10 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-    <CountsPanel/>
+    <CountsPanel :taskCounts="userTaskStore.taskCounts"/>
     <div class="grid grid-cols-12 gap-6">
         <div class="col-span-12 space-y-6 lg:col-span-8">
-          <div class="rounded-xl bg-white p-6 shadow-sm">
+          <div class="rounded-xl shadow-md bg-white p-6">
             <h2 class="mb-4 text-xl font-semibold">Priority Timeline</h2>
             <div class="space-y-4">
               <template v-if="userTaskStore.priorityTimeline?.today?.length > 0 || userTaskStore.priorityTimeline?.tomorrow?.length > 0">
@@ -89,15 +103,12 @@ onBeforeUnmount(() => {
             :isUpcomingDeadlinesError="userTaskStore.isUpcomingDeadlinesError"
             :upcomingTasksDeadline="userTaskStore.upcomingTasksDeadline"
          />
-
-          <!-- <div class="rounded-xl bg-white p-6 shadow-sm">
-            <h2 class="mb-4 text-xl font-semibold">Quick Notes</h2>
-            <div class="space-y-4">
-              <div class="rounded-lg bg-yellow-50 p-3">
-                <p class="text-sm text-yellow-800">Team meeting at 3 PM to discuss project timeline</p>
-              </div>
-            </div>
-          </div> -->
+         <TaskStatusDistributionChart
+            v-if="!isLoading"
+            :chartData="taskCountSData" 
+              title="Task Status Distribution" 
+              subtitle="January 2025"
+          />
         </div>
       </div>
 </template>
