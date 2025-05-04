@@ -2,6 +2,7 @@
 import { useUserTasks } from '@/stores/userTaskStore';
 import { Icon } from '@iconify/vue';
 import { onMounted } from 'vue';
+import LineChart from '@/components/LineChart.vue';
 defineProps({
     taskCounts: {
         type: Object,
@@ -38,16 +39,7 @@ onMounted(async () => {
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
-                    <svg viewBox="0 0 200 60" class="w-full">
-                        <defs>
-                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4" />
-                                <stop offset="100%" stop-color="#818cf8" stop-opacity="0.01" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10 V60 H0 Z" fill="url(#gradient1)" stroke="none"></path>
-                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10" fill="none" stroke="#818cf8" stroke-width="2"></path>
-                    </svg>
+                 <LineChart />
                 </div>
                 <div class="ml-3 text-sm">
                     <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.completed }}+</span> From last week</p>
@@ -67,16 +59,10 @@ onMounted(async () => {
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
-                    <svg viewBox="0 0 200 60" class="w-full">
-                        <defs>
-                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4" />
-                                <stop offset="100%" stop-color="#818cf8" stop-opacity="0.01" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10 V60 H0 Z" fill="url(#gradient1)" stroke="none"></path>
-                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10" fill="none" stroke="#818cf8" stroke-width="2"></path>
-                    </svg>
+                    <LineChart 
+                        :strokeColor="['#8c03fc']"
+                        :fillColor="['#c203fc']"
+                    />
                 </div>
                 <div class="ml-3 text-sm">
                     <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.in_progress }}+</span> From last week</p>
@@ -96,16 +82,10 @@ onMounted(async () => {
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
-                    <svg viewBox="0 0 200 60" class="w-full">
-                        <defs>
-                            <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4" />
-                                <stop offset="100%" stop-color="#818cf8" stop-opacity="0.01" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10 V60 H0 Z" fill="url(#gradient1)" stroke="none"></path>
-                        <path d="M0,50 Q25,40 50,45 T100,30 T150,25 T200,10" fill="none" stroke="#818cf8" stroke-width="2"></path>
-                    </svg>
+                    <LineChart 
+                        :strokeColor="['#fc030f']"
+                        :fillColor="['#fc03ba']"
+                    />
                 </div>
                 <div class="ml-3 text-sm">
                     <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.total }}+</span> From last week</p>
