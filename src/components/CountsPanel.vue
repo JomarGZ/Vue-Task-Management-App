@@ -1,25 +1,21 @@
 <script setup>
 import { useUserTasks } from '@/stores/userTaskStore';
 import { Icon } from '@iconify/vue';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import LineChart from '@/components/LineChart.vue';
-defineProps({
-    taskCounts: {
-        type: Object,
-        default: () => ({
-            completed: 0,
-            in_progress: 0,
-            total: 0,
-            last_week: {
-                completed: 0,
-                in_progress: 0,
-                total: 0
-            }
-        })
-    }
-})
+
 const userTaskStore = useUserTasks();
 
+const weekLabels = computed(() => {
+    return userTaskStore.taskCounts?.weekly_data?.map(week => {
+        const start = new Date(week.week_start);
+        const end = new Date(week.week_end);
+        return `${start.toLocaleString('default', {month: 'short'})} ${start.getDate()}-${end.getDate()}`
+    })
+})
+const getWeeklyData = (metric) => {
+    return userTaskStore.taskCounts.weekly_data?.map(week => week[metric] || 0);
+} 
 onMounted(async () => {
     await userTaskStore.getTaskCounts();
 })
@@ -34,15 +30,20 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Task Completed</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ taskCounts.completed }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.current_totals?.completed || 0 }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
-                 <LineChart :colors="['#10B981']"/>
+                 <LineChart 
+                    :colors="['#10B981']"
+                    :data="getWeeklyData('completed')"
+                    name="Completed"
+                    :labels="weekLabels"    
+                />
                 </div>
                 <div class="ml-3 text-sm">
-                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.completed }}+</span> From last week</p>
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ getWeeklyData('completed')?.[getWeeklyData('completed').length - 2]}}+</span> From last week</p>
                 </div>
             </div>
         </div>
@@ -54,17 +55,20 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Task In-progress</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ taskCounts.in_progress }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.current_totals?.in_progress || 0 }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
-                       :colors="['#F59E0B']"
+                        :colors="['#F59E0B']"
+                        :data="getWeeklyData('in_progress')"   
+                        name="In Progress"    
+                        :labels="weekLabels"  
                     />
                 </div>
                 <div class="ml-3 text-sm">
-                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.in_progress }}+</span> From last week</p>
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ getWeeklyData('in_progress')?.[getWeeklyData('in_progress').length - 2] }}+</span> From last week</p>
                 </div>
             </div>
         </div>
@@ -76,17 +80,20 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Total Tasks</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ taskCounts.total }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.current_totals?.total || 0 }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
                         :colors="['#3B82F6']"
+                        :data="getWeeklyData('total')"   
+                        name="Total" 
+                        :labels="weekLabels"  
                     />
                 </div>
                 <div class="ml-3 text-sm">
-                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ taskCounts.last_week?.total }}+</span> From last week</p>
+                    <p class="text-gray-500"><span class="text-green-400 font-semibold">{{ getWeeklyData('total')?.[getWeeklyData('total').length - 2] }}+</span> From last week</p>
                 </div>
             </div>
         </div>

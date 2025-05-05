@@ -5,7 +5,7 @@
       height="100%" 
       width="80%" 
       :options="chartOptions"
-      :series="formattedSeries"
+      :series="series"
     ></apexchart>
   </div>
 </template>
@@ -17,21 +17,24 @@ const props = defineProps({
     type: Array,
     default: () => (['#036ffc'])
   },
-  weeklyData: {
+  data: {
     type: Array,
-    default: () => [
-      { week: '2023-W01', value: 3 },
-      { week: '2023-W01', value: 10 },
-      { week: '2023-W01', value: 5 },
-      { week: '2023-W01', value: 3 },
-      { week: '2023-W02', value: 30 },
-    ]
+    default: () => []
+  },
+  labels: {
+    type: Array,
+    default: () => []
+  },
+  name: {
+    type: String,
+    default: 'Tasks'
   }
-
 })
-const formattedSeries = computed(() => [{
-  name: 'Weekly Data',
-  data: props.weeklyData.map(item => item.value)
+
+
+const series = computed(() => [{
+  name: props.name,
+  data: props.data
 }]);
 const chartOptions = ref({
   chart: {
@@ -44,7 +47,7 @@ const chartOptions = ref({
     labels: { show: false },  
     axisTicks: { show: false }, 
     axisBorder: { show: false }, 
-    categories: [] 
+    categories: props.labels
   },
   colors: props.colors,
   grid: { show: false },
