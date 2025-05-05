@@ -12,13 +12,13 @@ function auth(to, from, next) {
     next();
   }
 export default {
-    path: '/',
+    path: '/organization',
     name: 'organization',
     component: OrganizationLayout,
     beforeEnter: auth,
     children: [
     {
-        path: '/organization/dashboard',
+        path: 'dashboard',
         name: 'organization.dashboard',
         component: () => import('@/views/Dashboards/OrganizationDashboard.vue'),
     },

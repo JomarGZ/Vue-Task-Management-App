@@ -62,17 +62,34 @@ export const useNotifications = defineStore("notifications", () => {
     }
 
     const markAsReadNotification = async (id) => {
-        return window.axios.patch(`api/v1/user/notifications/${id}/mark-as-read`)
+        try {
+            const response = await window.axios.patch(`api/v1/user/notifications/${id}/mark-as-read`)
+            getNotifications();
+        } catch (e) {
+            console.error("Failed to mark notification as read:", e);
+            throw e;
+        }
     }
    
     const getNotifications = async () => {
-        return window.axios.get("api/v1/user/notifications");
+        if (isFetchLoading.value) return;
+        isFetchLoading.value = true;
+        try {
+            const response = await window.axios.get("api/v1/user/notifications");
+            notifications.value = response.data?.data || [];
+        } catch (e) {
+            console.error("Failed to fetch notifications:", e);
+            throw e;
+        } finally {
+            isFetchLoading.value = false;
+        }
     }
 
     return {
         fetchNotifications,
+        getNotifications,
         setupEcho,
-        handleMarkAsReadNotification,
+        markAsReadNotification,
         unreadCount,
         notifications,
         isFetchLoading,

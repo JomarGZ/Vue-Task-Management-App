@@ -16,14 +16,9 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const upcomingTasksDeadline = ref([]);
     const assignedTasks = ref([]);
     const priorityTimeline = ref([]);
+    const taskCounts = ref({});
     
     const {showToast} = useSweetAlert();
-    const taskCounts = reactive({
-        total: 0,
-        in_progress: 0,
-        completed: 0,
-        over_due: 0
-    });
 
     const pagination = reactive({
         current_page: 1,
@@ -34,11 +29,6 @@ export const useUserTasks = defineStore('user-tasks', () => {
         total: 0,
     })
     
-    const total_tasks = computed(() => taskCounts.total);
-    const in_progress_tasks = computed(() => taskCounts.in_progress);
-    const completed_tasks = computed(() => taskCounts.completed);
-    const over_due_tasks = computed(() => taskCounts.over_due);
-
     const clearFilters = () => {
         selectedStatus.value = "";
         selectedPriority.value = "";
@@ -57,13 +47,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
         if (!data) return;
         assignedTasks.value = data
     }
-    const setCountTask = (data) => {
-        if (!data) return;
-        taskCounts.total = data?.total_tasks || 0;
-        taskCounts.in_progress = data?.in_progress || 0;
-        taskCounts.completed = data?.completed || 0;
-        taskCounts.over_due = data?.overdue || 0;
-    }
+  
     const setUpcomingTaskDeadlines = (data) => {
         if (!data) return;
         upcomingTasksDeadline.value = data;
@@ -72,12 +56,6 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const handlePageChange = async (page) => {
         await fetchAssignedTasks({page: page});
     };
-
-    const fetchTaskCounts = async () => {
-       await handleAsyncRequestOperation(getTaskCounts, (response) => {
-            setCountTask(response.data?.data)
-       }, isTaskCountsLoading, isTaskCountsError);
-    }
 
     const fetchUpcomingTaskDeadlines = async () => {
         await handleAsyncRequestOperation(getUpcomingTaskDeadlines, (response) => {
@@ -100,7 +78,17 @@ export const useUserTasks = defineStore('user-tasks', () => {
         }
     }
     const getTaskCounts = async () => {
-        return window.axios.get("api/v1/user/task-status-counts");
+        if (isTaskCountsLoading.value) return;
+        isTaskCountsLoading.value = true;
+        try {
+            const response = await window.axios.get("api/v1/user/task-status-counts");
+            taskCounts.value = response?.data?.data || {};
+        } catch (e) {
+            console.error("Error fetching task counts:", e);
+            showToast('Failed to fetch task counts', 'error');
+        } finally {
+            isTaskCountsLoading.value = false;
+        }
     }
     const getUpcomingTaskDeadlines  = async () => {
         return window.axios.get("api/v1/user/upcoming-tasks-deadlines");
@@ -117,10 +105,7 @@ export const useUserTasks = defineStore('user-tasks', () => {
 
 
     return {
-        total_tasks,
-        in_progress_tasks,
-        completed_tasks,
-        over_due_tasks,
+        getTaskCounts,
         priorityTimeline,
         taskCounts,
         assignedTasks,
@@ -139,7 +124,6 @@ export const useUserTasks = defineStore('user-tasks', () => {
         fetchPriorityTimeline,
         fetchAssignedTasks,
         fetchUpcomingTaskDeadlines,
-        fetchTaskCounts,
         clearFilters,
     }
 });
