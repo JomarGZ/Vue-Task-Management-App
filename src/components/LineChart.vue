@@ -44,9 +44,9 @@ const chartOptions = ref({
   },
   dataLabels: { enabled: false },
   xaxis: {
-    labels: { show: false },  
-    axisTicks: { show: false }, 
-    axisBorder: { show: false }, 
+    labels: { show: false },
+    axisTicks: { show: false },
+    axisBorder: { show: false },
     categories: props.labels
   },
   colors: props.colors,

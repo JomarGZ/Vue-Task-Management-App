@@ -4,6 +4,7 @@ import { Icon } from '@iconify/vue';
 import { computed, onMounted } from 'vue';
 import LineChart from '@/components/LineChart.vue';
 
+
 const userTaskStore = useUserTasks();
 
 const weekLabels = computed(() => {
@@ -36,6 +37,7 @@ onMounted(async () => {
             <div class="flex justify-between items-center">
                 <div class="">
                  <LineChart 
+                    v-if="!userTaskStore.isTaskCountsLoading"
                     :colors="['#10B981']"
                     :data="getWeeklyData('completed')"
                     name="Completed"
@@ -61,6 +63,7 @@ onMounted(async () => {
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
+                        v-if="!userTaskStore.isTaskCountsLoading"
                         :colors="['#F59E0B']"
                         :data="getWeeklyData('in_progress')"   
                         name="In Progress"    
@@ -86,6 +89,7 @@ onMounted(async () => {
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
+                        v-if="!userTaskStore.isTaskCountsLoading"
                         :colors="['#3B82F6']"
                         :data="getWeeklyData('total')"   
                         name="Total" 
