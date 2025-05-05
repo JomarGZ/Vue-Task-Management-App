@@ -24,8 +24,8 @@ onMounted(async () => {
 
 const taskCountSData = computed(() => {
   return [
-    { value: userTaskStore.taskCounts.completed || 0, name: 'Task Completed' },
-    { value: userTaskStore.taskCounts.in_progress || 0, name: 'Task In Progress' },
+    { value: userTaskStore.taskCounts?.current_totals?.completed || 0, name: 'Task Completed' },
+    { value: userTaskStore.taskCounts?.current_totals?.in_progress || 0, name: 'Task In Progress' },
   ]
 })
 
