@@ -9,17 +9,14 @@ import TaskStatusDistributionChart from "@/components/PieChart.vue";
 import AreaChart from "@/components/AreaChart.vue";
 const userTaskStore = useUserTasks();
 
-const isLoading = ref(false);
 
 onMounted(async () => {
-  isLoading.value = true
   await Promise.all([
     userTaskStore.getTaskCounts(),
     userTaskStore.fetchPriorityTimeline(),
     userTaskStore.fetchAssignedTasks(),
     userTaskStore.fetchUpcomingTaskDeadlines(),
   ]);
-  isLoading.value = false
 });
 
 const taskCountSData = computed(() => {
@@ -131,7 +128,7 @@ onBeforeUnmount(() => {
               :upcomingTasksDeadline="userTaskStore.upcomingTasksDeadline"
           />
           <TaskStatusDistributionChart
-              v-if="!isLoading"
+              v-if="!userTaskStore.isTaskCountsLoading"
               :chartData="taskCountSData" 
               title="Task Status Distribution" 
               subtitle="January 2025"
