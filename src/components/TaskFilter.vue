@@ -47,11 +47,49 @@
 <script setup>
 import { useMemberStore } from "@/stores/memberStore";
 import { useTaskStore } from "@/stores/taskStore";
-import { onMounted, onUnmounted, watch } from "vue";
+import debounce from "lodash.debounce";
+import { onMounted, watch } from "vue";
 
-
+const emit = defineEmits(['submit-filters']);
 const taskStore = useTaskStore();
 const memberStore = useMemberStore();
+const filters = () => {
+    const query = new URLSearchParams(window.location.search)
+    const filterMappings = [
+        { storeKey: 'searchInput', queryKey: 'search' },
+        { storeKey: 'selectedStatus', queryKey: 'status' },
+        { storeKey: 'selectedPriority', queryKey: 'priority' },
+        { storeKey: 'selectedAssigneeId', queryKey: 'assigneeId' },
+    ];
+
+    filterMappings.forEach(({storeKey, queryKey}) => {
+        const rawValue = taskStore[storeKey];
+        const value = typeof rawValue === 'string' ? rawValue.trim() : String(rawValue);
+
+        if (value && value.length > 0) {
+            query.set(queryKey, value);
+        } else {
+            query.delete(queryKey);
+        }
+    });
+
+    const newUrl = `${window.location.pathname}?${query.toString()}`;
+    window.history.replaceState(null, '', newUrl);
+    emit('submit-filters', {
+        search: taskStore.searchInput,
+        status: taskStore.selectedStatus,
+        priority: taskStore.selectedPriority,
+        assigneeId: taskStore.selectedAssigneeId
+    })
+}
+const debounceSearch = debounce(filters, 300);
+watch(() => taskStore.searchInput, debounceSearch)
+
+watch([
+    () => taskStore.selectedAssigneeId,
+    () => taskStore.selectedPriority,
+    () => taskStore.selectedStatus,
+], () => filters())
 
 onMounted(async() => {
   await Promise.all([

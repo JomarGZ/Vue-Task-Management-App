@@ -1,24 +1,42 @@
 <script setup>
 import PageHeader from "@/components/PageHeader.vue";
 import { useTaskStore } from "@/stores/taskStore";
-import { onBeforeUnmount, onMounted } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { TailwindPagination } from 'laravel-vue-pagination';
 import TaskFilter from '@/components/TaskFilter.vue';
+import { useRoute } from "vue-router";
 const taskStore = useTaskStore();
 
+const route = useRoute();
 
 onMounted(async () => {
+   const filters = ref({});
+    const queryFiltersMap = [
+        {query: 'search', filter: 'search'},
+        {query: 'status', filter: 'status'},
+        {query: 'priority', filter: 'priority'},
+        {query: 'assigneeId', filter: 'assigneeId'},
+    ];
+    queryFiltersMap.forEach(({query, filter}) => {
+        const value = route.query[query]?.trim();
+        if (value && value.length > 0) {
+            filters.value[filter] = value
+        }
+    })
     await Promise.all([
-        taskStore.getTasks(),
+        taskStore.getTasks(1, filters.value),
     ]);
-
 });
+const handleFilters = async (filters) => {
+    await taskStore.getTasks(1, filters);
+}
+
 onBeforeUnmount(() => taskStore.resetFilters());
 </script>
 <template>
     <div class="">
         <page-header class="mb-7">Tasks</page-header>
-        <TaskFilter class="mb-7"/>
+        <TaskFilter @submit-filters="handleFilters" class="mb-7"/>
         <div>
             <table class="min-w-full">
                 <thead>
@@ -30,21 +48,21 @@ onBeforeUnmount(() => taskStore.resetFilters());
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-if="false" class="text-center">
+                    <tr v-if="taskStore?.loading" class="text-center">
                         <td colspan="100%" class="p-4">
                             <div class="flex items-center justify-center">
                                 <IconSpinner class="h-10 w-10 text-gray-500 opacity-30" name="custom-spinner" />
                             </div>
                         </td>
                     </tr>
-                    <tr v-else-if="false" class="text-center">
+                    <tr v-else-if="taskStore?.isError" class="text-center">
                         <td colspan="100%" class="p-4">
                             <div class="flex items-center justify-center">
                                 <p>Failed to load tasks</p>
                             </div>
                         </td>
                     </tr>
-                    <template v-else-if="true">
+                    <template v-else-if="taskStore.tasks.data?.length > 0">
                         <tr 
                            v-for="task in taskStore.tasks.data"
                             :key="task.id"
@@ -66,8 +84,8 @@ onBeforeUnmount(() => taskStore.resetFilters());
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    {{ task?.priority }}
+                                <span class="px-2 inline-flex text-xs capitalize leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    {{ task?.priority_level }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm flex items-center font-medium space-x-2">
