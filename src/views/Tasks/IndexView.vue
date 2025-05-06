@@ -1,107 +1,97 @@
 <script setup>
-import PaginationArrow from '@/components/PaginationArrow.vue';
-import TaskItem from '@/components/tasks/TaskItem.vue';
-import { capWords } from '@/composables/useUtil';
-import { useMemberStore } from '@/stores/memberStore';
-import { useTaskStore } from '@/stores/taskStore';
-import { onBeforeUnmount, onMounted, watch } from 'vue';
-
+import PageHeader from "@/components/PageHeader.vue";
+import { useTaskStore } from "@/stores/taskStore";
+import { onBeforeUnmount, onMounted } from "vue";
+import { TailwindPagination } from 'laravel-vue-pagination';
+import TaskFilter from '@/components/TaskFilter.vue';
 const taskStore = useTaskStore();
-const memberStore = useMemberStore();
 
-const handleSearch = (newSearch, oldSearch) => {
-    if (newSearch !== oldSearch) {
-        taskStore.debounceSearch({search: newSearch});
-    }
-}
-const handleFilterChange = ([selectedPriority, selectedStatus, selectedAssigneeId]) => {
-    taskStore.onChangeFilter({
-        priority_level: selectedPriority,
-        status: selectedStatus,
-        assigneeId: selectedAssigneeId
-    });
-}
-watch(() => taskStore.searchInput, handleSearch);
-
-watch(() => [
-    taskStore.selectedPriority, 
-    taskStore.selectedStatus,
-    taskStore.selectedAssigneeId
-], handleFilterChange);
 
 onMounted(async () => {
     await Promise.all([
-        taskStore.fetchTasks(),
-        taskStore.fetchStatuses(),
-        taskStore.fetchPriorityLevels(),
-        memberStore.getMemberListWithoutPagination()
+        taskStore.getTasks(),
     ]);
+
 });
 onBeforeUnmount(() => taskStore.resetFilters());
 </script>
 <template>
-    <div class="mx-auto p-6">
-    <!-- Page Header -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Tasks Management</h1>
+    <div class="">
+        <page-header class="mb-7">Tasks</page-header>
+        <TaskFilter class="mb-7"/>
+        <div>
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-if="false" class="text-center">
+                        <td colspan="100%" class="p-4">
+                            <div class="flex items-center justify-center">
+                                <IconSpinner class="h-10 w-10 text-gray-500 opacity-30" name="custom-spinner" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-else-if="false" class="text-center">
+                        <td colspan="100%" class="p-4">
+                            <div class="flex items-center justify-center">
+                                <p>Failed to load tasks</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <template v-else-if="true">
+                        <tr 
+                           v-for="task in taskStore.tasks.data"
+                            :key="task.id"
+                        >
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-mobile-alt text-purple-600"></i>
+                                    </div>
+                                    <div class="ml-4 min-w-0">
+                                        <div class="text-sm font-medium text-gray-900 truncate max-w-[180px]">{{ task?.title }}</div>
+                                        <div class="text-sm text-gray-500">Client: asignees</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    {{ task?.status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    {{ task?.priority }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm flex items-center font-medium space-x-2">
+                                <RouterLink :to="{name: 'tasks.show', params: { projectId: task.project?.id, taskId: task.id }}"  class="text-green-600 hover:text-green-900" title="View project">
+                                    <IconSVG name="eye-svg"/>
+                                </RouterLink>
+                            </td>
+                        </tr>
+                    </template>
+                    <tr v-else >
+                        <td colspan="100%" class="p-4">
+                            <div class="flex items-center justify-center">
+                                <p>No task found</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="flex items-center justify-center mt-4">
+                <TailwindPagination
+                    :data="taskStore.tasks"
+                    @pagination-change-page="taskStore.getTasks"
+                />
+            </div>
+        </div>
     </div>
-    <!-- Filters Section -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div class="mb-4">
-            <div class="relative">
-                <input type="text" 
-                    v-model="taskStore.searchInput"
-                    placeholder="Search tasks..." 
-                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                >
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="relative">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Assignees</label>
-                <select v-model="taskStore.selectedAssigneeId" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Select Assignee</option>
-                    <option v-for="member in memberStore.memberList" :key="member.id" :value="member.id">{{ capWords(member.name) }}</option>
-                </select>
-            </div>
-            <div class="relative">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Priority Levels</label>
-                <select v-model="taskStore.selectedPriority" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Select Priority</option>
-                    <option v-for=" priority in taskStore?.priorityLevels" :key="priority" :value="priority">{{ capWords(priority) }}</option>
-                </select>
-            </div>
-            <div class="relative">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select v-model="taskStore.selectedStatus" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="">Select Status</option>
-                    <option v-for="status in taskStore?.statuses" :key="status" :value="status">{{ capWords(status) }}</option>
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tasks List -->
-    <div class="bg-white rounded-lg shadow-sm">
-        <div v-if="taskStore.loading" class="flex items-center justify-center w-full p-4">
-            <IconSpinner class="h-10 w-10 text-gray-500 opacity-30" name="custom-spinner" />
-        </div>
-        <div v-else-if="taskStore.isError" class="flex items-center justify-center w-full p-4">
-            <p>Failed to load tasks</p>
-        </div>
-        <template v-else-if="taskStore.tasks.length > 0">
-            <TaskItem v-for="task in taskStore.tasks" :key="task.id" :task="task" />
-        </template>
-        <div v-else class="flex items-center justify-center w-full p-4">
-            <p>No Task Found</p>
-        </div>
-    </div>
-    <!-- Pagination -->
-   <PaginationArrow :pagination="taskStore?.pagination" :onChangePage="taskStore.changePage"/>
-</div>
 </template>

@@ -1,12 +1,12 @@
 <script setup>
 import { useUserTasks } from '@/stores/userTaskStore';
 import { Icon } from '@iconify/vue';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import LineChart from '@/components/LineChart.vue';
 
 
 const userTaskStore = useUserTasks();
-
+const isMounted = ref(false);
 const weekLabels = computed(() => {
     return userTaskStore.taskCounts?.weekly_data?.map(week => {
         const start = new Date(week.week_start);
@@ -19,6 +19,7 @@ const getWeeklyData = (metric) => {
 } 
 onMounted(async () => {
     await userTaskStore.getTaskCounts();
+    isMounted.value = true;
 })
 </script>
 <template>
@@ -37,7 +38,7 @@ onMounted(async () => {
             <div class="flex justify-between items-center">
                 <div class="">
                  <LineChart 
-                    v-if="!userTaskStore.isTaskCountsLoading"
+                    v-if="isMounted && !userTaskStore.isTaskCountsLoading"
                     :colors="['#10B981']"
                     :data="getWeeklyData('completed')"
                     name="Completed"
@@ -63,7 +64,7 @@ onMounted(async () => {
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
-                        v-if="!userTaskStore.isTaskCountsLoading"
+                        v-if="isMounted && !userTaskStore.isTaskCountsLoading"
                         :colors="['#F59E0B']"
                         :data="getWeeklyData('in_progress')"   
                         name="In Progress"    
@@ -89,7 +90,7 @@ onMounted(async () => {
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
-                        v-if="!userTaskStore.isTaskCountsLoading"
+                        v-if="isMounted && !userTaskStore.isTaskCountsLoading"
                         :colors="['#3B82F6']"
                         :data="getWeeklyData('total')"   
                         name="Total" 

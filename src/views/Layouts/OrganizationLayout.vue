@@ -13,29 +13,28 @@ const showRightSidebar = computed(() => currentRightSidebar.value !== null);
 </script>
 
 <template>
-  <div class="min-h-screen grid grid-rows-[auto_1fr] grid-cols-[auto_1fr_auto]">
-    <header class="col-span-3">
-        <AppHeader/>
+  <div class="min-h-screen flex flex-col">
+    <header>
+      <AppHeader/>
     </header>
-    <aside class=" bg-gray-50 p-4 hidden md:block row-start-2">
-        <AppSidebarNav/>
-    </aside>
-    <main 
-      class="p-4 row-start-2 bg-gray-100"
-      :class="{
-        'col-start-2': !showRightSidebar,
-        'col-start-2 col-end-3': showRightSidebar
-      }"
-    >
-      <RouterView />
-    </main>
     
-    <!-- Right Sidebar (conditional) -->
-    <aside 
+    <div class="flex flex-1 overflow-hidden">
+      <aside class="bg-gray-50 p-4 hidden md:block flex-shrink-0">
+        <AppSidebarNav/>
+      </aside>
+      
+      <main class="flex-1 p-4 bg-gray-100 overflow-auto">
+        <div class="max-w-full mx-auto">
+          <RouterView />
+        </div>
+      </main>
+      
+      <aside 
         v-if="showRightSidebar"
-      class="bg-gray-50 hidden lg:block row-start-2 col-start-3"
-    >
-      <component :is="currentRightSidebar"></component>
-    </aside>
+        class="bg-gray-50 hidden lg:block flex-shrink-0 w-72"
+      >
+        <component :is="currentRightSidebar"></component>
+      </aside>
+    </div>
   </div>
 </template>
