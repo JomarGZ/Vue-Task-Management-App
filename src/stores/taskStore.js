@@ -70,11 +70,35 @@ export const useTaskStore = defineStore('tasks', () => {
         .finally(() => loading.value = false)
     }
 
-    const getTasks = async () => {
-        return window.axios.get("api/v1/standalone/tasks", {params: route?.query})
-            .catch(error => {
-                console.error('Error on fetching tasks:', error)
-            });
+    const getTasks = async (page = 1, filters = {}) => {
+        if (loading.value) return;
+        loading.value = true;
+        isError.value = false;
+        try {
+            const params = new URLSearchParams({
+                page:  page,
+                ...(filters.search?.trim().length > 0 && {
+                    search: filters.search.trim()
+                }),
+                ...(filters.status?.trim().length > 0 && {
+                    status: filters.status.trim()
+                }),
+                ...(filters.priority?.trim().length > 0 && {
+                    priority_level: filters.priority.trim()
+                }),
+                ...(filters.assigneeId && {
+                    assigneeId: filters.assigneeId
+                }),
+             });
+            
+            const response = await window.axios.get(`api/v1/standalone/tasks?${params.toString()}`);
+            tasks.value = response.data || []
+        } catch (e) {
+            console.error('Error on fetching tasks:', e)
+            isError.value = false;
+        } finally {
+            loading.value = false;
+        }
 
     }
 
@@ -103,6 +127,7 @@ export const useTaskStore = defineStore('tasks', () => {
     return {
         tasks,
         pagination,
+        getTasks,
         debounceSearch,
         searchInput,
         priorityLevels,

@@ -57,7 +57,8 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-    <CountsPanel :taskCounts="userTaskStore.taskCounts"/>
+    <div>
+      <CountsPanel :taskCounts="userTaskStore.taskCounts"/>
     <div class="grid grid-cols-12 gap-6">
         <div class="col-span-12 space-y-6 lg:col-span-8">
           <div class="bg-gray-50 rounded-xl shadow-md p-6">
@@ -135,4 +136,5 @@ onBeforeUnmount(() => {
             />
         </div>
       </div>
+    </div>
 </template>
