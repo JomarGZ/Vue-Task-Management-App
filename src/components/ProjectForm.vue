@@ -4,10 +4,11 @@ import { z } from 'zod';
 import { Field, ErrorMessage,  } from 'vee-validate';
 import {useForm} from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { Icon } from '@iconify/vue';
 import { cleanHTML } from '@/composables/useUtil';
+import { useField } from 'vee-validate';
 const props = defineProps({
     loading: {
         type: Boolean,
@@ -19,65 +20,78 @@ const props = defineProps({
     },
     project: {
          type: Object,
-         default: () => ({})
+         default: () => ({
+            name: '',
+            description: '',
+            client_name: '',
+            started_at: '',
+            ended_at: '',
+            priority: '',
+            status: '',
+            budget: '',
+         })
     }
 })
 const emit = defineEmits(['form-submit'])
 const store = useProjectStore();
 const today = ref('');
+// const {value: editorMarkdownValue} = useField('description');
 
+const isHtmlEmpty = (html) => {
+    if (!html) return true;
+    
+    // Remove all HTML tags, newlines, and whitespace
+    const textContent = html.replace(/<[^>]*>/g, '').trim();
+    
+    // Check if the HTML contains only empty tags like <p></p> or <div></div>
+    return textContent.length === 0;
+};
+const nonEmptyHtml = z.string().refine(val => !isHtmlEmpty(val), {
+    message: 'Project description is required'
+})
 const schema = z.object({
     name: z.string().min(1, 'Project name is required'),
     client_name: z.string().min(1, 'Project name is required'),
-    descriptionText: z.string().min(1, 'Project description is required'),
-    descriptionHtml: z.string().optional(),
-    started_at: z.string().optional(),
+    description: nonEmptyHtml,
+    started_at: z.string().optional(),  
     ended_at: z.string().optional(),
     priority: z.string().optional(),
     status: z.string().optional(),
     budget: z.number().optional(),
 })
 
-const { handleSubmit, isSubmitting, setFieldValue, meta, resetForm, values } = useForm({
+const { handleSubmit, isSubmitting, meta, resetForm, values, setFieldValue } = useForm({
     validationSchema: toTypedSchema(schema),
-    initialValues: {
-        descriptionText: '',
-        descriptionHtml: ''
-    }
+  
 })
+
+const isEndDateDisabled = computed(() => !values.started_at);
+const disabledDaysBeforeStarted = computed(() => values.started_at)
+
 const prefilledForm = (project) => {
-    resetForm({
-        values: {
-            name: project.name || '',
-            client_name: project.client_name || '',
-            started_at: project.started_at ? new Date(project.started_at).toISOString().split('T')[0] : '',
-            ended_at: project.ended_at ? new Date(project.ended_at).toISOString().split('T')[0] : '',
-            priority: project.priority || '',
-            status: project.status || '',
-            budget: project.budget || '',
-            descriptionText: cleanHTML(project.description),
-        }
-    })
-}
-
-watch(() => props.project, prefilledForm, {immediate: true});
-watch(() => values.descriptionText, (value) =>  setFieldValue('descriptionHtml', value), {immediate: true})
-
-const onEditorChange = (event) => {
-    setFieldValue('descriptionText', event.textValue?.trim());
-    setFieldValue('descriptionHtml', event.htmlValue);
-}
-const filterDataForFinalSave = (values) => {
-    const data = {
-        ...values,
-        description: cleanHTML(values.descriptionHtml)
+  resetForm({
+    values: {
+      name: project.name ?? '',
+      client_name: project.client_name ?? '',
+      budget: project.budget ?? '',
+      status: project.status ?? '',
+      priority: project.priority ?? '',
+      started_at: project.started_at ? new Date(project.started_at).toISOString().split('T')[0] : '',
+      ended_at: project.ended_at ? new Date(project.ended_at).toISOString().split('T')[0] : '',
+      description: project.description ? cleanHTML(project.description) : '',
     }
-    return Object.fromEntries(
-        Object.entries(data).filter(([key]) => !['descriptionText', 'descriptionHtml'].includes(key))
-    )
-}
+  });
+};
+
+watch(() => props.project, prefilledForm, { immediate: true });
+
+const onEditorChange = (value) => {
+  setFieldValue('description', cleanHTML(value));
+
+};
+
 const onSubmit = handleSubmit((values) => {
-    emit('form-submit', filterDataForFinalSave(values));
+    emit('form-submit', values);
 })
 onMounted(() => {
     today.value = new Date().toISOString().split('T')[0];
@@ -106,12 +120,12 @@ onMounted(() => {
                     <div class="flex flex-col gap-1">
                         <label for="description">Description</label>
                         <Editor 
-                            v-model="values.descriptionText"
-                            class="rounded-md prose w-full max-w-full" 
-                            @text-change="onEditorChange"
+                            :modelValue="values.description"
+                             @value-change="onEditorChange"
+                            class="rounded-md prose w-full max-w-full"
                             editorStyle="height: 320px" 
                         />
-                        <ErrorMessage v-if="meta.touched"  name="descriptionText" class="mt-1 text-sm text-red-600 block" />
+                        <ErrorMessage v-if="meta.touched" name="description" class="mt-1 text-sm text-red-600 block" />
                     </div>
                     <div class="flex gap-4 items-center justify-start">
                         <div>
@@ -121,7 +135,7 @@ onMounted(() => {
                         </div>
                         <div>
                             <label for="ended_at">End Date</label>
-                            <Field id="ended_at" type="date" :min="today" name="ended_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+                            <Field id="ended_at" :disabled="isEndDateDisabled" type="date" :min="disabledDaysBeforeStarted" name="ended_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                             <ErrorMessage name="ended_at" class="mt-1 text-sm text-red-600 block" />
                         </div>
                         <div>
