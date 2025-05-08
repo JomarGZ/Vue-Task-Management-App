@@ -61,24 +61,23 @@ const prefilledForm = (project) => {
 }
 
 watch(() => props.project, prefilledForm, {immediate: true});
+watch(() => values.descriptionText, (value) =>  setFieldValue('descriptionHtml', value), {immediate: true})
 
 const onEditorChange = (event) => {
     setFieldValue('descriptionText', event.textValue?.trim());
     setFieldValue('descriptionHtml', event.htmlValue);
 }
-const filterDataForFinalSave = (data) => {
-    if (!data) return;
+const filterDataForFinalSave = (values) => {
+    const data = {
+        ...values,
+        description: cleanHTML(values.descriptionHtml)
+    }
     return Object.fromEntries(
         Object.entries(data).filter(([key]) => !['descriptionText', 'descriptionHtml'].includes(key))
     )
 }
 const onSubmit = handleSubmit((values) => {
-    const data = {
-        ...values,
-        description: cleanHTML(values.descriptionHtml)
-    }
-    const finalData = filterDataForFinalSave(data);
-    emit('form-submit', finalData);
+    emit('form-submit', filterDataForFinalSave(values));
 })
 onMounted(() => {
     today.value = new Date().toISOString().split('T')[0];
@@ -108,7 +107,7 @@ onMounted(() => {
                         <label for="description">Description</label>
                         <Editor 
                             v-model="values.descriptionText"
-                            class="border rounded-md" 
+                            class="rounded-md prose w-full max-w-full" 
                             @text-change="onEditorChange"
                             editorStyle="height: 320px" 
                         />
