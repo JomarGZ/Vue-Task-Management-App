@@ -15,10 +15,23 @@ import VueSweetalert2 from "vue-sweetalert2";
 import Pagination from "./components/Pagination.vue";
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import VueApexCharts from "vue3-apexcharts";
+import PrimeVue from 'primevue/config';
+import Aura from '@primeuix/themes/aura';
 const app = createApp(App)
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
+app.use(PrimeVue, {
+    // Default theme configuration
+    theme: {
+        preset: Aura,
+        options: {
+            prefix: 'p',
+            darkModeSelector: false,
+            cssLayer: false
+        }
+    }
+ });
 app.use(router)
 app.use(VueApexCharts)
 app.use(VueSweetalert2)
