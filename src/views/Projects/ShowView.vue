@@ -33,9 +33,9 @@ onMounted(() => projectStore.getProject(route.params?.projectId))
                 </nav>
             </page-header>
             <div class="flex space-x-3">
-                <button class="px-4 py-2 bg-blue-600 flex gap-2 items-center justify-center text-white rounded-lg hover:bg-blue-700 transition">
+                <router-link :to="{name: 'projects.edit', params: {projectId: projectStore.project?.id}}" class="px-4 py-2 bg-blue-600 flex gap-2 items-center justify-center text-white rounded-lg hover:bg-blue-700 transition">
                     <Icon icon="bxs:edit" width="24" height="24" />Edit Project
-                </button>
+                </router-link>
             </div>
         </div>
 
@@ -46,10 +46,11 @@ onMounted(() => projectStore.getProject(route.params?.projectId))
                 v-if="!projectStore.isLoading"
                 :title="projectStore.project?.name || ''"
                 subTitle="Complete redesign and development of the company's online store with new features"
-                :startedDate="projectStore.project?.created_at || ''"
-                clientName="Acme Corporation"
+                :startedDate="projectStore.project?.started_at || ''"
+                :endDate="projectStore.project?.ended_at || ''"
+                :clientName="projectStore.project?.client_name || ''"
                 budget="24000"
-                :description="projectStore.project?.description"
+                :description="projectStore.project?.description || ''"
                 status="active"
             />
 

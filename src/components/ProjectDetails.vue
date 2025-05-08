@@ -28,7 +28,7 @@ const props = defineProps({
         type: [Number, String],
         required: true
     },
-    timeline: {
+    endDate: {
         type: String,
         default: ''
     },
@@ -37,8 +37,10 @@ const props = defineProps({
         required: true
     }
 })
+const timeline = computed(() => props.startedDate && props.endDate ? `${new Date(props.startedDate).toLocaleDateString('en-US',{month: 'long', day: 'numeric'})} - ${new Date(props.endDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})}` : 'Not set')
 const formattedStartedAt = computed(() => props.startedDate ? new Date(props.startedDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : 'Not Started')
 const budgetInDollar = computed(() => props.budget ? new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(Number(props.budget)) : '$ 0');
+
 </script>
 <template>
     <div class="p-6 border-b border-gray-200">
@@ -92,9 +94,9 @@ const budgetInDollar = computed(() => props.budget ? new Intl.NumberFormat('en-U
                 <div class="text-xs text-gray-500 font-medium mb-1">TIMELINE</div>
                 <div class="flex items-center">
                     <i class="far fa-calendar-alt text-gray-400 mr-2"></i>
-                    <span class="font-medium">May 1 - Aug 15, 2023</span>
+                    <span class="font-medium">{{ timeline }}</span>
                 </div>
-                <div class="text-xs text-gray-500 mt-1">12 weeks remaining</div>
+                <!-- <div class="text-xs text-gray-500 mt-1">12 weeks remaining</div> -->
             </div>
             <div class="p-4">
                 <div class="text-xs text-gray-500 font-medium mb-1">PROGRESS</div>
@@ -111,7 +113,7 @@ const budgetInDollar = computed(() => props.budget ? new Intl.NumberFormat('en-U
         <!-- Project Description -->
         <div class="p-6 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-800 mb-3">Project Description</h3>
-            <div class="text-gray-600 space-y-3 prose lg:prose-xl" v-html="cleanHTML(description)">
+            <div class="text-gray-600 space-y-3 prose" v-html="cleanHTML(description)">
             </div>
         </div>
 </template>
