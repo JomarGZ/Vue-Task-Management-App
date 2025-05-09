@@ -35,15 +35,12 @@ const props = defineProps({
 const emit = defineEmits(['form-submit'])
 const store = useProjectStore();
 const today = ref('');
-// const {value: editorMarkdownValue} = useField('description');
 
 const isHtmlEmpty = (html) => {
     if (!html) return true;
     
-    // Remove all HTML tags, newlines, and whitespace
     const textContent = html.replace(/<[^>]*>/g, '').trim();
     
-    // Check if the HTML contains only empty tags like <p></p> or <div></div>
     return textContent.length === 0;
 };
 const nonEmptyHtml = z.string().max(1000, 'Description must be 1000 characters or less').refine(val => !isHtmlEmpty(val), {
@@ -110,10 +107,8 @@ onMounted(() => {
 <template>
      <div class="bg-white rounded-lg shadow p-6">
         <form @submit="onSubmit" class="space-y-6">
-            <!-- Basic Information -->
             <div class="space-y-4">
                 <h2 class="text-lg font-medium text-gray-900">Basic Information</h2>
-                <!-- Project Name -->
                 <fieldset class="space-y-7">
                     <div>
                         <label for="name">Project Name</label>
