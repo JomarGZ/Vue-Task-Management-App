@@ -46,18 +46,26 @@ const isHtmlEmpty = (html) => {
     // Check if the HTML contains only empty tags like <p></p> or <div></div>
     return textContent.length === 0;
 };
-const nonEmptyHtml = z.string().refine(val => !isHtmlEmpty(val), {
+const nonEmptyHtml = z.string().max(1000, 'Description must be 1000 characters or less').refine(val => !isHtmlEmpty(val), {
     message: 'Project description is required'
 })
 const schema = z.object({
-    name: z.string().min(1, 'Project name is required'),
-    client_name: z.string().min(1, 'Project name is required'),
+    name: z.string().min(1, 'Project name is required').max(255, 'Project name must be 255 characters or less'),
+    client_name: z.string().min(1, 'Client name is required').max(255, 'Client name must be 255 characters or less'),
     description: nonEmptyHtml,
-    started_at: z.string().optional(),  
+    started_at: z.string().nullable(),  
     ended_at: z.string().optional(),
-    priority: z.string().optional(),
-    status: z.string().optional(),
-    budget: z.number().optional(),
+    priority: z.string().nullable(),
+    status: z.string().nullable(),
+    budget: z.coerce
+    .number()
+    .max(9999999999, 'Budget must be 10 digits or less')
+    .nonnegative('Budget must be positive')
+    .nullable()
+    .optional()
+    .refine(val => val === null || !isNaN(val), {
+      message: 'Budget must be a valid number'
+    }),
 })
 
 const { handleSubmit, isSubmitting, meta, resetForm, values, setFieldValue } = useForm({

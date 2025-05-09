@@ -1,9 +1,7 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
-import useVuelidate from "@vuelidate/core";
-import { helpers, maxLength, numeric, required } from "@vuelidate/validators";
 import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
-import { computed, reactive, ref } from "vue";
+import { reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 export const useProjectStore = defineStore("project", () => {
@@ -33,45 +31,6 @@ export const useProjectStore = defineStore("project", () => {
         ended_at: '',
         budget: ''
     });
-
-    const rules = computed(() => ({
-        name: {
-          required: helpers.withMessage('Name is required.', required),
-          maxLength: helpers.withMessage('Name must not exceed 255 characters.', maxLength(255)),
-        },
-        description: {
-          required: helpers.withMessage('Description is required.', required),
-          maxLength: helpers.withMessage('Description must not exceed 500 characters.', maxLength(500)),
-        },
-        client_name: {
-          required: helpers.withMessage('Client name is required.', required),
-          maxLength: helpers.withMessage('Client name must not exceed 255 characters.', maxLength(255)),
-        },
-       
-        budget: {
-          numeric: helpers.withMessage('Budget must be a number.', numeric),
-          maxDigits: helpers.withMessage('Budget must not exceed 10 digits.', (value) => {
-            return String(value).length <= 10;
-          }),
-        },
-      }));
-
-    const v$ = useVuelidate(rules, form);
-    const isActionDisabled = computed(() => loading.value || v$.value.$invalid);
-    const resetForm = () => {
-        form.name = '';
-        form.description = '';
-        form.manager = '';
-        form.client_name = '';
-        form.status = '';
-        form.priority = '';
-        form.started_at = '';
-        form.ended_at = '';
-        form.budget = '';
-        v$.value.$reset();
-        errors.value = {}
-    }
-
     const pagination = reactive({
         current_page: 1,
         last_page: 0,
@@ -84,20 +43,7 @@ export const useProjectStore = defineStore("project", () => {
         if (!data) return;
         projects.value = data;
     }
-    const setProjectDataOnEditMode = (editMode, data) => {
-        if (editMode) {
-            if (typeof data !== 'object' && data === null) return;
-            form.name = data?.name || '';
-            form.description = data?.description || '';
-            form.manager = data?.manager?.id || ''
-            form.client_name = data?.client_name || '';
-            form.status = data?.status || ''
-            form.priority = data?.priority || '';
-            form.started_at = data?.started_at ? data.started_at.split('T')[0] : '';
-            form.ended_at = data?.ended_at ? data.ended_at.split('T')[0] : '';
-            form.budget = data?.budget || '';
-        }
-    }
+
     const setPagination = (projectsData) => {
         if (!projectsData) return;
             pagination.current_page = projectsData.current_page || 1
@@ -233,7 +179,6 @@ export const useProjectStore = defineStore("project", () => {
     return {
         getProjects,
         storeProject,
-        resetForm,
         changePage,
         getProject,
         updateProject,
@@ -242,9 +187,7 @@ export const useProjectStore = defineStore("project", () => {
         filterProjects,
         getPriorityLevels,
         project,
-        v$,
         isLoading,
-        isActionDisabled,
         selectedPriority,
         selectedStatus,
         hasFetchProjectsError,
