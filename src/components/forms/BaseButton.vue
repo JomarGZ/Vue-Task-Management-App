@@ -1,6 +1,5 @@
 <template>
     <button 
-        :disabled="isActionDisabled" 
         :type="type" 
         :class="buttonClasses"
         :aria-disabled="isActionDisabled"

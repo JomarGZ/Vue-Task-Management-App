@@ -1,5 +1,5 @@
 import { useRoute, useRouter } from "vue-router";
-
+import DOMPurify from 'dompurify';
 export const getPageNumber = (pageUrl) => {
     if (!pageUrl || typeof pageUrl !== "string") return null;
     try {
@@ -21,6 +21,7 @@ export const snakeCaseWord = (words) => {
     return words.toLowerCase().replace(/\s+/g, "_");
 }
 
+export const cleanHTML = (html) => html ? DOMPurify.sanitize(html) : '';
 
 export const handleAsyncRequestOperation = async (operation, onSuccess, loadingState, errorState, onError = null) => {
     if (loadingState.value) return;

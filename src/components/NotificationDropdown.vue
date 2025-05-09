@@ -1,11 +1,20 @@
 <script setup>
 import { Menu, MenuButton, MenuItems } from '@headlessui/vue'
 import { Icon } from '@iconify/vue'
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useNotifications } from '@/stores/notificationStore'
 import {formatDateDistance} from '@/composables/useFormatters'
+import { useAuth } from '@/stores/auth'
 const notificationStore = useNotifications()
- 
+const auth = useAuth();
+window.Echo.private(`App.Models.User.${auth.user?.id}`)
+    .notification((notification) => {
+      if (notification && typeof notification === 'object') {
+        notificationStore.getNotifications()
+      }
+    });
+const unreadNotificationCount = computed(() => notificationStore.notifications.filter(notification => !notification.read_at));
+
 onMounted(() => {
   notificationStore.getNotifications()
 })
@@ -13,11 +22,11 @@ onMounted(() => {
 <template>
       <!-- Trigger Button -->
     <Menu as="div" class="relative">
-      <MenuButton class="p-1 rounded-full hover:bg-gray-300 transition-colors text-gray-800">
+      <MenuButton class="p-1 rounded-full cursor-pointer hover:bg-gray-300 transition-colors text-gray-800">
         <Icon icon="lucide:bell" width="24" height="24" />
         <!-- Notification Badge -->
-        <span class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-          3
+        <span  v-if="unreadNotificationCount.length > 0" class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          {{ unreadNotificationCount.length }}
         </span>
       </MenuButton>
 
@@ -57,7 +66,12 @@ onMounted(() => {
                     </div>
                   </div>
                   <div class="min-w-0">
-                    <!-- <p class="text-sm font-medium">John Doe</p> -->
+                    <div class="flex items-center gap-1 mb-1" v-if="item.data?.assigner?.name">
+                      <span class="text-xs font-medium text-gray-900 capitalize">
+                          {{ item.data?.assigner?.name }}
+                      </span>
+                      <span class="text-xs text-gray-500">assigned you a task</span>
+                    </div>
                     <p class="text-xs text-gray-500 truncate">{{ item.data?.message }}</p>
                     <p class="text-xs text-gray-400 mt-1">{{ formatDateDistance(item.created_at) }}</p>
                   </div>
