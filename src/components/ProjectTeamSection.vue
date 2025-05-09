@@ -1,12 +1,25 @@
 <script setup>
+import { useProjectTeamStore } from '@/stores/projectTeamStore';
 import AssigneeItem from './AssigneeItem.vue';
+import { useProjectStore } from '@/stores/projectStore';
 
 const props = defineProps({
     teamAssignees: {
         type: Array,
         default: () => ([])
+    },
+    projectId: {
+        type: [Number, String],
+        required: true
     }
 })
+
+const projectTeamStore = useProjectTeamStore();
+const projectStore = useProjectStore();
+const handleRemoveAssignedMember = async (userId) => {
+    const success = await projectTeamStore.removeAssignedMember(props.projectId, userId)
+    if (success) projectStore.getProject(props.projectId)
+}
 </script>
 <template>
     <div class="p-6 border-b border-gray-200">
@@ -23,10 +36,12 @@ const props = defineProps({
             </template>
             <AssigneeItem
                 v-for="assignee in teamAssignees"
+                :id="assignee.id"
                 :key="assignee.id"
                 :name="assignee.name"
                 :avatar="assignee.avatar?.['thumb-60']"
                 :position="assignee.position?.name"
+                @remove-member="handleRemoveAssignedMember"
             />
         </div>
     </div>

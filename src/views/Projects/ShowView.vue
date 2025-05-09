@@ -43,7 +43,6 @@ onMounted(() => projectStore.getProject(route.params?.projectId))
         <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
             <!-- Project Header Section -->
             <ProjectDetails
-                v-if="!projectStore.isLoading"
                 :title="projectStore.project?.name || ''"
                 subTitle="Complete redesign and development of the company's online store with new features"
                 :startedDate="projectStore.project?.started_at || ''"
@@ -53,7 +52,9 @@ onMounted(() => projectStore.getProject(route.params?.projectId))
                 :description="projectStore.project?.description || ''"
                 status="active"
             />
-            <ProjectTeamSection v-if="!projectStore.isLoading" :teamAssignees="projectStore.project?.assigned_members"/>
+            <ProjectTeamSection 
+                :teamAssignees="projectStore.project?.assigned_members" 
+                :projectId="$route.params.projectId"/>
            <TaskTable/>
         </div>
     </div>

@@ -4,11 +4,12 @@ import { computed, ref } from "vue";
 
 export const useProjectTeamStore = defineStore("projectTeam", () => {
     const selectedMembers = ref([]);
+    const loading = ref(false);
     const project = ref({});
     const searchQuery = ref('');
     const teamMembers = ref([]); 
     const filteredOutMemberIds = ref([]);
-    const {showToast} = useSweetAlert();
+    const {showToast, showConfirmDialog} = useSweetAlert();
 
     const filteredMembers = computed(() => {
         if (!searchQuery.value) return [];
@@ -59,7 +60,36 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         }
     }
         
-  
+    const removeAssignedMember = async (projectId, userId) => {
+        if (!projectId || !userId) {
+            console.warn(`${!projectId ? 'Project ID' : 'User ID'} is required to remove assigned member`);
+            return false;
+        }
+
+        if (loading.value) return;
+        loading.value = true
+        try {
+            return await showConfirmDialog()
+                .then((async result => {
+                    if (!result.isConfirmed) {
+                        return false;
+                    }
+                    try {
+                        await window.axios.delete(`api/v1/projects/${projectId}/assignment?assignedMemberId=${userId}`)
+                        showToast('Removed member successfully');
+                        return true;
+                    } catch(e) {
+                        console.error('Error in removing assigned member of the project', e)
+                        showToast('Remove member failed', 'error');
+                        return false;
+                    } 
+                }))
+        } finally {
+            loading.value = false
+        }
+       
+      
+    }
     const resetForm = () => {
         selectedMembers.value = [];
         searchQuery.value = '';
@@ -93,6 +123,8 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         }
     }
 
+   
+
     return {
         project,
         selectedMembers,
@@ -100,6 +132,8 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         searchQuery,
         teamMembers,
         filteredMembers,
+        loading,
+        removeAssignedMember,
         isExistInSelectedMembers,
         isExistInFilteredOutMemberIds,
         resetFilteredOutMemberIds,
