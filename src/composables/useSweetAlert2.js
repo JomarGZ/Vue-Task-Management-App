@@ -16,15 +16,16 @@ export function useSweetAlert() {
     })
   }
 
-  const showConfirmDialog = (
-    title = 'Are you sure?',
-    text = "You won't be able to revert this!",
-    icon = 'warning',
-    confirmButtonText = 'Yes, delete it!',
-    cancelButtonColor = '#d33',
-    confirmButtonColor = '#3085d6',
-    showCancelButton = true,
-  ) => {
+  const showConfirmDialog = (options = {}) => {
+    const {
+      title = 'Are you sure?',
+      text = "You won't be able to revert this!",
+      icon = 'warning',
+      confirmButtonText = 'Yes, delete it!',
+      cancelButtonColor = '#d33',
+      confirmButtonColor = '#3085d6',
+      showCancelButton = true,
+    } = options
     return swal.fire({
       title,
       text,
@@ -33,6 +34,7 @@ export function useSweetAlert() {
       confirmButtonColor,
       cancelButtonColor,
       confirmButtonText,
+      ...options
     })
   }
 

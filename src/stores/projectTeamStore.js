@@ -68,8 +68,12 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
 
         if (loading.value) return;
         loading.value = true
+        const options = {
+            text: 'You will be removing this member to the project team!',
+            confirmButtonText: 'Yes, remove it!'
+        }
         try {
-            return await showConfirmDialog()
+            return await showConfirmDialog(options)
                 .then((async result => {
                     if (!result.isConfirmed) {
                         return false;
