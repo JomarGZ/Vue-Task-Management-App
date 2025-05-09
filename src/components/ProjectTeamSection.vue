@@ -4,6 +4,7 @@ import AssigneeItem from './AssigneeItem.vue';
 import { useProjectStore } from '@/stores/projectStore';
 import AssignProjectTeamModal from './AssignProjectTeamModal.vue';
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const props = defineProps({
     teamAssignees: {
@@ -15,12 +16,22 @@ const props = defineProps({
         required: true
     }
 })
+const route = useRoute();
 const projectTeamStore = useProjectTeamStore();
 const projectStore = useProjectStore();
 const isAddAssigneeFormModalShow = ref(false);
+
+
 const handleRemoveAssignedMember = async (userId) => {
     const success = await projectTeamStore.removeAssignedMember(props.projectId, userId)
     if (success) projectStore.getProject(props.projectId)
+}
+const handleAssignSubmission = async () => {
+    const success = await projectTeamStore.handleAssignMembers(route.params?.projectId);
+    if (success) {
+        projectStore.getProject(props.projectId)
+        isAddAssigneeFormModalShow.value = false;
+    }
 }
 </script>
 <template>
@@ -28,6 +39,8 @@ const handleRemoveAssignedMember = async (userId) => {
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium text-gray-800">Project Team</h3>
             <AssignProjectTeamModal 
+                @submit="handleAssignSubmission"
+                :teamAssignees="teamAssignees"
                 @open-modal="isAddAssigneeFormModalShow = !isAddAssigneeFormModalShow" 
                 @close-modal="isAddAssigneeFormModalShow = false" 
                 :show="isAddAssigneeFormModalShow"/>
