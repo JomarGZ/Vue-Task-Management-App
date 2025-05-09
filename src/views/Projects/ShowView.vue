@@ -53,10 +53,7 @@ onMounted(() => projectStore.getProject(route.params?.projectId))
                 :description="projectStore.project?.description || ''"
                 status="active"
             />
-
-            <!-- <ProjectTeamSection/> -->
             <ProjectTeamSection v-if="!projectStore.isLoading" :teamAssignees="projectStore.project?.assigned_members"/>
-            <!-- Project Tasks Section -->
            <TaskTable/>
         </div>
     </div>
