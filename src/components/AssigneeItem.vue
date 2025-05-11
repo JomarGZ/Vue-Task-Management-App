@@ -1,5 +1,5 @@
 <template>
-      <div class="bg-blue-50 p-4 rounded-lg relative">
+      <div class="bg-gray-50 p-4 rounded-lg border border-gray-300 relative">
         <div class="flex items-center mb-3 min-w-0">
             <img v-if="avatar" :src="avatar" alt="User" class="w-10 h-10 shadow-md rounded-full mr-3 shrink-0">
             <DefaultUserPic v-else :name="name" class="w-10 h-10 mr-3" />

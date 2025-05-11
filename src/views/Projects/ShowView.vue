@@ -4,12 +4,19 @@ import ProjectDetails from '@/components/ProjectDetails.vue';
 import ProjectTeamSection from '@/components/ProjectTeamSection.vue';
 import TaskTable from '@/components/TaskTable.vue'
 import { useProjectStore } from '@/stores/projectStore';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import {Icon} from '@iconify/vue';
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const projectStore = useProjectStore();
-onMounted(() => projectStore.getProject(route.params?.projectId))
+const projectTaskStore = useProjectTaskStore();
+onMounted(async() => {
+    await Promise.all([
+        projectStore.getProject(route.params?.projectId),
+        projectTaskStore.getTasks(route.params?.projectId)
+    ])
+})
 </script>
 <template>
     <div class="px-4 py-8">
@@ -55,7 +62,10 @@ onMounted(() => projectStore.getProject(route.params?.projectId))
             <ProjectTeamSection 
                 :teamAssignees="projectStore.project?.assigned_members" 
                 :projectId="$route.params.projectId"/>
-           <TaskTable/>
+           <TaskTable
+                :projectId="route.params?.projectId"
+                :tasks="projectTaskStore.tasks"
+           />
         </div>
     </div>
 </template>

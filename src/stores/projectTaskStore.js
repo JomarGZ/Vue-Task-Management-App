@@ -29,39 +29,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         status: "",
 
     });
-    
-    const rules = computed(() => ({
-        title: {
-          required: helpers.withMessage('Title is required.', required),
-          maxLength: helpers.withMessage('Title must not exceed 255 characters.', maxLength(255)),
-        },
-        description: {
-          required: helpers.withMessage('Description is required.', required),
-          maxLength: helpers.withMessage('Description must not exceed 500 characters.', maxLength(500)),
-        },
-    }));
-
-    const v$ = useVuelidate(rules, form);
-    const isActionDisabled = computed(() => loading.value || v$.value.$invalid);
-    const pagination = reactive({
-        current_page: 1,
-        last_page: 0,
-        links: {},
-        from: 0,
-        to: 0,
-        total: 0,
-      })
-
-     const debounceSearch = debounce((newSearch) => {
-           router
-           .replace({
-               query: newSearch ? { search: newSearch } : {},
-           })
-           .then(() => {
-               getTasks()
-           })
-       }, 300)
-
+   
 
     const getTask = async (task, editMode = false) => {
         window.axios.get(`api/v1/tasks/${task.id}`).then(response => {
@@ -79,16 +47,6 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
             }
         })
     }
-    const changePage = (pageUrl) => {
-        if (!pageUrl) return
-  
-        const params = new URLSearchParams(new URL(pageUrl).search)
-        const page = params.get('page')
-  
-        if (page) {
-            updateParams({ page: page })
-        }
-    }
     const updateParams = (params = {}) => {
         router
           .push({
@@ -99,24 +57,25 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
           })
           .then(() => getTasks())
       }
-    async function getTasks() {
-        return window.axios
-            .get(`api/v1/projects/${route.params.projectId}/tasks`, {params: route.query})
-            .then(response => {
-                const tasksData = response?.data;
-                if (tasksData) {
-                    tasks.value = tasksData.data;
-                    pagination.current_page = tasksData.meta.current_page || 1
-                    pagination.links = tasksData.meta?.links || {}
-                    pagination.last_page = tasksData.meta?.last_page || 0
-                    pagination.total = tasksData.meta?.total || 0
-                    pagination.from = tasksData.meta?.from || 0
-                    pagination.to = tasksData.meta?.to || 0
-                }
-            })
-            .catch(error => {
-                console.error("Error on fetching project tasks", error);
-            })
+    async function getTasks(projectId, page = 1, filters = {}) {
+        if (typeof projectId !== 'string' || !projectId.trim()) {
+            throw new Error('A valid non-empty projectId (string) is required');
+        }
+        if (loading.value) return;
+        loading.value = true;
+        try {
+            const params = new URLSearchParams({
+                page: page
+            });
+            const response = await window.axios.get(`api/v1/projects/${projectId}/tasks?${params.toString()}`)
+            tasks.value = response.data || {}
+        } catch (e) {
+            console.error('Failed to fetch project tasks', e);
+            throw e;
+        } finally {
+            loading.value = false;
+        }
+
     }
  
     function resetForm(){
@@ -126,7 +85,6 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         form.deadline_at = "";
         form.category_id = "";
         form.completed_at = "";
-        v$.value.$reset();
         errors.value = {};
     }
 
@@ -134,30 +92,24 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         taskData.value = {};
     }
 
-    async function storeTask (project) {
-        const isFormValidated = await v$.value.$validate();
-        if (!isFormValidated) return;
+    async function storeTask (projectId, values) {
+        if (typeof projectId !== 'string' || !projectId.trim()) {
+            throw new  Error('A valid projectId is required to create a task');
+        }
+        if (!values || typeof values !== 'object' || Array.isArray(values)) {
+            throw new Error('Values must be an object containing task data')
+        }
         if (loading.value) return;
-        errors.value = {};
         loading.value = true;
-
-        return window.axios.post(`api/v1/projects/${project.id}/tasks`, form)
-            .then((response) => {
-                const data = response.data.data;
-                showToast("Task added successfully")
-                resetForm();
-                router.push({ name : 'tasks.show', params: {projectId: data.project.id, taskId: data.id} })
-            })
-            .catch(error => {
-                if (error.response?.status === 422) {
-                    errors.value = error.response.data.errors;
-                } else {
-                    console.error("Error on adding task:", error)
-                }
-            })
-            .finally(() => {
-                loading.value = false;
-            })
+        try {
+            await window.axios.post(`api/v1/projects/${projectId}/tasks`, values)
+            return true;
+        } catch (e) {
+            console.error('Failed to create a task', e);
+            throw e;
+        } finally {
+            loading.value = false;
+        }
     }
 
     async function updateTask (task) {
@@ -269,7 +221,6 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         updateTask,
         storeTask,
         deleteTask,
-        changePage,
         updateStatus,
         fetchCategories,
         fetchPriorityLevels,
@@ -279,16 +230,12 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         resetForm,
         resetTaskData,
         updateParams,
-        v$,
-        isActionDisabled,
         selectedPriority,
         selectedStatus,
-        debounceSearch,
         priorityLevels,
         searchInput,
         taskData,
         categories,
-        pagination,
         tasks,
         form,
         errors,

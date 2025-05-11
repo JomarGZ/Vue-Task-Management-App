@@ -1,15 +1,27 @@
 <script setup>
 import TaskItem from '@/components/TaskItem.vue'
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import {Icon} from '@iconify/vue';
-
+import { TailwindPagination } from 'laravel-vue-pagination';
+defineProps({
+    projectId: {
+        type: [Number, String],
+        required: true
+    },
+    tasks: {
+        type: Object,
+        default: () => ({})
+    }
+})
+const projectTaskStore = useProjectTaskStore();
 </script>
 <template>
      <div class="p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium text-gray-800">Project Tasks</h3>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center">
+            <router-link :to="{name: 'tasks.create', params: {projectId: projectId}}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center">
                 <Icon icon="line-md:plus" width="24" height="24" />Create Task
-            </button>
+            </router-link>
         </div>
         
         <!-- Task Filters -->
@@ -40,57 +52,26 @@ import {Icon} from '@iconify/vue';
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <task-item
-                        title="Design Homepage Layout"
-                        :category="{name: 'UX/UI Design'}"
+                        v-for="task in tasks.data"
+                        :key="task.id"
+                        :title="task.title"
                         :assignee="{name: 'Emma Wilson'}"
-                        deadline="May 20, 2023"
-                        priority="High"
-                        status="In Progress"
-                    />
-                    <task-item
-                        title="Design Homepage Layout"
-                        :category="{name: 'UX/UI Design'}"
-                        :assignee="{name: 'Emma Wilson'}"
-                        deadline="May 20, 2023"
-                        priority="High"
-                        status="In Progress"
-                    />
-                    <task-item
-                        title="Design Homepage Layout"
-                        :category="{name: 'UX/UI Design'}"
-                        :assignee="{name: 'Emma Wilson'}"
-                        deadline="May 20, 2023"
-                        priority="High"
-                        status="In Progress"
-                    />
-                    <task-item
-                        title="Design Homepage Layout"
-                        :category="{name: 'UX/UI Design'}"
-                        :assignee="{name: 'Emma Wilson'}"
-                        deadline="May 20, 2023"
-                        priority="High"
-                        status="In Progress"
+                        :deadline="task.deadline_at"
+                        :priority="task.priority_level"
+                        :status="task.status"
                     />
                 </tbody>
             </table>
         </div>
-        
-        <!-- Pagination -->
         <div class="flex items-center justify-between mt-4">
             <div class="text-sm text-gray-500">
-                Showing <span class="font-medium">1</span> to <span class="font-medium">4</span> of <span class="font-medium">12</span> tasks
+                Showing <span class="font-medium">{{ tasks.meta?.from }}</span> to <span class="font-medium">{{ tasks.meta?.to }}</span> of <span class="font-medium">{{ tasks.meta?.total }}</span> tasks
             </div>
-            <div class="flex space-x-1">
-                <button class="px-3 py-1 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-500">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="px-3 py-1 border border-gray-300 rounded-lg text-sm bg-blue-600 text-white">1</button>
-                <button class="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">2</button>
-                <button class="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">3</button>
-                <button class="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
+              <TailwindPagination
+                    :item-classes="['cursor-pointer', 'border-gray-300']"
+                    :data="tasks"
+                    @pagination-change-page="(page) => projectTaskStore.getTasks(projectId, page, {})"
+                />
         </div>
     </div>
 </template>

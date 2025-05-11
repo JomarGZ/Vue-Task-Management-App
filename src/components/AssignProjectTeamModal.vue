@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useProjectTeamStore } from '@/stores/projectTeamStore';
 import { Icon } from '@iconify/vue'
 import DefaultUserPic from './DefaultUserPic.vue';
@@ -15,10 +15,11 @@ const props = defineProps({
         default: false
     }
 })
-defineEmits(['update:isModalShow', 'data-added', 'close-modal', 'open-modal', 'submit']);
+const emit = defineEmits(['update:isModalShow', 'data-added', 'close-modal', 'open-modal', 'submit']);
 
 const projectTeamStore = useProjectTeamStore();
 projectTeamStore.project = props.project;
+const validationError = ref('');
 
 const onSelectMember = (member) => {
     projectTeamStore.selectedMembers.push(member)
@@ -46,6 +47,17 @@ const memberList = computed(() => {
   
     return filteredMembers;
 })
+
+const emitSubmit = () => {
+    validationError.value = "";
+
+    if (projectTeamStore.selectedMembers.length > 0) {
+        emit('submit');
+    } else {
+        validationError.value = "Please search and select a member to assign!";
+    }
+
+}
 </script>
 
 <template>
@@ -92,7 +104,7 @@ const memberList = computed(() => {
                                     placeholder="Search members..."
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
-                                
+                                <p v-if="validationError.length > 0" class="text-red-600 text-xs p-2">{{ validationError }}</p>
                                 <!-- Dropdown Results -->
                                 <div v-if="projectTeamStore.searchQuery" class="absolute z-10 mt-1 w-full overflow-y-auto bg-white shadow-lg rounded-md max-h-[200px] py-1 border border-gray-200">
                                     <div v-for="member in memberList" :key="member.id" @click="onSelectMember(member)" class="cursor-pointer hover:bg-blue-50 px-4 py-2">
@@ -107,7 +119,7 @@ const memberList = computed(() => {
                         </div>
                         <button
                             type="button"
-                            @click="$emit('submit')"
+                            @click="emitSubmit"
                             :disabled="projectTeamStore.loading"
                             class="w-full flex justify-center cursor-pointer py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >   

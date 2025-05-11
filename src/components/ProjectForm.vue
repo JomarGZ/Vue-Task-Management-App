@@ -8,7 +8,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { Icon } from '@iconify/vue';
 import { cleanHTML } from '@/composables/useUtil';
-import { useField } from 'vee-validate';
 const props = defineProps({
     loading: {
         type: Boolean,
@@ -50,15 +49,15 @@ const schema = z.object({
     name: z.string().min(1, 'Project name is required').max(255, 'Project name must be 255 characters or less'),
     client_name: z.string().min(1, 'Client name is required').max(255, 'Client name must be 255 characters or less'),
     description: nonEmptyHtml,
-    started_at: z.string().nullable(),  
+    started_at: z.string().optional(),  
     ended_at: z.string().optional(),
-    priority: z.string().nullable(),
-    status: z.string().nullable(),
+    priority: z.string().optional(),
+    status: z.string().optional(),
     budget: z.coerce
     .number()
     .max(9999999999, 'Budget must be 10 digits or less')
     .nonnegative('Budget must be positive')
-    .nullable()
+    .optional()
     .optional()
     .refine(val => val === null || !isNaN(val), {
       message: 'Budget must be a valid number'
@@ -127,7 +126,23 @@ onMounted(() => {
                              @value-change="onEditorChange"
                             class="rounded-md prose w-full max-w-full"
                             editorStyle="height: 320px" 
-                        />
+                        >
+                            <template v-slot:toolbar>
+                                <span class="ql-formats">
+                                    <select class="ql-header" v-tooltip.bottom="'Text Size'">
+                                        <option value="1">Heading 1</option>
+                                        <option value="2">Heading 2</option>
+                                        <option value="3">Heading 3</option>
+                                        <option value="">Normal</option>
+                                    </select>
+                                    <button v-tooltip.bottom="'Bold'" class="ql-bold"></button>
+                                    <button v-tooltip.bottom="'Italic'" class="ql-italic"></button>
+                                    <button v-tooltip.bottom="'Underline'" class="ql-underline"></button>
+                                    <button v-tooltip.bottom="'Bullet List'" class="ql-list" value="bullet"></button>
+                                    <button v-tooltip.bottom="'Numbered List'" class="ql-list" value="ordered"></button>
+                                </span>
+                            </template>
+                        </Editor>
                         <ErrorMessage v-if="meta.touched" name="description" class="mt-1 text-sm text-red-600 block" />
                     </div>
                     <div class="flex gap-4 items-center justify-start">

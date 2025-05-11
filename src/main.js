@@ -18,6 +18,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import VueApexCharts from "vue3-apexcharts";
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
+import Tooltip from 'primevue/tooltip';
 const app = createApp(App)
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate)
@@ -34,6 +35,7 @@ app.use(PrimeVue, {
     }
  });
 app.use(router)
+app.directive('tooltip', Tooltip); 
 app.use(VueApexCharts)
 app.use(VueSweetalert2)
 app.component("ValidationError", ValidationError)
