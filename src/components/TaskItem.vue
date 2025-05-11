@@ -1,7 +1,13 @@
 <script setup>
+import { Icon } from '@iconify/vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { computed } from 'vue';
-
+import UserAvatar from './UserAvatar.vue';
 const props = defineProps({
+    id: {
+        type: [Number, String],
+        required: true
+    },
     title: {
         type: String,
         required: true
@@ -10,9 +16,9 @@ const props = defineProps({
         type: Object,
         default: () => {}
     },
-    assignee: {
-        type: Object,
-        default: () => {},
+    assignees: {
+        type: Array,
+        default: () => ([]),
     },
     deadline: {
         type: String,
@@ -27,7 +33,20 @@ const props = defineProps({
         default: ''
     }
 })
+const daysLeft = ref('');
+
+const updateCountdown = (deadline) => {
+    if (!deadline) return;
+    const now = new Date();
+    const diff = new Date(deadline) - now;
+    daysLeft.value = diff > 0 ? `${Math.ceil(diff / (1000 * 60 * 60 * 24))} days left` : 'Expired'; 
+}
 const formattedDeadline = computed(() => props.deadline ? new Date(props.deadline).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : 'Not set')
+onMounted(() => {
+    updateCountdown(props.deadline)
+    const timer = setInterval(updateCountdown, 1000 * 60 * 60);
+    onBeforeUnmount(() => clearInterval(timer))
+})
 </script>
 <template>
     <tr class="hover:bg-gray-50">
@@ -43,26 +62,34 @@ const formattedDeadline = computed(() => props.deadline ? new Date(props.deadlin
         </div>
     </td>
         <td class="px-6 py-4 whitespace-nowrap">
-            <!-- <div class="flex items-center min-w-0 max-w-[200px]">
-                <user-avatar :name="assignee.name" :avatar="assignee.avatar?.['thumb-60']"/>
-                <span class="truncate capitalize">{{ assignee.name }}</span>
-            </div> -->
-            <div class="flex -space-x-4 rtl:space-x-reverse">
-                <img class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800" src="https://i.pravatar.cc/60" alt="" title="John Doe">
-                <img class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800" src="https://i.pravatar.cc/60" alt="">
-                <img class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800" src="https://i.pravatar.cc/60" alt="">
-                <p class="flex items-center justify-center w-10 h-10 text-xs font-medium text-white bg-slate-300 border-2 border-white rounded-full" href="#">+99</p>
+            <div class="flex -space-x-4 rlt:space-x-reverse">
+                 <template v-if="assignees.length > 0">
+                    <user-avatar 
+                        v-for="assignee in assignees"
+                        :key="assignee.id" 
+                        :name="assignee.name" 
+                        :avatar="assignee.avatar?.['thumb-60']"
+                    />
+                    <p class="flex items-center justify-center w-10 h-10 text-xs font-medium text-white bg-slate-300 border-2 border-white rounded-full" href="#">+99</p>
+                 </template>
+                 <p v-else class="text-xs text-gray-500">No assignee</p>
             </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
             <div class="text-sm text-gray-900">{{ formattedDeadline }}</div>
-            <div class="text-xs text-gray-500">3 days left</div>
+            <div v-if="daysLeft" class="text-xs text-gray-500">{{ daysLeft }}</div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
             <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 capitalize">{{ status }}</span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
             <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 capitalize">{{ priority }}</span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap flex items-center justify-center gap-2">
+            
+            <router-link :to="{name: 'tasks.show', params: {taskId: id}}" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="material-icon-theme:folder-vm-open" width="20" height="20" /></router-link>
+            <router-link :to="{name: 'tasks.edit', params: {taskId: id}}" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="emojione:pencil" width="20" height="20" /></router-link>
+            <button class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="icon-park:delete" width="20" height="20" /></button>
         </td>
     </tr>
 </template>

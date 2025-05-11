@@ -1,18 +1,18 @@
 <script setup>
 import TaskForm from '@/components/TaskForm.vue';
-import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { onBeforeUnmount, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
-const projectStore = useProjectStore();
 const projectTaskStore = useProjectTaskStore();
 const handleSubmit = async (values) => {
-    const success = await projectTaskStore.storeTask(route.params?.projectId, values);
-    if (success) router.push({name: 'projects.show', params: {projectId: route.params?.projectId}});    
+   const success = await projectTaskStore.updateTask(route.params?.taskId, values);
+   if (success) router.push({name: 'projects.show', params: {projectId: route.params?.projectId}})
 }
-onMounted(async() => projectStore.getProject(route?.params?.projectId));
+onMounted(async() => {
+    projectTaskStore.getTask(route.params?.taskId)
+});
 </script>
 <template>
     <div class="mx-auto space-y-6">
@@ -22,7 +22,7 @@ onMounted(async() => projectStore.getProject(route?.params?.projectId));
                 <!-- Project Header -->
                 <div class="flex justify-between items-start">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-800">{{ projectStore?.project?.name }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">{{ projectTaskStore?.task?.project?.name }}</h3>
                     </div>
                     <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Q1 2025</span>
                 </div>
@@ -69,9 +69,11 @@ onMounted(async() => projectStore.getProject(route?.params?.projectId));
 
         <!-- Task Creation Form (Same as before with updated title) -->
         <div class="bg-white rounded-xl shadow-sm p-8 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-800 mb-6 truncate">Add New Task to {{ projectStore?.project?.name }}</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-6 truncate">Edit {{ projectTaskStore.task?.title || 'Task' }}</h3>
             <TaskForm
                 :projectId="$route.params.projectId"
+                :task="projectTaskStore.task"
+                :isEditMode="true"
                 @submit="handleSubmit"
             />
         </div>

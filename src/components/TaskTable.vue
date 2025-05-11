@@ -54,6 +54,7 @@ const projectTaskStore = useProjectTaskStore();
                     <task-item
                         v-for="task in tasks.data"
                         :key="task.id"
+                        :id="task.id"
                         :title="task.title"
                         :assignee="{name: 'Emma Wilson'}"
                         :deadline="task.deadline_at"
