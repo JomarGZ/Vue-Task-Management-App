@@ -1,7 +1,7 @@
 <script setup>
 import TaskForm from '@/components/TaskForm.vue';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { onMounted } from 'vue';
+import { onBeforeMount, onBeforeUnmount, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
@@ -13,6 +13,7 @@ const handleSubmit = async (values) => {
 onMounted(async() => {
     projectTaskStore.getTask(route.params?.taskId)
 });
+onBeforeUnmount(() => projectTaskStore.task = {});
 </script>
 <template>
     <div class="mx-auto space-y-6">
