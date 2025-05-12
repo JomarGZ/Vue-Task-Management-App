@@ -1,208 +1,130 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
-import useVuelidate from "@vuelidate/core";
-import { helpers, maxLength, required } from "@vuelidate/validators";
-import debounce from "lodash.debounce";
+import { AxiosError } from "axios";
+
 import { defineStore } from "pinia";
-import { computed, reactive, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { reactive, ref } from "vue";
 
 export const useProjectTaskStore = defineStore("project-tasks", () => {
-    const router = useRouter();
-    const route = useRoute();
-    const taskData = ref({});
+    const task = ref({});
     const selectedStatus = ref('');
     const selectedPriority = ref('');
     const statuses = ref([]);
     const priorityLevels = ref([]);
-    const searchInput = ref(route.query.search || '');
     const tasks = ref({});
+    const isFetching = ref(false);
     const loading = ref(false);
-    const errors = reactive({});
+    const error = ref({});
     const categories = reactive({});
-    const { showToast } = useSweetAlert();
-    const form = reactive({
-        title: "",
-        description: "",
-        priority_level: "",
-        deadline_at: "",
-        completed_at: "",
-        status: "",
+    const { showToast, showConfirmDialog } = useSweetAlert();
 
-    });
-    
-    const rules = computed(() => ({
-        title: {
-          required: helpers.withMessage('Title is required.', required),
-          maxLength: helpers.withMessage('Title must not exceed 255 characters.', maxLength(255)),
-        },
-        description: {
-          required: helpers.withMessage('Description is required.', required),
-          maxLength: helpers.withMessage('Description must not exceed 500 characters.', maxLength(500)),
-        },
-    }));
+    const getTask = async (taskId) => {
+       
+        if (loading.value) return;
+        isFetching.value = true;
 
-    const v$ = useVuelidate(rules, form);
-    const isActionDisabled = computed(() => loading.value || v$.value.$invalid);
-    const pagination = reactive({
-        current_page: 1,
-        last_page: 0,
-        links: {},
-        from: 0,
-        to: 0,
-        total: 0,
-      })
-
-     const debounceSearch = debounce((newSearch) => {
-           router
-           .replace({
-               query: newSearch ? { search: newSearch } : {},
-           })
-           .then(() => {
-               getTasks()
-           })
-       }, 300)
-
-
-    const getTask = async (task, editMode = false) => {
-        window.axios.get(`api/v1/tasks/${task.id}`).then(response => {
-            const data = response.data.data;
-            if (editMode) {
-                form.title = data?.title;
-                form.description = data?.description;
-                form.status = data?.status;
-                form.deadline_at = data?.deadline_at;
-                form.priority_level = data?.priority_level
-                form.completed_at = data?.completed_at;
-            } else {
-                taskData.value = data;
-                selectedStatus.value = data?.status
+        try {
+            if (!taskId) {
+                throw new Error(`taskId is required to fetch task. Received: ${taskId}`);
             }
-        })
-    }
-    const changePage = (pageUrl) => {
-        if (!pageUrl) return
-  
-        const params = new URLSearchParams(new URL(pageUrl).search)
-        const page = params.get('page')
-  
-        if (page) {
-            updateParams({ page: page })
+            const response = await window.axios.get(`api/v1/tasks/${taskId}`);
+            task.value = response.data?.data || {}
+        } catch (e) {
+            console.error('Error on fetching task', e);
+            throw e;
+        } finally {
+            isFetching.value = false;
         }
     }
-    const updateParams = (params = {}) => {
-        router
-          .push({
-            query: {
-              ...route.query,
-              ...params,
-            },
-          })
-          .then(() => getTasks())
-      }
-    async function getTasks() {
-        return window.axios
-            .get(`api/v1/projects/${route.params.projectId}/tasks`, {params: route.query})
-            .then(response => {
-                const tasksData = response?.data;
-                if (tasksData) {
-                    tasks.value = tasksData.data;
-                    pagination.current_page = tasksData.meta.current_page || 1
-                    pagination.links = tasksData.meta?.links || {}
-                    pagination.last_page = tasksData.meta?.last_page || 0
-                    pagination.total = tasksData.meta?.total || 0
-                    pagination.from = tasksData.meta?.from || 0
-                    pagination.to = tasksData.meta?.to || 0
-                }
-            })
-            .catch(error => {
-                console.error("Error on fetching project tasks", error);
-            })
-    }
- 
-    function resetForm(){
-        form.title = "";
-        form.description = "";
-        form.status = "";
-        form.deadline_at = "";
-        form.category_id = "";
-        form.completed_at = "";
-        v$.value.$reset();
-        errors.value = {};
-    }
-
-    function resetTaskData() {
-        taskData.value = {};
-    }
-
-    async function storeTask (project) {
-        const isFormValidated = await v$.value.$validate();
-        if (!isFormValidated) return;
-        if (loading.value) return;
-        errors.value = {};
-        loading.value = true;
-
-        return window.axios.post(`api/v1/projects/${project.id}/tasks`, form)
-            .then((response) => {
-                const data = response.data.data;
-                showToast("Task added successfully")
-                resetForm();
-                router.push({ name : 'tasks.show', params: {projectId: data.project.id, taskId: data.id} })
-            })
-            .catch(error => {
-                if (error.response?.status === 422) {
-                    errors.value = error.response.data.errors;
-                } else {
-                    console.error("Error on adding task:", error)
-                }
-            })
-            .finally(() => {
-                loading.value = false;
-            })
-    }
-
-    async function updateTask (task) {
-        const isFormValidated = await v$.value.$validate();
-        if (!isFormValidated) return;
-        if (loading.value) return;
-        errors.value = {};
-        loading.value = true;
-
-        updateRequest(task).then(response => {
-            showToast('Task updated successfully')
-            const data = response?.data?.data;
-            if (data) {
-                taskData.value = response?.data?.data;
+  
+    async function getTasks(projectId, page = 1, filters = {}) {
+       
+        if (isFetching.value) return;
+        isFetching.value = true;
+        error.value = {};
+        try {
+             if (typeof projectId !== 'string' || !projectId.trim()) {
+                throw new Error('A valid non-empty projectId (string) is required');
             }
-        })
-        .finally(() => {
+            const params = new URLSearchParams({
+                page: page,
+                ...(filters.search?.trim().length > 0 && {
+                    search: filters.search?.trim()
+                }),
+                ...(filters.status?.trim().length > 0 && {
+                    status: filters.status?.trim()
+                }),
+                ...(filters.priority?.trim().length > 0 && {
+                    priority_level: filters.priority?.trim()
+                })
+            });
+            const response = await window.axios.get(`api/v1/projects/${projectId}/tasks?${params.toString()}`)
+            tasks.value = response.data || {}
+        } catch (e) {
+            console.error('Failed to fetch project tasks', e);
+            error.value = e;
+            throw e;
+        } finally {
+            isFetching.value = false;
+        }
+
+    }
+
+    async function storeTask (projectId, values) {
+      
+        if (loading.value) return;
+        loading.value = true;
+        try {
+            if (typeof projectId !== 'string' || !projectId.trim()) {
+                throw new  Error('A valid projectId is required to create a task');
+            }
+            if (!values || typeof values !== 'object' || Array.isArray(values)) {
+                throw new Error('Values must be an object containing task data')
+            }
+            await window.axios.post(`api/v1/projects/${projectId}/tasks`, values)
+            showToast('Task created successfully');
+            return true;
+        } catch (e) {
+            console.error('Failed to create a task', e);
+            showToast('Task created failed', 'error');
+            throw e;
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    async function deleteTask(taskId) {
+     
+        if (loading.value) return;
+        loading.value = true;
+        try {
+            if (!taskId) {
+                throw new Error(`taskId is required to delete a task. Received: ${taskId}`)
+            }
+            return await showConfirmDialog()
+                .then((async result => {
+                    if (!result.isConfirmed) {
+                        return false;
+                    }
+                    try {
+                        await window.axios.delete(`api/v1/tasks/${taskId}`);
+                        showToast('Task deleted succussfully')
+                        return true;
+                    } catch (e) {
+                        console.error('Failed to delete a task');
+                        showToast('Task deletion failed', 'error');
+                        throw e;
+                    }
+                }))
+        } finally {
             loading.value = false
-        })
-    }
-
-    async function deleteTask(task) {
-        if (loading.value) return;
-        if (! confirm("Are you sure you want to delete?")) {
-            return;
         }
-        loading.value = true;
-        window.axios.delete(`api/v1/tasks/${task.id}`)
-            .then(() => {
-                getTasks();
-            })
-            .catch(error => {
-                console.error("Error on deleting a task:", error);
-            })
-            .finally(() => (loading.value = false));
     }
     
     async function updateStatus (task) {
         return window.axios.patch(`api/v1/tasks/${task.id}/status`, {status: selectedStatus.value})
             .then(response => {
                 showToast("Task status updated successfully");
-                const data = response?.data?.data;
-                if (data) {
-                    taskData.value = data;
-                }
+           
             })
             .catch((error) => console.log("error:", error))
     }
@@ -226,25 +148,29 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
             });
     }
 
+    const updateTask = async (taskId, values) => {
+       
+        if (loading.value) return;
+        loading.value = true;
 
-    async function updatePriorityLevel (level) {
-        return window.axios.put(`api/v1/tasks/${taskData.value.id}/priority/update`, { priority: level })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.error('There is an error on updating the task priority level', error)
-            })
-    }
-
-    const updateRequest = async (task) => {
-        return window.axios.put(`api/v1/tasks/${task.id}`, form)
-            .catch(error => {
-                console.error("errors", error)
-                if (error.response.status === 422) {
-                    errors.value = error.response.data.errors;
-                }
-            })
+        try {
+            if (!taskId) {
+                throw new Error(`taskId is required to update a task. Received ${taskId}`);
+            }
+            if (!values || typeof values !== 'object' || Array.isArray(values)) {
+                throw new Error('values must be an object containing task data');
+            }
+            await window.axios.put(`api/v1/tasks/${taskId}`, values)
+            showToast('Task updated successfully');
+            return true;
+        } catch (e) {
+            console.error('Error on updating task', e);
+            showToast('Task update failed', 'error')
+            throw e;
+        } finally {
+            loading.value = false
+        }
+      
     }
 
     async function fetchCategories () {
@@ -269,30 +195,20 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         updateTask,
         storeTask,
         deleteTask,
-        changePage,
         updateStatus,
         fetchCategories,
         fetchPriorityLevels,
-        updatePriorityLevel,
         getTask,
         getTasks,
-        resetForm,
-        resetTaskData,
-        updateParams,
-        v$,
-        isActionDisabled,
+        task,
         selectedPriority,
         selectedStatus,
-        debounceSearch,
         priorityLevels,
-        searchInput,
-        taskData,
         categories,
-        pagination,
         tasks,
-        form,
-        errors,
+        error,
         loading,
+        isFetching,
         statuses
     }
 });

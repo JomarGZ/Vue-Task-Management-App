@@ -1,13 +1,12 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
-import useVuelidate from "@vuelidate/core";
-import { helpers, maxLength, numeric, required } from "@vuelidate/validators";
 import debounce from "lodash.debounce";
 import { defineStore } from "pinia";
-import { computed, reactive, ref } from "vue";
+import { reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 export const useProjectStore = defineStore("project", () => {
     const errors = reactive({});
+    const isLoading = ref(false);
     const projects = ref(null);
     const router = useRouter();
     const projectStatuses = ref([]);
@@ -32,45 +31,6 @@ export const useProjectStore = defineStore("project", () => {
         ended_at: '',
         budget: ''
     });
-
-    const rules = computed(() => ({
-        name: {
-          required: helpers.withMessage('Name is required.', required),
-          maxLength: helpers.withMessage('Name must not exceed 255 characters.', maxLength(255)),
-        },
-        description: {
-          required: helpers.withMessage('Description is required.', required),
-          maxLength: helpers.withMessage('Description must not exceed 500 characters.', maxLength(500)),
-        },
-        client_name: {
-          required: helpers.withMessage('Client name is required.', required),
-          maxLength: helpers.withMessage('Client name must not exceed 255 characters.', maxLength(255)),
-        },
-       
-        budget: {
-          numeric: helpers.withMessage('Budget must be a number.', numeric),
-          maxDigits: helpers.withMessage('Budget must not exceed 10 digits.', (value) => {
-            return String(value).length <= 10;
-          }),
-        },
-      }));
-
-    const v$ = useVuelidate(rules, form);
-    const isActionDisabled = computed(() => loading.value || v$.value.$invalid);
-    const resetForm = () => {
-        form.name = '';
-        form.description = '';
-        form.manager = '';
-        form.client_name = '';
-        form.status = '';
-        form.priority = '';
-        form.started_at = '';
-        form.ended_at = '';
-        form.budget = '';
-        v$.value.$reset();
-        errors.value = {}
-    }
-
     const pagination = reactive({
         current_page: 1,
         last_page: 0,
@@ -83,24 +43,7 @@ export const useProjectStore = defineStore("project", () => {
         if (!data) return;
         projects.value = data;
     }
-    const setProject = (data) => {
-        if (!data) return;
-        project.value = data;
-    }
-    const setProjectDataOnEditMode = (editMode, data) => {
-        if (editMode) {
-            if (typeof data !== 'object' && data === null) return;
-            form.name = data?.name || '';
-            form.description = data?.description || '';
-            form.manager = data?.manager?.id || ''
-            form.client_name = data?.client_name || '';
-            form.status = data?.status || ''
-            form.priority = data?.priority || '';
-            form.started_at = data?.started_at ? data.started_at.split('T')[0] : '';
-            form.ended_at = data?.ended_at ? data.ended_at.split('T')[0] : '';
-            form.budget = data?.budget || '';
-        }
-    }
+
     const setPagination = (projectsData) => {
         if (!projectsData) return;
             pagination.current_page = projectsData.current_page || 1
@@ -149,17 +92,18 @@ export const useProjectStore = defineStore("project", () => {
           .then(() => getProjects())
       }
 
-    const getProject = async (projectData, editMode = false) => {
-        return window.axios
-            .get(`api/v1/projects/${projectData?.id}`)
-            .then(response => {
-                const data = response?.data?.data;
-                setProjectDataOnEditMode(editMode, data);
-                setProject(data);
-            })
-            .catch(error => {
-                console.error('Error on fetching project:', error);
-            });
+    const getProject = async (projectId) => {
+        if (!projectId) console.warn('Project ID is required to get single project');
+        if(isLoading.value) return;
+        isLoading.value = true;
+        try {
+            const response = await window.axios.get(`api/v1/projects/${projectId}`);
+            project.value = response.data?.data || {}
+        } catch (e) {
+            console.error('Error on fetching single project', e);
+        } finally {
+            isLoading.value = false
+        }
     }
 
     const getProjects = () => {
@@ -180,51 +124,38 @@ export const useProjectStore = defineStore("project", () => {
             }).finally(() => isFetchingProjects.value = false)
     }
 
-    const handleSubmit = async () => {
-        const isFormValidated = v$.value.$validate();
-        if (!isFormValidated) return;
-        if(loading.value) return;
-
-        loading.value = true;
-
-        errors.value = {};
-        return window.axios
-            .post("api/v1/projects", form)
-            .then(response => {
-                showToast("Project Added Successfully");
-                resetForm()
-                router.push({name: 'projects.index'})
-            })
-            .catch(error => {
-                if (error.response.status === 422) {
-                    errors.value = error.response.data.errors;
-                } else {
-                    console.error('Error on adding project:', error)
-                    showToast('Project Added Failed', 'error');
-                }
-            })
-            .finally(() => loading.value = false);
+    const storeProject = async (data) => {
+        if (loading.value) return;
+        loading.value = true
+        try {
+            await window.axios.post("api/v1/projects", data);
+            showToast('Project created successfully');
+            return true;
+        } catch(e) {
+            console.error('Failed to create project', e);
+            showToast('Project created failed', 'error');
+            return false;
+        } finally {
+            loading.value = false
+        }
     }
     
-    const updateProject = async (projectData) => {
+    const updateProject = async (projectId, data) => {
+        if (!projectId) return;
         if (loading.value) return;
-        loading.value = true;
-        errors.value = {};
-        return window.axios
-            .put(`api/v1/projects/${projectData?.id}`, form)
-            .then(response => {
-                resetForm()
-                showToast("Project Updated successfully");
-                router.push({name: 'projects.show', params: {projectId: projectData?.id}});
-            })
-            .catch(error => {
-                if (error?.response?.status === 422) {
-                    errors.value = error?.response?.data?.errors;
-                } else {
-                    console.error('Error on updating project', error)
-                }
-            })
-            .finally(() => loading.value = false)
+        loading.value = true
+
+       try {
+            const response = await window.axios.put(`api/v1/projects/${projectId}`, data)
+            showToast('Project updated successfully');
+            return true;
+       } catch(e) {
+            console.error('Project update failed', e)
+            showToast('Project update failed', 'error');
+            return false
+       } finally {
+            loading.value = false
+       }
     }
 
     const getStatuses = async () => {
@@ -247,8 +178,7 @@ export const useProjectStore = defineStore("project", () => {
     
     return {
         getProjects,
-        handleSubmit,
-        resetForm,
+        storeProject,
         changePage,
         getProject,
         updateProject,
@@ -257,8 +187,7 @@ export const useProjectStore = defineStore("project", () => {
         filterProjects,
         getPriorityLevels,
         project,
-        v$,
-        isActionDisabled,
+        isLoading,
         selectedPriority,
         selectedStatus,
         hasFetchProjectsError,

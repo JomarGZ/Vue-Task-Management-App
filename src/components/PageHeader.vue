@@ -1,7 +1,14 @@
 <script setup>
+defineProps({
+    headerName: {
+        type: String,
+        required: true
+    }
+})
 </script>
 <template>
-    <header class="text-2xl font-bold text-gray-800">
-        <slot></slot>
-    </header>
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">{{ headerName }}</h1>
+           <slot></slot>
+        </div>
 </template>
