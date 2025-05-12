@@ -1,8 +1,8 @@
 <script setup>
 import TaskItem from '@/components/TaskItem.vue'
-import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import {Icon} from '@iconify/vue';
 import { TailwindPagination } from 'laravel-vue-pagination';
+import TaskFilter from './TaskFilter.vue';
 defineProps({
     projectId: {
         type: [Number, String],
@@ -11,9 +11,26 @@ defineProps({
     tasks: {
         type: Object,
         default: () => ({})
+    },
+    error: {
+        type: Object,
+        default: () => ({})
+
+    },
+    loading: {
+        type: Boolean,
+        default: false
+    },
+    isFetching: {
+        type: Boolean,
+        default: false
     }
 })
-const projectTaskStore = useProjectTaskStore();
+const emit = defineEmits(['submit-filters', 'delete-task', 'onPaginate', 'retry']);
+
+const handleFilters = (filters) => {
+    emit('submit-filters', filters);
+}
 </script>
 <template>
      <div class="p-6">
@@ -25,21 +42,11 @@ const projectTaskStore = useProjectTaskStore();
         </div>
         
         <!-- Task Filters -->
-        <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
-            <div class="flex space-x-2">
-                <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">All</button>
-                <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">Active</button>
-                <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">Completed</button>
-                <button class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">High Priority</button>
-            </div>
-            <div class="relative">
-                <input type="text" placeholder="Search tasks..." class="pl-8 pr-4 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <i class="fas fa-search absolute left-3 top-2 text-gray-400"></i>
-            </div>
+         <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
+            <TaskFilter @submit-filters="handleFilters"/>
         </div>
-        
         <!-- Tasks Table -->
-        <div class="overflow-x-auto">
+        <div class="relative">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -60,18 +67,40 @@ const projectTaskStore = useProjectTaskStore();
                         :deadline="task.deadline_at"
                         :priority="task.priority_level"
                         :status="task.status"
+                        @delete-task="(taskId) => $emit('delete-task', taskId)"
+                        :loading="loading"
                     />
                 </tbody>
             </table>
+                <div 
+                    v-if="isFetching" 
+                    class="absolute inset-0 flex items-center text-gray-400 justify-center bg-white bg-opacity-70"
+                >
+                    <Icon icon="eos-icons:loading" width="50" height="50" />
+                </div>
+                <div 
+                    v-if="tasks.data?.length === 0" 
+                    class="absolute inset-0 flex items-center text-gray-400 justify-center bg-white bg-opacity-70"
+                >
+                    <p>No task found!</p>
+                </div>
+                <div 
+                    v-if="Object.keys(error).length > 0" 
+                    class="absolute inset-0 flex flex-col items-center justify-center bg-white bg-opacity-70 p-4"
+                >
+                    <Icon icon="mdi:alert-circle-outline" width="50" height="50" class="text-red-500" />
+                    <p class="mt-2 text-red-400 font-medium">{{ error.message || 'Oops! Error. Please try again later!' }}</p>
+                </div>
+
         </div>
         <div class="flex items-center justify-between mt-4">
             <div class="text-sm text-gray-500">
                 Showing <span class="font-medium">{{ tasks.meta?.from }}</span> to <span class="font-medium">{{ tasks.meta?.to }}</span> of <span class="font-medium">{{ tasks.meta?.total }}</span> tasks
             </div>
               <TailwindPagination
-                    :item-classes="['cursor-pointer', 'border-gray-300']"
+                    :item-classes="['cursor-pointer', 'border-gray-300', 'hover:bg-blue-100']"
                     :data="tasks"
-                    @pagination-change-page="(page) => projectTaskStore.getTasks(projectId, page, {})"
+                    @pagination-change-page="(page) => $emit('onPaginate', page)"
                 />
         </div>
     </div>

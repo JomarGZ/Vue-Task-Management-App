@@ -31,10 +31,23 @@ const props = defineProps({
     priority: {
         type: String,
         default: ''
+    },
+    loading: {
+        type: Boolean,
+        default: false
     }
 })
+
 const daysLeft = ref('');
 
+const emit = defineEmits(['delete-task']);
+const onDeleteTask = (taskId) => {
+    if (!taskId) {
+        console.warn(`task id is required to emit task deletion. Received: ${taskId}`)
+        return
+    }
+    emit('delete-task', taskId)
+}
 const updateCountdown = (deadline) => {
     if (!deadline) return;
     const now = new Date();
@@ -89,7 +102,10 @@ onMounted(() => {
             
             <router-link :to="{name: 'tasks.show', params: {taskId: id}}" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="material-icon-theme:folder-vm-open" width="20" height="20" /></router-link>
             <router-link :to="{name: 'tasks.edit', params: {taskId: id}}" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="emojione:pencil" width="20" height="20" /></router-link>
-            <button class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="icon-park:delete" width="20" height="20" /></button>
+            <button @click="onDeleteTask(id)" :disabled="loading" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2">
+                <span v-if="loading"><Icon icon="eos-icons:loading" width="24" height="24" /></span>
+                <span v-else><Icon icon="icon-park:delete" width="20" height="20" /></span>
+            </button>
         </td>
     </tr>
 </template>

@@ -1,8 +1,8 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
+import { AxiosError } from "axios";
 
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
 
 export const useProjectTaskStore = defineStore("project-tasks", () => {
     const task = ref({});
@@ -11,60 +11,75 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     const statuses = ref([]);
     const priorityLevels = ref([]);
     const tasks = ref({});
+    const isFetching = ref(false);
     const loading = ref(false);
-    const errors = reactive({});
+    const error = ref({});
     const categories = reactive({});
-    const { showToast } = useSweetAlert();
+    const { showToast, showConfirmDialog } = useSweetAlert();
 
     const getTask = async (taskId) => {
-        if (!taskId) {
-            throw new Error(`taskId is required to fetch task. Received: ${taskId}`);
-        }
+       
         if (loading.value) return;
-        loading.value = true;
+        isFetching.value = true;
 
         try {
+            if (!taskId) {
+                throw new Error(`taskId is required to fetch task. Received: ${taskId}`);
+            }
             const response = await window.axios.get(`api/v1/tasks/${taskId}`);
             task.value = response.data?.data || {}
         } catch (e) {
             console.error('Error on fetching task', e);
             throw e;
         } finally {
-            loading.value = false;
+            isFetching.value = false;
         }
     }
   
     async function getTasks(projectId, page = 1, filters = {}) {
-        if (typeof projectId !== 'string' || !projectId.trim()) {
-            throw new Error('A valid non-empty projectId (string) is required');
-        }
-        if (loading.value) return;
-        loading.value = true;
+       
+        if (isFetching.value) return;
+        isFetching.value = true;
+        error.value = {};
         try {
+             if (typeof projectId !== 'string' || !projectId.trim()) {
+                throw new Error('A valid non-empty projectId (string) is required');
+            }
             const params = new URLSearchParams({
-                page: page
+                page: page,
+                ...(filters.search?.trim().length > 0 && {
+                    search: filters.search?.trim()
+                }),
+                ...(filters.status?.trim().length > 0 && {
+                    status: filters.status?.trim()
+                }),
+                ...(filters.priority?.trim().length > 0 && {
+                    priority_level: filters.priority?.trim()
+                })
             });
             const response = await window.axios.get(`api/v1/projects/${projectId}/tasks?${params.toString()}`)
             tasks.value = response.data || {}
         } catch (e) {
             console.error('Failed to fetch project tasks', e);
+            error.value = e;
             throw e;
         } finally {
-            loading.value = false;
+            isFetching.value = false;
         }
 
     }
 
     async function storeTask (projectId, values) {
-        if (typeof projectId !== 'string' || !projectId.trim()) {
-            throw new  Error('A valid projectId is required to create a task');
-        }
-        if (!values || typeof values !== 'object' || Array.isArray(values)) {
-            throw new Error('Values must be an object containing task data')
-        }
+      
         if (loading.value) return;
         loading.value = true;
         try {
+            if (typeof projectId !== 'string' || !projectId.trim()) {
+                throw new  Error('A valid projectId is required to create a task');
+            }
+            if (!values || typeof values !== 'object' || Array.isArray(values)) {
+                throw new Error('Values must be an object containing task data')
+            }
             await window.axios.post(`api/v1/projects/${projectId}/tasks`, values)
             showToast('Task created successfully');
             return true;
@@ -77,20 +92,32 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         }
     }
 
-    async function deleteTask(task) {
+    async function deleteTask(taskId) {
+     
         if (loading.value) return;
-        if (! confirm("Are you sure you want to delete?")) {
-            return;
-        }
         loading.value = true;
-        window.axios.delete(`api/v1/tasks/${task.id}`)
-            .then(() => {
-                getTasks();
-            })
-            .catch(error => {
-                console.error("Error on deleting a task:", error);
-            })
-            .finally(() => (loading.value = false));
+        try {
+            if (!taskId) {
+                throw new Error(`taskId is required to delete a task. Received: ${taskId}`)
+            }
+            return await showConfirmDialog()
+                .then((async result => {
+                    if (!result.isConfirmed) {
+                        return false;
+                    }
+                    try {
+                        await window.axios.delete(`api/v1/tasks/${taskId}`);
+                        showToast('Task deleted succussfully')
+                        return true;
+                    } catch (e) {
+                        console.error('Failed to delete a task');
+                        showToast('Task deletion failed', 'error');
+                        throw e;
+                    }
+                }))
+        } finally {
+            loading.value = false
+        }
     }
     
     async function updateStatus (task) {
@@ -122,16 +149,17 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     }
 
     const updateTask = async (taskId, values) => {
-        if (!taskId) {
-            throw new Error(`taskId is required to update a task. Received ${taskId}`);
-        }
-        if (!values || typeof values !== 'object' || Array.isArray(values)) {
-            throw new Error('values must be an object containing task data');
-        }
+       
         if (loading.value) return;
         loading.value = true;
 
         try {
+            if (!taskId) {
+                throw new Error(`taskId is required to update a task. Received ${taskId}`);
+            }
+            if (!values || typeof values !== 'object' || Array.isArray(values)) {
+                throw new Error('values must be an object containing task data');
+            }
             await window.axios.put(`api/v1/tasks/${taskId}`, values)
             showToast('Task updated successfully');
             return true;
@@ -178,8 +206,9 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         priorityLevels,
         categories,
         tasks,
-        errors,
+        error,
         loading,
+        isFetching,
         statuses
     }
 });

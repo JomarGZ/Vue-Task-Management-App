@@ -17,6 +17,10 @@ onMounted(async() => {
         projectTaskStore.getTasks(route.params?.projectId)
     ])
 })
+const handleDeleteTask = async (taskId) => {
+    const success = await projectTaskStore.deleteTask(taskId)
+    if (success) await projectTaskStore.getTasks(route.params?.projectId)
+}
 </script>
 <template>
     <div class="px-4 py-8">
@@ -65,6 +69,13 @@ onMounted(async() => {
            <TaskTable
                 :projectId="route.params?.projectId"
                 :tasks="projectTaskStore.tasks"
+                @submit-filters="(filters) => projectTaskStore.getTasks(route.params?.projectId,1, filters)"
+                @delete-task="handleDeleteTask"
+                @onPaginate="(page) => projectTaskStore.getTasks(route.params?.projectId, page, {})"
+                :loading="projectTaskStore.loading"
+                :isFetching="projectTaskStore.isFetching"
+                @retry="projectTaskStore.getTasks(route.params?.projectId)"
+                :error="projectTaskStore.error"
            />
         </div>
     </div>
