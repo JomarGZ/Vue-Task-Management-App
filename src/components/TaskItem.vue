@@ -43,7 +43,7 @@ const daysLeft = ref('');
 const emit = defineEmits(['delete-task']);
 const hoverMore = ref(false);
 const topThreeAssignedUsers = computed(() => props.assignees.length > 0 ? props.assignees.slice(0, 3) : []);
-const moreAssigneesCount = computed(() => props.assignees.length > 3 ? props.assignees.slice(3, props.assignees.length).length : 0)
+const moreAssignees = computed(() => props.assignees.length > 3 ? props.assignees.slice(3, props.assignees.length) : [])
 const onDeleteTask = (taskId) => {
     if (!taskId) {
         console.warn(`task id is required to emit task deletion. Received: ${taskId}`)
@@ -78,7 +78,7 @@ onMounted(() => {
         </div>
     </td>
         <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex -space-x-6 rlt:space-x-reverse">
+            <div class="flex items-center justify-start -space-x-6 rlt:space-x-reverse">
                  <template v-if="topThreeAssignedUsers.length > 0">
                     <div  
                         class="group relative" 
@@ -96,7 +96,7 @@ onMounted(() => {
                         </div>
                     </div>
                     <p 
-                        v-if="moreAssigneesCount"
+                        v-if="moreAssignees.length > 0"
                         class="
                             flex relative hover:border-blue-300 
                             transition-all duration-200 hover:scale-110 
@@ -107,7 +107,7 @@ onMounted(() => {
                         @mouseenter="hoverMore = true"
                         @mouseleave="hoverMore = false"
                     >
-                    {{ moreAssigneesCount }}+
+                    {{ moreAssignees.length }}+
                        <div 
                 v-if="hoverMore"
                 class="
@@ -119,7 +119,7 @@ onMounted(() => {
                 "
             >
                 <div 
-                    v-for="user in assignees" 
+                    v-for="user in moreAssignees" 
                     :key="user.id"
                     class="py-1 px-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                 >
