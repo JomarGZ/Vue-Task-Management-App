@@ -69,6 +69,7 @@ const handleFilters = (filters) => {
                         :status="task.status"
                         @delete-task="(taskId) => $emit('delete-task', taskId)"
                         :loading="loading"
+                        :assignees="task.assigned_users"
                     />
                 </tbody>
             </table>
