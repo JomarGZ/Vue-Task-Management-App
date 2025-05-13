@@ -4,8 +4,6 @@ import { useProjectTeamStore } from '@/stores/projectTeamStore';
 import { Icon } from '@iconify/vue'
 import DefaultUserPic from './DefaultUserPic.vue';
 const props = defineProps({
-    isModalShow: Boolean,
-    project: Object,
     teamAssignees: {
         type: Array,
         default: () => ([])
@@ -15,10 +13,9 @@ const props = defineProps({
         default: false
     }
 })
-const emit = defineEmits(['update:isModalShow', 'data-added', 'close-modal', 'open-modal', 'submit']);
+const emit = defineEmits(['data-added', 'close-modal', 'open-modal', 'submit']);
 
 const projectTeamStore = useProjectTeamStore();
-projectTeamStore.project = props.project;
 const validationError = ref('');
 
 const onSelectMember = (member) => {
@@ -30,8 +27,14 @@ const onRemoveSelectedMember = (selected) => {
     projectTeamStore.selectedMembers = projectTeamStore.selectedMembers.filter(m => m.id !== selected.id);
 }
 
-watch(() => props.show, (bool) => bool ?  projectTeamStore.fetchMembers() : '');
-watch(() => props.show, (bool) => !bool ?  projectTeamStore.selectedMembers = [] : '');
+watch(() => props.show, (isVisible) => {
+    if (!isVisible) {
+        projectTeamStore.clearSelectedMembers()
+        validationError.value =''
+    } else {
+        projectTeamStore.fetchMembers()
+    }
+});
 
 const memberList = computed(() => {
     let filteredMembers = props.teamAssignees
@@ -61,8 +64,9 @@ const emitSubmit = () => {
 </script>
 
 <template>
-     <button @click="$emit('open-modal')" class="px-3 py-1 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm">
-        <i class="fas fa-user-plus mr-1"></i>Add Member
+     <button @click="$emit('open-modal')" class="px-3 py-1 gap-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm">
+        <Icon icon="heroicons-solid:user-add" width="20" height="20" />
+        <span>Add Member</span>
     </button>
     <teleport to='body'>
         <transition

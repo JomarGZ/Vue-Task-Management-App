@@ -1,212 +1,273 @@
 <script setup>
-import CommentsSection from '@/components/CommentsSection.vue';
-import DefaultUserPic from '@/components/DefaultUserPic.vue';
-import AssignTaskModal from '@/components/Tasks/AssignTaskModal.vue';
-import TaskEditModal from '@/components/Tasks/TaskEditModal.vue';
-import TaskLinksForm from '@/components/tasks/TaskLinksForm.vue';
-import UnAssignedModal from '@/components/Tasks/UnAssignedModal.vue';
-import { formatDateWithTime, getInitials } from '@/composables/useFormatters';
-import { capWords } from '@/composables/useUtil';
-import { useProjectStore } from '@/stores/projectStore';
-import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { useTaskComments } from '@/stores/taskCommentStore';
-import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-
-const isUnassignModalShow = ref(false);
-const isModalShow = ref(false);
-const isEditTaskModalShow = ref(false);
-const route = useRoute();
-const projectStore = useProjectStore();
-const taskStore = useProjectTaskStore();
-const taskCommentStore = useTaskComments();
-const taskId = computed(() => route?.params?.taskId);
-
-const onStatusChange = () => {
-    taskStore.updateStatus({ id: taskId.value });
-}
-onMounted(async () => {
-    await Promise.all([
-        taskStore.fetchStatuses(),
-        taskStore.getTask({ id: taskId.value }),
-        projectStore.getProject({ id: route.params.projectId }),
-        taskCommentStore.fetchComments({id: taskId.value})
-    ])
-    
-})
-watch(() =>[taskId.value, route.params.projectId], () => {
-    taskStore.getTask({ id: taskId.value });
-    projectStore.getProject({ id: route.params.projectId });
-})
-onBeforeUnmount(() => {
-    taskStore.taskData = {}
-});
-
-const taskLinks = computed(() => {
-    return {
-        pr_link: taskStore?.taskData?.pr_link,
-        issue_link: taskStore?.taskData?.issue_link,
-        doc_link: taskStore?.taskData?.doc_link,
-        other_link: taskStore?.taskData?.other_link
-    }
-});
+import PageHeader from '@/components/PageHeader.vue';
+import { Icon } from '@iconify/vue';
+import { ref } from 'vue';
+import TaskAssigneesSection from '@/components/TaskAssigneesSection.vue';
 </script>
 <template>
-        <!-- Breadcrumb -->
-        <nav class="mb-8 text-sm flex items-center justify-between">
-            <ol class="flex items-center space-x-2">
-                <li><RouterLink :to="{name: 'projects.index'}" class="text-blue-600 hover:text-blue-800">Projects</RouterLink></li>
-                <li class="text-gray-500">/</li>
-                <li><RouterLink :to="{name: 'projects.show', params: {projectId: projectStore?.project?.id}}" class="text-blue-600 hover:text-blue-800">{{ projectStore?.project?.name }}</RouterLink></li>
-            </ol>
-            <div>
-                <button @click="isEditTaskModalShow = true">
-                    <IconSVG name="edit-svg"/>
-                </button>
-                <TaskEditModal
-                    v-if="isEditTaskModalShow"
-                    @update:isEditTaskModalShow="val => isEditTaskModalShow = val"
-                    :task="taskStore?.taskData"
-                />
-            </div>
-        </nav>
-
+      <div class="container mx-auto px-4 py-8">
         <!-- Task Header -->
-        <div class="bg-white rounded-lg shadow-sm p-4 md:p-6 mb-6">
-            <div class="flex flex-col md:flex-row items-center md:items-start justify-between mb-4 text-center md:text-left">
-                <div class="mb-4 md:mb-0 flex-grow min-w-0">
-                    <h1 class="text-xl md:text-2xl font-bold min-w-0 text-gray-900 break-words whitespace-normal">
-                        {{ taskStore?.taskData?.title }}
-                    </h1>
-                </div>
-                <span class="px-3 py-1 shrink-0 text-sm capitalize font-medium bg-yellow-100 text-yellow-800 rounded-full">
-                    {{ taskStore?.taskData?.status }}
-                </span>
-            </div>
-
-            <!-- Project Info -->
-            <div class="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 text-sm text-gray-600 text-center md:text-left">
-                <span class="flex items-center justify-center md:justify-start">
-                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
-                    </svg>
-                    {{ projectStore?.project?.name }}
-                </span>
-                <p>Created: <span class="text-gray-900 font-semibold">{{ formatDateWithTime(taskStore?.taskData?.created_at) || '--.--' }}</span></p>
-                <p>Due: <span class="text-gray-900 font-semibold">{{ formatDateWithTime(taskStore?.taskData?.deadline_at) || '--.--' }}</span></p>
-            </div>
-
-        </div>
-
-        <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Left Column -->
-            <div class="col-span-1 md:col-span-2 space-y-6">
-                <!-- Description -->
-                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-                    <h2 class="text-lg font-semibold mb-4">Description</h2>
-                    <p class="text-gray-700 break-words">{{ taskStore?.taskData?.description }}</p>
-                </div>
-
-                <!-- Links -->
-                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-                    <h2 class="text-lg font-semibold mb-4">Related Links</h2>
-                   <TaskLinksForm :task="taskLinks"/>
-                </div>
-
-                <!-- Comments -->
-                <CommentsSection
-                  :comments="taskCommentStore.comments"
-                  :isFetchLoading="taskCommentStore.isFetchLoading"
-                  :isFetchError="taskCommentStore.isFetchError"
-                  v-model:content="taskCommentStore.form.content"
-                  @submit-comment="taskCommentStore.handleSubmitComment({id: taskId})" 
-                />
-            </div>
-
-            <!-- Right Column -->
-            <div class="col-span-1 space-y-6">
-                <!-- Status -->
-                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-                    <h2 class="text-lg font-semibold mb-4">Status</h2>
-                    <select @change="onStatusChange" v-model="taskStore.selectedStatus" class="w-full capitalize p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option
-                            class="capitalize"
-                            :key="status"
-                            :value="status"
-                            v-for="status in taskStore?.statuses">
-                                {{ status }}
-                        </option>
-                    </select>
-                </div>
-
-                <!-- Assignments -->
-                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-semibold">Assignments</h2>
-                        <div class="flex items-center gap-2">
-                            <div>
-                                <button @click="isUnassignModalShow = true">
-                                    <IconSVG name="minus-svg"/>
-                                </button>
-                                <UnAssignedModal
-                                    v-if="isUnassignModalShow"
-                                    @update:isUnassignModalShow="val => isUnassignModalShow = val"
-                                    :task="taskStore?.taskData"
-                                    @taskUpdate="taskStore.getTask({id: route?.params?.taskId})"
-                                />
-                            </div>
-                            <div>
-                                <button @click="isModalShow = true"><IconSVG name="plus-svg"/></button>
-                                <AssignTaskModal 
-                                    v-if="isModalShow"
-                                    @update:isModalShow="val => isModalShow = val"
-                                    :task="taskStore?.taskData"
-                                    @taskUpdate="taskStore.getTask({id: route?.params?.taskId})"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <template v-if="taskStore?.taskData?.assigned_users?.length > 0">
-                            <div 
-                                v-for="assignee in taskStore?.taskData?.assigned_users"
-                                :key="assignee.id"
-                            >
-                                <label class="block text-sm font-medium text-gray-700 mb-2">{{ assignee.position?.name }}</label>
-                                <div class="flex items-center space-x-2">
-                                    <img v-if="assignee.avatar?.['thumb-60']" :src="assignee.avatar?.['thumb-60']" class="w-8 h-8 rounded-full" alt="Developer avatar">
-                                    <DefaultUserPic v-else :name="assignee.name" class="w-8 h-8 border-2 text-sm"/>
-                                    <span class="text-gray-900 capitalize">{{ assignee.name }}</span>
+         <div class="flex items-center justify-between mb-6">
+            <page-header headerName="Task Dashboard">
+                    <nav class="flex mt-2" aria-label="Breadcrumb">
+                        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                            <li class="inline-flex items-center">
+                                <button type="button" @click="$router.back()"  class=" cursor-pointer text-gray-700 hover:text-blue-600 text-sm">Tasks</button>
+                            </li>
+                            <li aria-current="page" class="min-w-0">
+                                <div class="flex items-center gap-2 min-w-0 max-w-[300px] overflow-hidden">
+                                    <Icon icon="weui:arrow-outlined" width="10" height="20" class="text-gray-400 shrink-0"/>
+                                    <span class="text-gray-500 text-sm truncate capitalize">
+                                        Task name
+                                    </span>
                                 </div>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <div>
-                                <p>Unassigned</p>
-                            </div>
-                        </template>
+                            </li>
+                        </ol>
+                    </nav>
+            </page-header>
+             <div class="flex space-x-3">
+                <router-link :to="{name: 'tasks.edit', params: {taskId: $route.params?.taskId}}" class="px-4 py-2 bg-blue-600 flex gap-2 items-center justify-center text-white rounded-lg hover:bg-blue-700 transition">
+                    <Icon icon="bxs:edit" width="24" height="24" />Edit Project
+                </router-link>
+            </div>
+        </div>
+      
+
+        <!-- Main Task Card -->
+        <div class="bg-gray-50 rounded-xl shadow-md overflow-hidden mb-6">
+            <!-- Task Title and Metadata -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <div class="flex items-center mb-2">
+                            <span class="bg-priority-high text-white text-xs font-medium px-2.5 py-0.5 rounded-full mr-3">High Priority</span>
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Active</span>
+                        </div>
+                        <h2 class="text-2xl font-semibold text-gray-800">Complete Project Proposal Draft</h2>
+                    </div>
+                    <div class="relative">
+                        <select class="block appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500">
+                            <option>To Do</option>
+                            <option selected>In Progress</option>
+                            <option>In Review</option>
+                            <option>Completed</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Metadata -->
-                <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-                    <h2 class="text-lg font-semibold mb-4">Details</h2>
-                    <div class="space-y-3 text-sm">
-                        <div v-if="taskStore?.taskData?.priority_level">
-                            <span class="text-gray-500">Priority:</span>
-                            <span class="ml-2 text-gray-900">{{ capWords(taskStore?.taskData?.priority_level) }}</span>
+                
+                <!-- Task Metadata Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="text-xs text-gray-500 font-medium mb-1">START DATE</div>
+                        <div class="flex items-center">
+                            <i class="far fa-calendar-alt text-gray-400 mr-2"></i>
+                            <span class="font-medium">May 5, 2023</span>
                         </div>
-                        <div v-if="taskStore?.taskData?.started_at">
-                            <span class="text-gray-500">started on:</span>
-                            <span class="ml-2 text-gray-900">{{ taskStore?.taskData?.started_at }}</span>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="text-xs text-gray-500 font-medium mb-1">DUE DATE</div>
+                        <div class="flex items-center">
+                            <i class="far fa-calendar-check text-gray-400 mr-2"></i>
+                            <span class="font-medium">May 15, 2023</span>
+                            <span class="ml-auto text-sm px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">5 days left</span>
                         </div>
-                        <div v-if="taskStore?.taskData?.deadline_at">
-                            <span class="text-gray-500">Deadline:</span>
-                            <span class="ml-2 text-gray-900">{{ taskStore?.taskData?.deadline_at }}</span>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="text-xs text-gray-500 font-medium mb-1">ESTIMATED TIME</div>
+                        <div class="flex items-center">
+                            <i class="far fa-clock text-gray-400 mr-2"></i>
+                            <span class="font-medium">8 hours</span>
+                            <span class="ml-auto text-sm text-gray-500">4h logged</span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Task Description -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-lg font-medium text-gray-800">Description</h3>
+                    <button class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+                        <i class="fas fa-pencil-alt mr-1 text-xs"></i> Edit
+                    </button>
+                </div>
+                <p class="text-gray-600">
+                    Draft the initial proposal for the client project including scope, timeline, and budget estimates. 
+                    The proposal should align with our company standards and include all necessary sections as per the template.
+                    Ensure to highlight our unique value proposition and include case studies from similar projects.
+                </p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">Marketing</span>
+                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">Client Project</span>
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Q2 Goal</span>
+                </div>
+            </div>
+
+            <!-- Progress and Time Tracking -->
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-800 mb-3">Progress</h3>
+                <div class="mb-4">
+                    <div class="flex justify-between text-sm text-gray-500 mb-1">
+                        <span>Completion</span>
+                        <span>65%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 65%"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">Time Spent</div>
+                        <div class="font-medium">4h 22m</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">Time Remaining</div>
+                        <div class="font-medium">3h 38m</div>
+                    </div>
+                </div>
+                <button class="mt-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center text-sm">
+                    <i class="fas fa-stopwatch mr-2"></i>Log Time
+                </button>
+            </div>
+
+            <!-- Links Section -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-lg font-medium text-gray-800">Related Links</h3>
+                    <button class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+                        <i class="fas fa-plus mr-1"></i> Add Link
+                    </button>
+                </div>
+                <div class="space-y-3">
+                    <!-- Link Items -->
+                    <div class="flex items-center justify-between group p-3 hover:bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                                <i class="fab fa-google-drive text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <a href="#" class="text-blue-600 hover:underline font-medium">Project Proposal Draft</a>
+                                <p class="text-xs text-gray-500">Google Docs - Last edited 2 hours ago</p>
+                            </div>
+                        </div>
+                        <button class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between group p-3 hover:bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-purple-100 p-2 rounded-lg mr-3">
+                                <i class="fab fa-github text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <a href="#" class="text-blue-600 hover:underline font-medium">PR #42: Authentication fixes</a>
+                                <p class="text-xs text-gray-500">GitHub - Merged yesterday</p>
+                            </div>
+                        </div>
+                        <button class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between group p-3 hover:bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-red-100 p-2 rounded-lg mr-3">
+                                <i class="fab fa-google-drive text-red-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <a href="#" class="text-blue-600 hover:underline font-medium">Client Presentation Deck</a>
+                                <p class="text-xs text-gray-500">Google Slides - Shared</p>
+                            </div>
+                        </div>
+                        <button class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignees Section -->
+            <task-assignees-section/>
         </div>
+
+        <!-- Comments Section -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <h3 class="text-lg font-medium text-gray-800 mb-4">Activity</h3>
+                
+                <!-- Activity Timeline -->
+                <div class="border-l border-gray-200 pl-6 pb-6 space-y-6">
+                    <!-- Status Change -->
+                    <div class="relative">
+                        <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-1.5 border border-white"></div>
+                        <div class="flex items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-6 h-6 rounded-full mr-2">
+                            <span class="font-medium text-sm">Sarah Johnson</span>
+                            <span class="text-xs text-gray-500 ml-2">2 hours ago</span>
+                        </div>
+                        <p class="text-sm text-gray-600 pl-8">Changed status from <span class="font-medium">"To Do"</span> to <span class="font-medium">"In Progress"</span></p>
+                    </div>
+                    
+                    <!-- Comment -->
+                    <div class="relative">
+                        <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-1.5 border border-white"></div>
+                        <div class="flex items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-6 h-6 rounded-full mr-2">
+                            <span class="font-medium text-sm">Michael Chen</span>
+                            <span class="text-xs text-gray-500 ml-2">1 hour ago</span>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 ml-8">
+                            <p>I've reviewed the initial draft and added some technical specifications for the implementation phase. The timeline might need adjustment once we get client feedback.</p>
+                            <div class="mt-2 flex space-x-2">
+                                <a href="#" class="text-blue-600 text-xs hover:underline flex items-center">
+                                    <i class="fab fa-google-drive mr-1"></i> Proposal Draft
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Link Added -->
+                    <div class="relative">
+                        <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-1.5 border border-white"></div>
+                        <div class="flex items-center mb-1">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="w-6 h-6 rounded-full mr-2">
+                            <span class="font-medium text-sm">Emma Wilson</span>
+                            <span class="text-xs text-gray-500 ml-2">30 minutes ago</span>
+                        </div>
+                        <p class="text-sm text-gray-600 pl-8">Added link <a href="#" class="text-blue-600 hover:underline">"Client Presentation Deck"</a></p>
+                    </div>
+                </div>
+                
+                <!-- Comment Form -->
+                <div class="flex mt-6">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-10 h-10 rounded-full mr-3">
+                    <div class="flex-1">
+                        <form>
+                            <textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="3" placeholder="Add a comment or update..."></textarea>
+                            <div class="flex justify-between items-center mt-2">
+                                <div class="flex space-x-2">
+                                    <button type="button" class="text-gray-500 hover:text-blue-600 flex items-center text-sm">
+                                        <i class="fas fa-paperclip mr-1"></i> Link
+                                    </button>
+                                    <button type="button" class="text-gray-500 hover:text-blue-600 flex items-center text-sm">
+                                        <i class="fas fa-stopwatch mr-1"></i> Time
+                                    </button>
+                                    <button type="button" class="text-gray-500 hover:text-blue-600 flex items-center text-sm">
+                                        <i class="fas fa-tag mr-1"></i> Status
+                                    </button>
+                                </div>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                    Post
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
   </template>

@@ -10,7 +10,9 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
     const teamMembers = ref([]);
     const {showToast, showConfirmDialog} = useSweetAlert();
  
-
+    const clearSelectedMembers = () => {
+        selectedMembers.value = [];
+    }
         
     const removeAssignedMember = async (projectId, userId) => {
         if (!projectId || !userId) {
@@ -88,6 +90,7 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         loading,
         removeAssignedMember,
         handleAssignMembers,
+        clearSelectedMembers,
         resetForm,
         fetchMembers,
     };

@@ -10,15 +10,47 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     const selectedPriority = ref('');
     const statuses = ref([]);
     const priorityLevels = ref([]);
+    const projectTeamMembers = ref([]);
     const tasks = ref({});
     const isFetching = ref(false);
+    const selectedTaskAssignees = ref([]);
     const loading = ref(false);
     const error = ref({});
     const categories = reactive({});
     const { showToast, showConfirmDialog } = useSweetAlert();
+    const search = ref('');
 
+    const clearSelectedAssignees = () => {
+        selectedTaskAssignees.value = [];
+    }
+    const onSelectTaskAssignee = (member) => {
+        if (!member && typeof member !== 'object') {
+            console.warn('Member is required and must be an object to add in selected assignees')
+            return;
+        }
+        const alreadyExists = selectedTaskAssignees.value.some(
+            existing => existing.id === member.id  
+        )
+        if (alreadyExists) {
+            showToast("Already exist on the selected assignee", 'warning');
+            return;
+        }
+        selectedTaskAssignees.value.push(member)
+        search.value = ''
+    }
+    const onRemoveSelectedTaskAssignee = (selected) => {
+        if (!selected && typeof selected !== 'object') {
+            console.warn('Selected assignee is required and must be an object to remove selected assignee');
+            return;
+        }
+        const isExists = selectedTaskAssignees.value.some(
+            existing => existing.id === selected.id
+        )
+        if (isExists) {
+            selectedTaskAssignees.value = selectedTaskAssignees.value.filter(s => s.id !== selected.id);
+        }
+    }
     const getTask = async (taskId) => {
-       
         if (loading.value) return;
         isFetching.value = true;
 
@@ -189,10 +221,28 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         } 
     }
 
+    const getProjectTeamMembers = async (projectId) => {
+        if (isFetching.value) return;
+        isFetching.value = true;
+        error.value = {}
+        try {
+            if (!projectId) {
+                throw new Error(`Project ID is required. Recieved: ${projectId}`)
+            }
+            const response = await window.axios.get(`api/v1/projects/${projectId}/team-members`)
+            projectTeamMembers.value = response.data?.data || []
+        } catch (e) {
+            console.error('Failed to fetch project team members', e)
+            throw e;
+        } finally {
+            isFetching.value = false
+        }
+    }
     return {
         fetchStatuses,
         updateTaskLinks,
         updateTask,
+        selectedTaskAssignees,
         storeTask,
         deleteTask,
         updateStatus,
@@ -200,6 +250,12 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         fetchPriorityLevels,
         getTask,
         getTasks,
+        getProjectTeamMembers,
+        onSelectTaskAssignee,
+        onRemoveSelectedTaskAssignee,
+        clearSelectedAssignees,
+        projectTeamMembers,
+        search,
         task,
         selectedPriority,
         selectedStatus,
