@@ -1,5 +1,4 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
-import { AxiosError } from "axios";
 
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
@@ -17,8 +16,9 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     const loading = ref(false);
     const error = ref({});
     const categories = reactive({});
-    const { showToast, showConfirmDialog } = useSweetAlert();
+    const validationError = ref('');
     const search = ref('');
+    const { showToast, showConfirmDialog } = useSweetAlert();
 
     const clearSelectedAssignees = () => {
         selectedTaskAssignees.value = [];
@@ -238,11 +238,65 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
             isFetching.value = false
         }
     }
+
+    const assignMemberToTask = async (taskId) => {
+        if (loading.value) return;
+        loading.value = true;
+        try {
+            if (!taskId) {
+                throw new Error(`task ID is required to assign member. Recieved ${taskId}`)
+            }
+            const response = await window.axios.post(`api/v1/tasks/${taskId}/assignment`, {assigneeIds: selectedTaskAssignees.value.map(m => m.id)});
+            task.value = response.data?.data || {}
+            showToast('Assigned successfully');
+            return true;
+        } catch(e) {
+            if (e && e.response && e.response?.status === 422) {
+                validationError.value = e.response?.data?.message || 'Failed to assign a task'
+            } else {
+                console.error('Error on assigning user to task', e)
+                throw e;
+            }
+        } finally {
+            loading.value = false;
+        }
+    }
+    const removeAssignee = async (taskId, assigneeId) => {
+        if (loading.value) return;
+        loading.value = true;
+        try {
+            if (!taskId) {
+                throw new Error(`Task ID is required to remove assignee from task. Recieved: ${taskId}`);
+            }
+            if (!assigneeId) {
+                 throw new Error(`assingee ID is required to remove assignee from task. Recieved: ${taskId}`);
+            }
+            return await showConfirmDialog()
+                .then((async result => {
+                    if (!result.isConfirmed) {
+                        return
+                    }
+                    try {
+                        const response = await window.axios.delete(`api/v1/tasks/${taskId}/unassignment?assigneeId=${assigneeId}`)
+                        task.value = response.data?.data || {};
+                        showToast('Removed assignee successfully')
+                        return true;
+                    } catch (e) {
+                        showToast('Removing assignee from task failed', 'error');
+                        throw e;
+                    }
+                }))
+        } finally {
+            loading.value = false
+        }
+        
+    }
     return {
         fetchStatuses,
         updateTaskLinks,
         updateTask,
         selectedTaskAssignees,
+        removeAssignee,
         storeTask,
         deleteTask,
         updateStatus,
@@ -253,6 +307,8 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         getProjectTeamMembers,
         onSelectTaskAssignee,
         onRemoveSelectedTaskAssignee,
+        assignMemberToTask,
+        validationError,
         clearSelectedAssignees,
         projectTeamMembers,
         search,

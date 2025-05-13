@@ -16,7 +16,6 @@ const props = defineProps({
 const emit = defineEmits(['data-added', 'close-modal', 'open-modal', 'submit']);
 
 const projectTeamStore = useProjectTeamStore();
-const validationError = ref('');
 
 const onSelectMember = (member) => {
     projectTeamStore.selectedMembers.push(member)
@@ -30,12 +29,14 @@ const onRemoveSelectedMember = (selected) => {
 watch(() => props.show, (isVisible) => {
     if (!isVisible) {
         projectTeamStore.clearSelectedMembers()
-        validationError.value =''
+        projectTeamStore.validationError = ''
     } else {
         projectTeamStore.fetchMembers()
     }
 });
-
+watch(() => projectTeamStore.selectedMembers, (selected) => {
+  if (selected.length > 0) projectTeamStore.validationError = ''
+}, {deep: true})
 const memberList = computed(() => {
     let filteredMembers = props.teamAssignees
         ? projectTeamStore.teamMembers.filter(member => !props.teamAssignees.some(assignee => assignee.id === member.id)) 
@@ -52,12 +53,12 @@ const memberList = computed(() => {
 })
 
 const emitSubmit = () => {
-    validationError.value = "";
+    projectTeamStore.validationError = "";
 
     if (projectTeamStore.selectedMembers.length > 0) {
         emit('submit');
     } else {
-        validationError.value = "Please search and select a member to assign!";
+        projectTeamStore.validationError = "Please search and select a member to assign!";
     }
 
 }
@@ -108,7 +109,7 @@ const emitSubmit = () => {
                                     placeholder="Search members..."
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
-                                <p v-if="validationError.length > 0" class="text-red-600 text-xs p-2">{{ validationError }}</p>
+                                <p v-if="projectTeamStore.validationError?.trim().length > 0" class="text-red-600 text-xs p-2">{{ projectTeamStore.validationError }}</p>
                                 <!-- Dropdown Results -->
                                 <div v-if="projectTeamStore.searchQuery" class="absolute z-10 mt-1 w-full overflow-y-auto bg-white shadow-lg rounded-md max-h-[200px] py-1 border border-gray-200">
                                     <div v-for="member in memberList" :key="member.id" @click="onSelectMember(member)" class="cursor-pointer hover:bg-blue-50 px-4 py-2">

@@ -1,8 +1,15 @@
 <script setup>
 import PageHeader from '@/components/PageHeader.vue';
 import { Icon } from '@iconify/vue';
-import { ref } from 'vue';
 import TaskAssigneesSection from '@/components/TaskAssigneesSection.vue';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
+import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+const projectTaskStore = useProjectTaskStore();
+const route = useRoute();
+onMounted(async() => {
+    await projectTaskStore.getTask(route.params.taskId);
+});
 </script>
 <template>
       <div class="container mx-auto px-4 py-8">
@@ -191,7 +198,9 @@ import TaskAssigneesSection from '@/components/TaskAssigneesSection.vue';
             </div>
 
             <!-- Assignees Section -->
-            <task-assignees-section/>
+            <task-assignees-section
+                :assignees="projectTaskStore.task?.assigned_users"
+            />
         </div>
 
         <!-- Comments Section -->

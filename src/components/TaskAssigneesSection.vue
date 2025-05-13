@@ -3,6 +3,8 @@ import { Icon } from '@iconify/vue';
 import { computed, onMounted, ref } from 'vue';
 import taskAssigneeItem from './taskAssigneeItem.vue';
 import TaskAssignmentModal from './TaskAssignmentModal.vue';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
+import { useRoute } from 'vue-router';
 const showMore = ref(false)
 const props = defineProps({
     isFetching: {
@@ -15,54 +17,26 @@ const props = defineProps({
     },
     assignees: {
         type: Array,
-        default: () => ([
-            {
-                id: 1,
-                name: 'John Doe',
-                position: 'Frontend Developer',
-                avatar: {
-                    'thumb-60': 'https://randomuser.me/api/portraits/women/68.jpg' 
-                }
-            },
-            {
-                id: 2,
-                name: 'james pal',
-                position: 'UI/UX Designer',
-                avatar: {
-                    'thumb-60': 'https://randomuser.me/api/portraits/women/68.jpg' 
-                }
-            },
-            {
-                id: 3,
-                name: 'Jessy',
-                position: 'Frontend Developer',
-                avatar: {
-                    'thumb-60': 'https://randomuser.me/api/portraits/women/68.jpg' 
-                }
-            },
-            {
-                id: 4,
-                name: 'Max',
-                position: 'Backend Developer',
-                avatar: {
-                    'thumb-60': 'https://randomuser.me/api/portraits/women/68.jpg' 
-                }
-            },
-        ])
+        default: () => ([])
     }
 })
+const projectTaskStore = useProjectTaskStore();
+const route = useRoute();
 const isTaskAssignmentModalShow = ref(false);
 const firstTwoAssignees = computed(() => props.assignees?.length > 0 ? props.assignees.slice(0, 2) : [])
 const moreAssignees = computed(() => props.assignees?.length >= 3  ? props.assignees.slice(2, Number(props.assignees.length)) : []);
-const handleAssignMembers = () => {
-    console.log('submitted');
+
+const handleAssignMembers = async () => {
+    const success = await projectTaskStore.assignMemberToTask(route.params.taskId);
+    if (success) isTaskAssignmentModalShow.value = false;
 }
 </script>
 <template>
     <div class="p-6">
         <div class="flex justify-between items-center mb-3">
             <h3 class="text-lg font-medium text-gray-800">Team</h3>
-            <TaskAssignmentModal 
+            <TaskAssignmentModal
+                :taskAssignees="assignees" 
                 :projectId="$route.params?.projectId"
                 :show="isTaskAssignmentModalShow"
                 @open-modal="isTaskAssignmentModalShow = !isTaskAssignmentModalShow"
@@ -81,7 +55,8 @@ const handleAssignMembers = () => {
                     :avatar="assignee.avatar?.['thumb-60']"
                     :position="assignee.position"
                     :id="assignee.id"
-                    @delete-item="(id) =>console.log(id)"
+                    :loading="projectTaskStore.loading"
+                    @delete-item="(assigneeId) => projectTaskStore.removeAssignee($route.params?.taskId, assigneeId)"
                 />
                 <Transition 
                     enter-active-class="transition duration-300 ease-out"
@@ -99,7 +74,8 @@ const handleAssignMembers = () => {
                             :position="assignee.position"
                             :name="assignee.name"
                             :id="assignee.id"
-                            @delete-item="(id) =>console.log(id)"
+                            :loading="projectTaskStore.loading"
+                            @delete-item="(assigneeId) => projectTaskStore.removeAssignee($route.params?.taskId, assigneeId)"
                         />
                     </div>
                 </Transition>

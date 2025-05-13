@@ -18,7 +18,7 @@ const props = defineProps({
     }
 })
 
-const validationError = ref('');
+
 
 const emit = defineEmits(['open-modal', 'close-modal', 'submit']);
 const projectTaskStore = useProjectTaskStore();
@@ -27,7 +27,7 @@ watch(() => props.show, (isVisible) => {
         projectTaskStore.getProjectTeamMembers(props.projectId)
         projectTaskStore.clearSelectedAssignees()
     } else {
-        validationError.value = ''
+        projectTaskStore.validationError = ''
     }
 });
 
@@ -39,7 +39,7 @@ const projectTeams = computed(() => {
         filteredProjectMembers = filteredProjectMembers.filter(m => m.name.toLowerCase().includes(query));
     }
     if (props.taskAssignees?.length > 0) {
-        filteredProjectMembers = filteredProjectMembers.filter(projectMember => !props.taskAssignees.some(taskAssignee => taskAssignee.id === projectMember.id ));
+        filteredProjectMembers = filteredProjectMembers.filter(projectMember => !props.taskAssignees.some(taskAssignee => taskAssignee.id === projectMember.id));
     }
     if (projectTaskStore.selectedTaskAssignees?.length > 0) {
         filteredProjectMembers = filteredProjectMembers.filter(m => !projectTaskStore.selectedTaskAssignees.some(selected => selected.id === m.id));
@@ -50,7 +50,7 @@ const emitSubmit = () => {
     if (projectTaskStore.selectedTaskAssignees?.length > 0) {
         emit('submit')
     } else {
-        validationError.value = 'Please search and select a member to assign';
+        projectTaskStore.validationError = 'Please search and select a member to assign';
     }
 }
 </script>
@@ -98,7 +98,7 @@ const emitSubmit = () => {
                                     placeholder="Search members..."
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
-                                <p v-if="validationError.length > 0" class="text-red-600 text-xs p-2">{{ validationError }}</p>
+                                <p v-if="projectTaskStore.validationError?.trim().length > 0" class="text-red-600 text-xs p-2">{{ projectTaskStore.validationError }}</p>
                                 <div v-if="projectTaskStore.search" class="absolute z-10 mt-1 w-full overflow-y-auto bg-white shadow-lg rounded-md max-h-[200px] py-1 border border-gray-200">
                                     <div v-for="member in projectTeams" :key="member.id" @click="projectTaskStore.onSelectTaskAssignee(member)" class="cursor-pointer hover:bg-blue-50 px-4 py-2">
                                         <div class="flex items-center">

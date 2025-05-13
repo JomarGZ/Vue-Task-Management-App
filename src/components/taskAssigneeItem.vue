@@ -7,8 +7,9 @@
                 <div class="text-xs text-gray-500 capitalize truncate">{{ position }}</div>
             </div>
         </div>
-        <button @click="$emit('delete-item', id)" class="text-gray-400 hover:text-red-500 bg-red-50 p-2 rounded-full hover:bg-red-100 cursor-pointer transition-all duration-200 hover:scale-105 shrink-0">
-            <Icon icon="iwwa:delete" width="17" height="17" />
+        <button @click="$emit('delete-item', id)" :disabled="loading" type="button" class="text-gray-400 hover:text-red-500 bg-red-50 p-2 rounded-full hover:bg-red-100 cursor-pointer transition-all duration-200 hover:scale-105 shrink-0">
+            <span v-if="loading"><Icon icon="eos-icons:loading" width="24" height="24" /></span>
+            <span v-else><Icon icon="iwwa:delete" width="17" height="17" /></span>
         </button>
     </div>
 </template>
@@ -31,6 +32,10 @@ defineProps({
     position: {
         type: String,
         default: ''
+    },
+    loading: {
+        type: Boolean,
+        default: false
     }
 })
 defineEmits(['delete-item']);
