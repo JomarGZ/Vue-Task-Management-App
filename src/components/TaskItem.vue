@@ -3,6 +3,7 @@ import { Icon } from '@iconify/vue';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { computed } from 'vue';
 import UserAvatar from './UserAvatar.vue';
+import { getTaskPriorityByValue, getTaskStatusByValue } from '@/constants/task';
 const props = defineProps({
     id: {
         type: [Number, String],
@@ -39,6 +40,9 @@ const props = defineProps({
 })
 
 const daysLeft = ref('');
+
+const statusConfig = computed(() => getTaskStatusByValue(props.status))
+const priorityConfig = computed(() => getTaskPriorityByValue(props.priority))
 
 const emit = defineEmits(['delete-task']);
 const hoverMore = ref(false);
@@ -109,23 +113,23 @@ onMounted(() => {
                     >
                     {{ moreAssignees.length }}+
                        <div 
-                v-if="hoverMore"
-                class="
-                    absolute bottom-full left-0 mb-2
-                    p-2 min-w-[120px] max-h-[200px] overflow-y-auto
-                    bg-white dark:bg-gray-800 rounded-lg shadow-xl
-                    border border-gray-200 dark:border-gray-700
-                    transition-opacity duration-200
-                "
-            >
-                <div 
-                    v-for="user in moreAssignees" 
-                    :key="user.id"
-                    class="py-1 px-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                >
-                    {{ user.name }}
-                </div>
-            </div>
+                            v-if="hoverMore"
+                            class="
+                                absolute bottom-full left-0 mb-2
+                                p-2 min-w-[120px] max-h-[200px] overflow-y-auto
+                                bg-white dark:bg-gray-800 rounded-lg shadow-xl
+                                border border-gray-200 dark:border-gray-700
+                                transition-opacity duration-200
+                            "
+                        >
+                            <div 
+                                v-for="user in moreAssignees" 
+                                :key="user.id"
+                                class="py-1 px-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                            >
+                                {{ user.name }}
+                            </div>
+                        </div>
                     </p>
                  </template>
                  <p v-else class="text-xs text-gray-500">No assignee</p>
@@ -136,10 +140,21 @@ onMounted(() => {
             <div v-if="daysLeft" class="text-xs text-gray-500">{{ daysLeft }}</div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 capitalize">{{ status }}</span>
+            <span 
+                class="px-2 py-1 text-xs font-medium rounded-full capitalize"
+                :class="statusConfig.badgeClass"
+            >
+                {{ statusConfig.label }}
+            </span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 capitalize">{{ priority }}</span>
+            <span 
+                class="px-2 py-1 text-xs font-medium rounded-full capitalize"
+
+                :class="[priorityConfig.badgeClass]"
+            >
+                {{ priorityConfig.label }}
+            </span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap flex items-center justify-center gap-2">
             

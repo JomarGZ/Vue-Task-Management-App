@@ -8,6 +8,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { Icon } from '@iconify/vue';
 import { cleanHTML } from '@/composables/useUtil';
+import { getProjectPriorityOptions, getProjectStatusOptions } from '@/constants/project';
 const props = defineProps({
     loading: {
         type: Boolean,
@@ -99,8 +100,6 @@ const onSubmit = handleSubmit((values) => {
 })
 onMounted(() => {
     today.value = new Date().toISOString().split('T')[0];
-    store.getStatuses();
-    store.getPriorityLevels();
 })
 </script>
 <template>
@@ -148,12 +147,12 @@ onMounted(() => {
                     <div class="flex gap-4 items-center justify-start">
                         <div>
                             <label for="started_at">Start Date</label>
-                            <Field id="started_at" type="date" :min="today" name="started_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+                            <Field id="started_at" type="date" :min="values.started_at || today" name="started_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                             <ErrorMessage name="started_at" class="mt-1 text-sm text-red-600 block" />
                         </div>
                         <div>
                             <label for="ended_at">End Date</label>
-                            <Field id="ended_at" :disabled="isEndDateDisabled" type="date" :min="disabledDaysBeforeStarted" name="ended_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+                            <Field id="ended_at" :disabled="isEndDateDisabled" type="date" :min="values.ended || disabledDaysBeforeStarted" name="ended_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                             <ErrorMessage name="ended_at" class="mt-1 text-sm text-red-600 block" />
                         </div>
                         <div>
@@ -167,11 +166,11 @@ onMounted(() => {
                                     >
                                     <option value="">Select priority</option>
                                     <option 
-                                        v-for="priority in store.projectPriorityLevels" 
-                                        :key="priority" 
-                                        :value="priority"
+                                        v-for="priority in getProjectPriorityOptions()" 
+                                        :key="priority.value" 
+                                        :value="priority.value"
                                     >
-                                        {{ priority }}
+                                        {{ priority.label }}
                                     </option>
                                 </select>
                                 <ErrorMessage name="priority" class="mt-1 text-sm text-red-600" />
@@ -186,10 +185,10 @@ onMounted(() => {
                                     >
                                     <option value="">Select Status</option>
                                     <option
-                                        v-for="status in store.projectStatuses"
-                                        :key="status"
-                                        :value="status">
-                                        {{ status }}
+                                        v-for="status in getProjectStatusOptions()"
+                                        :key="status.value"
+                                        :value="status.value">
+                                        {{ status.label }}
                                     </option>
                                 </select>
                                 <ErrorMessage name="status" class="mt-1 text-sm text-red-600" />

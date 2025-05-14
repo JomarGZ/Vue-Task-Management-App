@@ -3,7 +3,7 @@ import TaskItem from '@/components/TaskItem.vue'
 import {Icon} from '@iconify/vue';
 import { TailwindPagination } from 'laravel-vue-pagination';
 import TaskFilter from './TaskFilter.vue';
-defineProps({
+const props = defineProps({
     projectId: {
         type: [Number, String],
         required: true
@@ -26,8 +26,8 @@ defineProps({
         default: false
     }
 })
-const emit = defineEmits(['submit-filters', 'delete-task', 'onPaginate', 'retry']);
 
+const emit = defineEmits(['submit-filters', 'delete-task', 'onPaginate', 'retry']);
 const handleFilters = (filters) => {
     emit('submit-filters', filters);
 }
@@ -63,7 +63,6 @@ const handleFilters = (filters) => {
                         :key="task.id"
                         :id="task.id"
                         :title="task.title"
-                        :assignee="{name: 'Emma Wilson'}"
                         :deadline="task.deadline_at"
                         :priority="task.priority_level"
                         :status="task.status"

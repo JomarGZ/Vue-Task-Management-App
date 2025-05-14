@@ -87,6 +87,9 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
                 }),
                 ...(filters.priority?.trim().length > 0 && {
                     priority_level: filters.priority?.trim()
+                }),
+                ...(filters.assigneeId && {
+                    assigneeId: filters.assigneeId
                 })
             });
             const response = await window.axios.get(`api/v1/projects/${projectId}/tasks?${params.toString()}`)

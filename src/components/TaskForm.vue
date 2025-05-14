@@ -1,7 +1,7 @@
 <script setup>
 import { cleanHTML } from '@/composables/useUtil';
+import { getTaskPriorityOptions, getTaskStatusOptions } from '@/constants/task';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { useTaskStore } from '@/stores/taskStore';
 import { Icon } from '@iconify/vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import Editor from 'primevue/editor';
@@ -30,7 +30,6 @@ const props = defineProps({
     }
 })
 const emit = defineEmits(['submit']);
-const taskStore = useTaskStore();
 const projectTaskStore = useProjectTaskStore();
 const today = ref('');
 
@@ -79,8 +78,6 @@ const emitSubmit = handleSubmit((values) => {
     emit('submit', values);
 })
 onMounted(() => {
-    taskStore.fetchPriorityLevels();
-    taskStore.fetchStatuses();
     today.value = new Date().toISOString().split('T')[0];
 })
 </script>
@@ -125,11 +122,11 @@ onMounted(() => {
                             >
                             <option value="" selected disabled>Select priority</option>
                             <option 
-                                v-for="priority in taskStore.priorityLevels" 
-                                :key="priority" 
-                                :value="priority"
+                                v-for="priority in getTaskPriorityOptions()" 
+                                :key="priority.value" 
+                                :value="priority.value"
                             >
-                                {{ priority }}
+                                {{ priority.label }}
                             </option>
                         </select>
                         <ErrorMessage name="priority_level" class="mt-1 text-sm text-red-600" />
@@ -146,11 +143,11 @@ onMounted(() => {
                             >
                             <option value="" selected disabled>Select priority</option>
                             <option 
-                                v-for="status in taskStore.statuses" 
-                                :key="status" 
-                                :value="status"
+                                v-for="status in getTaskStatusOptions()" 
+                                :key="status.value" 
+                                :value="status.value"
                             >
-                                {{ status }}
+                                {{ status.value }}
                             </option>
                         </select>
                         <ErrorMessage name="status" class="mt-1 text-sm text-red-600" />

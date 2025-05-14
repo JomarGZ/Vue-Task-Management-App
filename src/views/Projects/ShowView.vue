@@ -11,16 +11,15 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const projectStore = useProjectStore();
 const projectTaskStore = useProjectTaskStore();
-onMounted(async() => {
-    await Promise.all([
-        projectStore.getProject(route.params?.projectId),
-        projectTaskStore.getTasks(route.params?.projectId)
-    ])
+onMounted(async () => {
+   await projectStore.getProject(route.params?.projectId),
+   await projectTaskStore.getTasks(route.params?.projectId)
 })
 const handleDeleteTask = async (taskId) => {
     const success = await projectTaskStore.deleteTask(taskId)
     if (success) await projectTaskStore.getTasks(route.params?.projectId)
 }
+
 </script>
 <template>
     <div class="px-4 py-8">
