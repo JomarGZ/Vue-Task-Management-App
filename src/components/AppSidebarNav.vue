@@ -13,11 +13,6 @@ const navLinks = [
         icon: 'ix:project'
     },
     {
-        name: 'Tasks',
-        to: {name: 'tasks.index'},
-        icon: 'fluent-mdl2:task-group-mirrored'
-    },
-    {
         name: 'Members',
         to: {name: 'members.index'},
         icon: 'tdesign:member'

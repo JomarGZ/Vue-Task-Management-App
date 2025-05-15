@@ -131,12 +131,103 @@ export const TASK_PRIORITY = {
     }
 }
 
-export const getTaskStatusOptions = () => Object.values(TASK_STATUS)
+export const TASK_CATEGORY = {
+  UI_UX_DESIGN: {
+    value: 'ui/ux design',
+    label: 'UI/UX Design',
+    color: 'text-purple-700',
+    icon: 'fluent:design-ideas-32-regular',     
+    badgeClass: 'bg-purple-100 text-purple-900 border border-purple-200'
+  },
+  BACKEND_DEVELOPMENT: {
+    value: 'backend development',
+    label: 'Backend Development',
+    color: 'text-blue-700',
+    icon: 'mdi:code',        
+    badgeClass: 'bg-blue-100 text-blue-900 border border-blue-200'
+  },
+  FRONTEND_DEVELOPMENT: {
+    value: 'frontend development',
+    label: 'Frontend Development',
+    color: 'text-cyan-700', 
+    icon: 'hugeicons:code-circle',       
+    badgeClass: 'bg-cyan-100 text-cyan-900 border border-cyan-200'
+  },
+  FULLSTACK_DEVELOPMENT: {
+    value: 'fullstack development',
+    label: 'Fullstack Development',
+    color: 'text-indigo-700', 
+    icon: 'flowbite:laptop-code-outline',     
+    badgeClass: 'bg-indigo-100 text-indigo-900 border border-indigo-200'
+  },
+  IOS_DEVELOPMENT: {
+    value: 'ios development',
+    label: 'iOS Development',
+    color: 'text-gray-700', 
+    icon: 'ic:baseline-apple',        
+    badgeClass: 'bg-gray-100 text-gray-900 border border-gray-200'
+  },
+  ANDROID_DEVELOPMENT: {
+    value: 'android development',
+    label: 'Android Development',
+    color: 'text-emerald-700', 
+    icon: 'hugeicons:android',     
+    badgeClass: 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+  },
+  DEVOPS: {
+    value: 'devops',
+    label: 'DevOps',
+    color: 'text-orange-700', 
+    icon: 'carbon:ibm-devops-control',      
+    badgeClass: 'bg-orange-100 text-orange-900 border border-orange-200'
+  },
+  QUALITY_ASSURANCE: {
+    value: 'quality assurance',
+    label: 'Quality Assurance',
+    color: 'text-green-700',
+    icon: 'solar:bug-bold',      
+    badgeClass: 'bg-green-100 text-green-700 border border-green-200'
+  },
+  DATABASE_DESIGN: {
+    value: 'database design',
+    label: 'Database Design',
+    color: 'text-amber-700',    
+    icon: 'hugeicons:database',   
+    badgeClass: 'bg-amber-100 text-amber-900 border border-amber-200'
+  },
+  PERFORMANCE_OPTIMIZATION: {
+    value: 'performance optimization',
+    label: 'Performance Optimization',
+    color: 'text-pink-700',      
+    icon: 'grommet-icons:document-performance',   
+    badgeClass: 'bg-pink-100 text-pink-900 border border-pink-200'
+  },
+  TECHNICAL_DOCUMENTATION: {
+    value: 'technical documentation',
+    label: 'Technical Documentation',
+    color: 'text-yellow-700',
+    icon: 'system-uicons:document',       
+    badgeClass: 'bg-yellow-100 text-yellow-900 border border-yellow-200'
+  },
+  OTHER: {
+    value: 'other',
+    label: 'Other',
+    color: 'text-gray-500',
+    icon: 'fluent:glance-default-12-filled',          
+    badgeClass: 'bg-gray-50 text-gray-600 border border-gray-300'
+  }
+};
+
+export const getTaskStatusOptions = () => Object.values(TASK_STATUS);
 export const getTaskPriorityOptions = () => Object.values(TASK_PRIORITY);
+export const getTaskCategoryOptions = () => Object.values(TASK_CATEGORY);
 
 export const getTaskStatusByValue = (value) => {
   return Object.values(TASK_STATUS).find(status => status.value === value) || TASK_STATUS.NOT_STARTED
 }
 export const getTaskPriorityByValue = (value) => {
   return Object.values(TASK_PRIORITY).find(PRIORITY => PRIORITY.value === value) || TASK_PRIORITY.LOW
+}
+export const getTaskCategoryByValue = (value) => {
+    return Object.values(TASK_CATEGORY).find(category => category.value === value) || TASK_CATEGORY.OTHER
 }

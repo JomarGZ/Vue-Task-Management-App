@@ -1,7 +1,7 @@
 <script setup>
 import Editor from 'primevue/editor';
 import { z } from 'zod';
-import { Field, ErrorMessage,  } from 'vee-validate';
+import { Field, ErrorMessage, useField,  } from 'vee-validate';
 import {useForm} from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -65,11 +65,11 @@ const schema = z.object({
     }),
 })
 
-const { handleSubmit, isSubmitting, meta, resetForm, values, setFieldValue } = useForm({
+const { handleSubmit, isSubmitting, resetForm, values, setFieldValue } = useForm({
     validationSchema: toTypedSchema(schema),
   
 })
-
+useField('description')
 const isEndDateDisabled = computed(() => !values.started_at);
 const disabledDaysBeforeStarted = computed(() => values.started_at)
 
@@ -109,17 +109,17 @@ onMounted(() => {
                 <h2 class="text-lg font-medium text-gray-900">Basic Information</h2>
                 <fieldset class="space-y-7">
                     <div>
-                        <label for="name">Project Name</label>
+                        <label for="name">Project Name<span class="text-xs text-red-600">*</span></label>
                         <Field id="name" name="name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                         <ErrorMessage name="name" class="mt-1 text-sm text-red-600 block" />
                     </div>
                     <div>
-                        <label for="client_name">Client Name</label>
+                        <label for="client_name">Client Name<span class="text-xs text-red-600">*</span></label>
                         <Field id="client_name" name="client_name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                         <ErrorMessage name="client_name" class="mt-1 text-sm text-red-600 block" />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <label for="description">Description</label>
+                        <label for="description">Description<span class="text-xs text-red-600">*</span></label>
                         <Editor 
                             :modelValue="values.description"
                              @value-change="onEditorChange"
@@ -142,7 +142,7 @@ onMounted(() => {
                                 </span>
                             </template>
                         </Editor>
-                        <ErrorMessage v-if="meta.touched" name="description" class="mt-1 text-sm text-red-600 block" />
+                        <ErrorMessage name="description" class="mt-1 text-sm text-red-600 block" />
                     </div>
                     <div class="flex gap-4 items-center justify-start">
                         <div>

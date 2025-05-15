@@ -66,6 +66,7 @@ const handleFilters = (filters) => {
                         :deadline="task.deadline_at"
                         :priority="task.priority_level"
                         :status="task.status"
+                        :category="task.category"
                         @delete-task="(taskId) => $emit('delete-task', taskId)"
                         :loading="loading"
                         :assignees="task.assigned_users"

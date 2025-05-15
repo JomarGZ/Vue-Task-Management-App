@@ -3,7 +3,7 @@ import { Icon } from '@iconify/vue';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { computed } from 'vue';
 import UserAvatar from './UserAvatar.vue';
-import { getTaskPriorityByValue, getTaskStatusByValue } from '@/constants/task';
+import { getTaskCategoryByValue, getTaskPriorityByValue, getTaskStatusByValue } from '@/constants/task';
 const props = defineProps({
     id: {
         type: [Number, String],
@@ -14,8 +14,8 @@ const props = defineProps({
         required: true
     },
     category: {
-        type: Object,
-        default: () => {}
+        type: String,
+        required: true
     },
     assignees: {
         type: Array,
@@ -40,7 +40,7 @@ const props = defineProps({
 })
 
 const daysLeft = ref('');
-
+const categoryConfig = computed(() => props.category?.trim().length > 0 ? getTaskCategoryByValue(props.category) : '');
 const statusConfig = computed(() => getTaskStatusByValue(props.status))
 const priorityConfig = computed(() => getTaskPriorityByValue(props.priority))
 
@@ -72,12 +72,15 @@ onMounted(() => {
     <tr class="hover:bg-gray-50">
         <td class="py-4 whitespace-nowrap ">
         <div class="flex items-center">
-            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                <i class="fas fa-tasks text-blue-600"></i>
+            <div 
+                class="flex-shrink-0 h-10 w-10 rounded-lg flex items-center justify-center mr-3"
+                :class="categoryConfig.badgeClass"
+            >
+              <Icon :icon="categoryConfig.icon" width="25" height="25" />
             </div>
             <div class="min-w-0 max-w-[200px]">
                 <div class="font-medium text-gray-900 truncate">{{ title }}</div>
-                <div v-if="category?.name" class="text-sm text-gray-500 truncate ">{{ category?.name }}</div>
+                <div class="text-sm text-gray-500 truncate ">{{ categoryConfig.label }}</div>
             </div>
         </div>
     </td>
