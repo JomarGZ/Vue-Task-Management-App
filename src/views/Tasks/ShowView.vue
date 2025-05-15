@@ -3,7 +3,7 @@ import PageHeader from '@/components/PageHeader.vue';
 import { Icon } from '@iconify/vue';
 import TaskAssigneesSection from '@/components/TaskAssigneesSection.vue';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { onMounted } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import TaskMainDetails from '@/components/TaskMainDetails.vue';
 import TaskProgressSection from '@/components/TaskProgressSection.vue';
@@ -14,6 +14,7 @@ const route = useRoute();
 onMounted(async() => {
     await projectTaskStore.getTask(route.params.taskId);
 });
+onBeforeUnmount(() => projectTaskStore.task = {})
 </script>
 <template>
       <div class="container mx-auto px-4 py-8">

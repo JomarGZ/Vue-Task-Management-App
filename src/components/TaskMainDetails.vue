@@ -63,7 +63,7 @@ const updateCountDown = (deadline) => {
     const diff = new Date(deadline) - now;
     daysLeft.value = diff > 0 ? `${Math.ceil(diff / (1000 * 60 * 60 * 24))} days left` : 'Expired';
 }
-watch(() => props.dueDate, updateCountDown);
+watch(() => props.dueDate, updateCountDown, {deep: true});
 
 const estimatedHours = computed(() => {
     if (!props.startDate?.trim() || !props.dueDate?.trim()) return 'No estimation';
