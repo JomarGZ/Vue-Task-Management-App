@@ -106,8 +106,8 @@ onBeforeUnmount(() => {
                     <h2 class="text-2xl font-semibold text-gray-800 capitalize">{{ title }}</h2>
                 </div>
                 <div class="relative">
-                    <select class="block appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500">
-                        <option value="" selected disabled>Select tatus</option>
+                    <select class="block appearance-none bg-gray-50 cursor-pointer border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500">
+                        <option value="" selected disabled>Select status</option>
                         <option 
                             v-for="status in getTaskStatusOptions()"
                             :key="status.value"
@@ -123,25 +123,25 @@ onBeforeUnmount(() => {
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                <div class="bg-gray-50 p-3 rounded-lg">
+                <div class="bg-gray-100 p-3 rounded-lg">
                     <div class="text-xs text-gray-500 font-medium mb-1">START DATE</div>
                     <div class="flex items-center">
-                        <i class="far fa-calendar-alt text-gray-400 mr-2"></i>
+                        <Icon icon="flat-color-icons:calendar" width="20" height="20" class="mr-2"/>
                         <span class="font-medium">{{ startedDate }}</span>
                     </div>
                 </div>
-                <div class="bg-gray-50 p-3 rounded-lg">
+                <div class="bg-gray-100 p-3 rounded-lg">
                     <div class="text-xs text-gray-500 font-medium mb-1">DUE DATE</div>
                     <div class="flex items-center">
-                        <i class="far fa-calendar-check text-gray-400 mr-2"></i>
+                        <Icon icon="flat-color-icons:calendar" width="20" height="20" class="mr-2"/>
                         <span class="font-medium">{{ dueDate }}</span>
                         <span v-if="daysLeft" class="ml-auto text-sm px-2 py-0.5 rounded bg-yellow-100 text-yellow-800">{{ daysLeft }}</span>
                     </div>
                 </div>
-                <div class="bg-gray-50 p-3 rounded-lg">
+                <div class="bg-gray-100 p-3 rounded-lg">
                     <div class="text-xs text-gray-500 font-medium mb-1">ESTIMATED TIME</div>
                     <div class="flex items-center">
-                        <i class="far fa-clock text-gray-400 mr-2"></i>
+                        <Icon icon="mingcute:time-line" width="20" height="20" class="mr-2"/>
                         <span class="font-medium">{{ estimatedHours }}</span>
                         <span class="ml-auto text-sm text-gray-500">4h logged</span>
                     </div>

@@ -29,7 +29,7 @@ onMounted(async() => {
                                 <div class="flex items-center gap-2 min-w-0 max-w-[300px] overflow-hidden">
                                     <Icon icon="weui:arrow-outlined" width="10" height="20" class="text-gray-400 shrink-0"/>
                                     <span class="text-gray-500 text-sm truncate capitalize">
-                                        Task name
+                                        {{ projectTaskStore.task?.title }}
                                     </span>
                                 </div>
                             </li>
