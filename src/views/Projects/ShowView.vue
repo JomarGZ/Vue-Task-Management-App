@@ -58,7 +58,7 @@ const handleDeleteTask = async (taskId) => {
                 :startedDate="projectStore.project?.started_at || ''"
                 :endDate="projectStore.project?.ended_at || ''"
                 :clientName="projectStore.project?.client_name || ''"
-                budget="24000"
+                :budget="projectStore.project?.budget || ''"
                 :description="projectStore.project?.description || ''"
                 status="active"
             />

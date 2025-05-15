@@ -1,7 +1,7 @@
 <script setup>
 import { Icon } from '@iconify/vue';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import UserAvatar from './UserAvatar.vue';
 import { getTaskCategoryByValue, getTaskPriorityByValue, getTaskStatusByValue } from '@/constants/task';
 const props = defineProps({
@@ -62,6 +62,7 @@ const updateCountdown = (deadline) => {
     daysLeft.value = diff > 0 ? `${Math.ceil(diff / (1000 * 60 * 60 * 24))} days left` : 'Expired'; 
 }
 const formattedDeadline = computed(() => props.deadline ? new Date(props.deadline).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : 'Not set')
+watch(() => props.deadline, updateCountdown)
 onMounted(() => {
     updateCountdown(props.deadline)
     const timer = setInterval(updateCountdown, 1000 * 60 * 60);

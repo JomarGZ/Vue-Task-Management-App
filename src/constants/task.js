@@ -231,3 +231,13 @@ export const getTaskPriorityByValue = (value) => {
 export const getTaskCategoryByValue = (value) => {
     return Object.values(TASK_CATEGORY).find(category => category.value === value) || TASK_CATEGORY.OTHER
 }
+
+export const VALID_TASK_CATEGORIES = Object.values(TASK_CATEGORY).map(
+    category => category.value
+);
+export const VALID_TASK_STATUS = Object.values(TASK_STATUS).map(
+    status => status.value
+);
+export const VALID_TASK_PRIORITY = Object.values(TASK_PRIORITY).map(
+    priority => priority.value
+);

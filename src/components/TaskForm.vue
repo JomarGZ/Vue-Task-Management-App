@@ -1,6 +1,6 @@
 <script setup>
 import { cleanHTML } from '@/composables/useUtil';
-import { getTaskCategoryOptions, getTaskPriorityOptions, getTaskStatusOptions } from '@/constants/task';
+import { getTaskCategoryOptions, getTaskPriorityOptions, getTaskStatusOptions, VALID_TASK_CATEGORIES, VALID_TASK_STATUS, VALID_TASK_PRIORITY } from '@/constants/task';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { Icon } from '@iconify/vue';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -49,10 +49,32 @@ const schema = z.object({
     description: nonEmptyHtml,
     deadline_at: z.string().optional(),
     started_at: z.string().optional(),
-    priority_level: z.string().optional(),
-    status: z.string().optional(),
-    category: z.string().min(1, 'Category is required'),
-
+    priority_level: z
+        .string()
+        .optional()
+        .transform((val) => (val === "" ? undefined : val))
+        .pipe(
+            z.enum(VALID_TASK_PRIORITY, {
+                errorMap: () => ({message: 'Invalid task priority'})
+            })
+        ),
+    status: z
+        .string()
+        .optional()
+        .transform((val) => (val === "" ? undefined : val))
+        .pipe(
+            z.enum(VALID_TASK_STATUS, {
+                errorMap: () => ({ message: 'Invalid task status'})
+            })
+        ),
+    category: z.string()
+        .min(1, 'Category is required')
+        .transform((val) => (val === "" ? undefined : val)) // Treat empty as undefined
+        .pipe(
+            z.enum(VALID_TASK_CATEGORIES, { 
+                errorMap: () => ({ message: 'Invalid task category' }) 
+            })
+        ),
 })
 
 const { handleSubmit, isSubmitting, values, setFieldValue, resetForm } =  useForm({

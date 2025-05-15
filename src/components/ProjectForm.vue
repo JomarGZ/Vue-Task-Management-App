@@ -8,7 +8,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { Icon } from '@iconify/vue';
 import { cleanHTML } from '@/composables/useUtil';
-import { getProjectPriorityOptions, getProjectStatusOptions } from '@/constants/project';
+import { getProjectPriorityOptions, getProjectStatusOptions, VALID_PROJECT_STATUS, VALID_PROJECT_PRIORITY } from '@/constants/project';
 const props = defineProps({
     loading: {
         type: Boolean,
@@ -52,8 +52,24 @@ const schema = z.object({
     description: nonEmptyHtml,
     started_at: z.string().optional(),  
     ended_at: z.string().optional(),
-    priority: z.string().optional(),
-    status: z.string().optional(),
+    priority: z
+        .string()
+        .optional()
+        .transform((val) => val === "" ? undefined : val)
+        .pipe(
+            z.enum(VALID_PROJECT_PRIORITY, {
+                errorMap: () => ({message: 'Invalid priority'})
+            })
+        ),
+    status: z
+        .string()
+        .optional()
+        .transform((val) => val === "" ? undefined : val)
+        .pipe(
+            z.enum(VALID_PROJECT_STATUS, {
+                errorMap: () => ({message: 'Invalid Status'})
+            })
+        ),
     budget: z.coerce
     .number()
     .max(9999999999, 'Budget must be 10 digits or less')
@@ -164,7 +180,7 @@ onMounted(() => {
                                     class="mt-1 capitalize block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                     :class="{ 'border-red-500': errors.length }"
                                     >
-                                    <option value="">Select priority</option>
+                                    <option value="" disabled selected>Select priority</option>
                                     <option 
                                         v-for="priority in getProjectPriorityOptions()" 
                                         :key="priority.value" 
@@ -183,7 +199,7 @@ onMounted(() => {
                                     class="mt-1 capitalize block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                         :class="{ 'border-red-500': errors.length }"
                                     >
-                                    <option value="">Select Status</option>
+                                    <option value="" disabled selected>Select Status</option>
                                     <option
                                         v-for="status in getProjectStatusOptions()"
                                         :key="status.value"

@@ -140,3 +140,10 @@ export const getProjectStatusByValue = (value) => {
 export const getProjectPriorityByValue = (value) => {
   return Object.values(PROJECT_PRIORITY).find(PRIORITY => PRIORITY.value === value) || PROJECT_PRIORITY.LOW
 }
+
+export const VALID_PROJECT_STATUS = Object.values(PROJECT_STATUS).map(
+    status => status.value
+);
+export const VALID_PROJECT_PRIORITY = Object.values(PROJECT_PRIORITY).map(
+    priority => priority.value
+);
