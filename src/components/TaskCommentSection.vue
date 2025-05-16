@@ -1,45 +1,43 @@
+<script setup>
+import { Icon } from '@iconify/vue';
+import CommentItem from './CommentItem.vue';
+defineProps({
+    comments: {
+        type: Array,
+        default: () => ([
+           
+        ])
+    },
+    loading: {
+        type: Boolean,
+        default: false
+    }
+})
+defineEmits(['load-more'])
+</script>
+
 <template>
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="p-6">
             <h3 class="text-lg font-medium text-gray-800 mb-4">Activity</h3>
             
-            <div class="border-l border-gray-200 pl-6 pb-6 space-y-6">
-                <div class="relative">
-                    <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-1.5 border border-white"></div>
-                    <div class="flex items-center mb-1">
-                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-6 h-6 rounded-full mr-2">
-                        <span class="font-medium text-sm">Sarah Johnson</span>
-                        <span class="text-xs text-gray-500 ml-2">2 hours ago</span>
-                    </div>
-                    <p class="text-sm text-gray-600 pl-8">Changed status from <span class="font-medium">"To Do"</span> to <span class="font-medium">"In Progress"</span></p>
-                </div>
-                
-                <div class="relative">
-                    <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-1.5 border border-white"></div>
-                    <div class="flex items-center mb-1">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-6 h-6 rounded-full mr-2">
-                        <span class="font-medium text-sm">Michael Chen</span>
-                        <span class="text-xs text-gray-500 ml-2">1 hour ago</span>
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 ml-8">
-                        <p>I've reviewed the initial draft and added some technical specifications for the implementation phase. The timeline might need adjustment once we get client feedback.</p>
-                        <div class="mt-2 flex space-x-2">
-                            <a href="#" class="text-blue-600 text-xs hover:underline flex items-center">
-                                <i class="fab fa-google-drive mr-1"></i> Proposal Draft
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="relative">
-                    <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-1.5 border border-white"></div>
-                    <div class="flex items-center mb-1">
-                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="w-6 h-6 rounded-full mr-2">
-                        <span class="font-medium text-sm">Emma Wilson</span>
-                        <span class="text-xs text-gray-500 ml-2">30 minutes ago</span>
-                    </div>
-                    <p class="text-sm text-gray-600 pl-8">Added link <a href="#" class="text-blue-600 hover:underline">"Client Presentation Deck"</a></p>
-                </div>
+            <div class="border-l relative border-gray-200 pl-6 pb-6 space-y-6 max-h-[600px] min-h-11 overflow-auto">
+                <div v-if="false" class="text-center absolute inset-0 flex items-center justify-center text-gray-300"><Icon icon="eos-icons:loading" width="50" height="50" /></div>
+                <div v-else-if="error" class="text-center text-red-600 capitalize"><p>{{ error }}</p></div>
+                <template v-else-if="comments.length">
+                     <CommentItem
+                        v-for="comment in comments"
+                        :key="comment.id"
+                        :created_at="comment.created_at"
+                        :content="comment.content"
+                        :author_name="comment.author?.name"
+                        avatar="https://randomuser.me/api/portraits/men/32.jpg"
+                    />
+                    <button @click="$emit('load-more')" class="flex hover:text-blue-500 cursor-pointer items-center justify-center mx-auto">
+                        Load More (5 remaining)   
+                    </button>
+                </template>
+                <div v-else class="text-center text-gray-500">No comments yet. Be the first to comment!</div>
             </div>
             
             <div class="flex mt-6">

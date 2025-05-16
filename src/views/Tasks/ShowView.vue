@@ -9,7 +9,9 @@ import TaskMainDetails from '@/components/TaskMainDetails.vue';
 import TaskProgressSection from '@/components/TaskProgressSection.vue';
 import TaskLinkSection from '@/components/TaskLinkSection.vue';
 import TaskCommentSection from '@/components/TaskCommentSection.vue';
+import { useTaskComments } from '@/stores/taskCommentStore';
 const projectTaskStore = useProjectTaskStore();
+const taskCommentStore = useTaskComments();
 const route = useRoute();
 onMounted(async() => {
     await projectTaskStore.getTask(route.params.taskId);
@@ -58,6 +60,6 @@ onBeforeUnmount(() => projectTaskStore.task = {})
                 :assignees="projectTaskStore.task?.assigned_users"
             />
         </div>
-        <TaskCommentSection/>
+        <TaskCommentSection :comments="taskCommentStore.comments" @load-more="taskCommentStore.loadMore"/>
     </div>
   </template>
