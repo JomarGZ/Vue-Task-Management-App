@@ -14,9 +14,4 @@ export default [
         name: 'tasks.edit',
         component: () => import('@/views/Tasks/EditView.vue'),
     },
-    {
-        path: '/tasks',
-        name: 'tasks.index',
-        component: () => import('@/views/Tasks/IndexView.vue'),
-    },
   ];

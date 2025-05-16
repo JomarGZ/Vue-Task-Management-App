@@ -1,11 +1,11 @@
 <script setup>
 import { cleanHTML } from '@/composables/useUtil';
+import { getTaskCategoryOptions, getTaskPriorityOptions, getTaskStatusOptions, VALID_TASK_CATEGORIES, VALID_TASK_STATUS, VALID_TASK_PRIORITY } from '@/constants/task';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
-import { useTaskStore } from '@/stores/taskStore';
 import { Icon } from '@iconify/vue';
 import { toTypedSchema } from '@vee-validate/zod';
 import Editor from 'primevue/editor';
-import { ErrorMessage, Field, useForm } from 'vee-validate';
+import { ErrorMessage, Field, useField, useForm } from 'vee-validate';
 import { computed, onMounted, ref, watch } from 'vue';
 import { z } from 'zod';
 const props = defineProps({
@@ -25,12 +25,12 @@ const props = defineProps({
             deadline_at: '',
             started_at: '',
             priority_level: '',
-            status: ''
+            status: '',
+            category: '',
         })
     }
 })
 const emit = defineEmits(['submit']);
-const taskStore = useTaskStore();
 const projectTaskStore = useProjectTaskStore();
 const today = ref('');
 
@@ -49,13 +49,39 @@ const schema = z.object({
     description: nonEmptyHtml,
     deadline_at: z.string().optional(),
     started_at: z.string().optional(),
-    priority_level: z.string().optional(),
-    status: z.string().optional(),
+    priority_level: z
+        .string()
+        .optional()
+        .transform((val) => (val === "" ? undefined : val))
+        .pipe(
+            z.enum(VALID_TASK_PRIORITY, {
+                errorMap: () => ({message: 'Invalid task priority'})
+            })
+        ),
+    status: z
+        .string()
+        .optional()
+        .transform((val) => (val === "" ? undefined : val))
+        .pipe(
+            z.enum(VALID_TASK_STATUS, {
+                errorMap: () => ({ message: 'Invalid task status'})
+            })
+        ),
+    category: z.string()
+        .min(1, 'Category is required')
+        .transform((val) => (val === "" ? undefined : val)) // Treat empty as undefined
+        .pipe(
+            z.enum(VALID_TASK_CATEGORIES, { 
+                errorMap: () => ({ message: 'Invalid task category' }) 
+            })
+        ),
 })
 
-const { handleSubmit, isSubmitting, values, meta, setFieldValue, resetForm } =  useForm({
+const { handleSubmit, isSubmitting, values, setFieldValue, resetForm } =  useForm({
     validationSchema: toTypedSchema(schema)
 })
+
+useField('description');
 
 const prefilledForm = (task) => {
     resetForm({
@@ -63,6 +89,7 @@ const prefilledForm = (task) => {
             title: task?.title ?? '',
             description: task?.description ? cleanHTML(task?.description) : '',
             status: task?.status ?? '',
+            category: task?.category ?? '',
             priority_level: task?.priority_level ?? '',
             started_at: task?.started_at ? new Date(task?.started_at).toISOString().split('T')[0] : '',
             deadline_at: task?.deadline_at ? new Date(task?.deadline_at).toISOString().split('T')[0] : '',
@@ -79,8 +106,6 @@ const emitSubmit = handleSubmit((values) => {
     emit('submit', values);
 })
 onMounted(() => {
-    taskStore.fetchPriorityLevels();
-    taskStore.fetchStatuses();
     today.value = new Date().toISOString().split('T')[0];
 })
 </script>
@@ -94,7 +119,11 @@ onMounted(() => {
             </div>
             <div>
                 <label for="title">Description<span class="text-xs text-red-600">*</span></label>
-                <Editor :modelValue="values.description" @value-change="onEditorChange" editorStyle="height: 320px" class="prose w-full max-w-full">
+                <Editor 
+                    :modelValue="values.description" 
+                    @value-change="onEditorChange" 
+                    editorStyle="height: 320px" 
+                    class="prose w-full max-w-full">
                     <template v-slot:toolbar>
                     <span class="ql-formats">
                         <select class="ql-header" v-tooltip.bottom="'Text Size'">
@@ -111,7 +140,7 @@ onMounted(() => {
                     </span>
                     </template>
                 </Editor>
-                 <ErrorMessage v-if="meta.touched" name="description" class="mt-1 text-sm text-red-600" />
+                 <ErrorMessage name="description" class="mt-1 text-sm text-red-600" />
             </div>
             <div class="flex items-center justify-start gap-3">
                  <div>
@@ -125,11 +154,11 @@ onMounted(() => {
                             >
                             <option value="" selected disabled>Select priority</option>
                             <option 
-                                v-for="priority in taskStore.priorityLevels" 
-                                :key="priority" 
-                                :value="priority"
+                                v-for="priority in getTaskPriorityOptions()" 
+                                :key="priority.value" 
+                                :value="priority.value"
                             >
-                                {{ priority }}
+                                {{ priority.label }}
                             </option>
                         </select>
                         <ErrorMessage name="priority_level" class="mt-1 text-sm text-red-600" />
@@ -144,16 +173,37 @@ onMounted(() => {
                             class="mt-1 capitalize block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                             :class="{ 'border-red-500': errors.length }"
                             >
-                            <option value="" selected disabled>Select priority</option>
+                            <option value="" selected disabled>Select status</option>
                             <option 
-                                v-for="status in taskStore.statuses" 
-                                :key="status" 
-                                :value="status"
+                                v-for="status in getTaskStatusOptions()" 
+                                :key="status.value" 
+                                :value="status.value"
                             >
-                                {{ status }}
+                                {{ status.value }}
                             </option>
                         </select>
                         <ErrorMessage name="status" class="mt-1 text-sm text-red-600" />
+                    </Field>
+                </div>
+                 <div>
+                    <label for="status">Category<span class="text-xs text-red-600">*</span></label>
+                    <Field v-slot="{ field, errors }" name="category">
+                        <select 
+                            v-bind="field"
+                            id="status"
+                            class="mt-1 capitalize block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            :class="{ 'border-red-500': errors.length }"
+                            >
+                            <option value="" selected disabled>Select category</option>
+                            <option 
+                                v-for="category in getTaskCategoryOptions()" 
+                                :key="category.value" 
+                                :value="category.value"
+                            >
+                                {{ category.label }}
+                            </option>
+                        </select>
+                        <ErrorMessage name="category" class="mt-1 text-sm text-red-600" />
                     </Field>
                 </div>
                  <div>

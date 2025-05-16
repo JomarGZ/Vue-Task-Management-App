@@ -8,7 +8,7 @@ const router = useRouter();
 const projectTaskStore = useProjectTaskStore();
 const handleSubmit = async (values) => {
    const success = await projectTaskStore.updateTask(route.params?.taskId, values);
-   if (success) router.push({name: 'projects.show', params: {projectId: route.params?.projectId}})
+    if (success) router.back();  
 }
 onMounted(async() => {
     projectTaskStore.getTask(route.params?.taskId)

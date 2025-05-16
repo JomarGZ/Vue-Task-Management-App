@@ -1,4 +1,5 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
+import { AxiosError } from "axios";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -9,8 +10,10 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
     const searchQuery = ref('');
     const teamMembers = ref([]);
     const {showToast, showConfirmDialog} = useSweetAlert();
- 
-
+    const validationError = ref('');
+    const clearSelectedMembers = () => {
+        selectedMembers.value = [];
+    }
         
     const removeAssignedMember = async (projectId, userId) => {
         if (!projectId || !userId) {
@@ -72,8 +75,11 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
             showToast('Member assigned successfully');
             return true;
         } catch (error) {
-            console.error('Error assigning members:', error);
-            showToast('Member assigned failed', 'error');
+            if (error && error.response && error.response.status === 422) {
+                validationError.value = error.response?.data?.message || 'Action is not allowed!'
+            } else {
+                console.error('Error assigning members:', error);
+            }
             return false
         } finally {
             loading.value = false;
@@ -88,6 +94,8 @@ export const useProjectTeamStore = defineStore("projectTeam", () => {
         loading,
         removeAssignedMember,
         handleAssignMembers,
+        clearSelectedMembers,
+        validationError,
         resetForm,
         fetchMembers,
     };

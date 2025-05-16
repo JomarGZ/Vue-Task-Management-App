@@ -6,7 +6,7 @@ import { computed } from 'vue';
 import RightSidebar from '@/components/RightSidebar.vue';
 const route = useRoute();
 const rightSidebarMap = {
-    'organization.dashboard': RightSidebar,
+    // 'organization.dashboard': RightSidebar,
 }
 const currentRightSidebar = computed(() => rightSidebarMap[route.name] || null);
 const showRightSidebar = computed(() => currentRightSidebar.value !== null);

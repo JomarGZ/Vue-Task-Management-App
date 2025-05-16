@@ -1,13 +1,14 @@
 <script setup>
 import Editor from 'primevue/editor';
 import { z } from 'zod';
-import { Field, ErrorMessage,  } from 'vee-validate';
+import { Field, ErrorMessage, useField,  } from 'vee-validate';
 import {useForm} from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { Icon } from '@iconify/vue';
 import { cleanHTML } from '@/composables/useUtil';
+import { getProjectPriorityOptions, getProjectStatusOptions, VALID_PROJECT_STATUS, VALID_PROJECT_PRIORITY } from '@/constants/project';
 const props = defineProps({
     loading: {
         type: Boolean,
@@ -51,8 +52,24 @@ const schema = z.object({
     description: nonEmptyHtml,
     started_at: z.string().optional(),  
     ended_at: z.string().optional(),
-    priority: z.string().optional(),
-    status: z.string().optional(),
+    priority: z
+        .string()
+        .optional()
+        .transform((val) => val === "" ? undefined : val)
+        .pipe(
+            z.enum(VALID_PROJECT_PRIORITY, {
+                errorMap: () => ({message: 'Invalid priority'})
+            })
+        ),
+    status: z
+        .string()
+        .optional()
+        .transform((val) => val === "" ? undefined : val)
+        .pipe(
+            z.enum(VALID_PROJECT_STATUS, {
+                errorMap: () => ({message: 'Invalid Status'})
+            })
+        ),
     budget: z.coerce
     .number()
     .max(9999999999, 'Budget must be 10 digits or less')
@@ -64,11 +81,11 @@ const schema = z.object({
     }),
 })
 
-const { handleSubmit, isSubmitting, meta, resetForm, values, setFieldValue } = useForm({
+const { handleSubmit, isSubmitting, resetForm, values, setFieldValue } = useForm({
     validationSchema: toTypedSchema(schema),
   
 })
-
+useField('description')
 const isEndDateDisabled = computed(() => !values.started_at);
 const disabledDaysBeforeStarted = computed(() => values.started_at)
 
@@ -99,8 +116,6 @@ const onSubmit = handleSubmit((values) => {
 })
 onMounted(() => {
     today.value = new Date().toISOString().split('T')[0];
-    store.getStatuses();
-    store.getPriorityLevels();
 })
 </script>
 <template>
@@ -110,17 +125,17 @@ onMounted(() => {
                 <h2 class="text-lg font-medium text-gray-900">Basic Information</h2>
                 <fieldset class="space-y-7">
                     <div>
-                        <label for="name">Project Name</label>
+                        <label for="name">Project Name<span class="text-xs text-red-600">*</span></label>
                         <Field id="name" name="name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                         <ErrorMessage name="name" class="mt-1 text-sm text-red-600 block" />
                     </div>
                     <div>
-                        <label for="client_name">Client Name</label>
+                        <label for="client_name">Client Name<span class="text-xs text-red-600">*</span></label>
                         <Field id="client_name" name="client_name" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                         <ErrorMessage name="client_name" class="mt-1 text-sm text-red-600 block" />
                     </div>
                     <div class="flex flex-col gap-1">
-                        <label for="description">Description</label>
+                        <label for="description">Description<span class="text-xs text-red-600">*</span></label>
                         <Editor 
                             :modelValue="values.description"
                              @value-change="onEditorChange"
@@ -143,17 +158,17 @@ onMounted(() => {
                                 </span>
                             </template>
                         </Editor>
-                        <ErrorMessage v-if="meta.touched" name="description" class="mt-1 text-sm text-red-600 block" />
+                        <ErrorMessage name="description" class="mt-1 text-sm text-red-600 block" />
                     </div>
                     <div class="flex gap-4 items-center justify-start">
                         <div>
                             <label for="started_at">Start Date</label>
-                            <Field id="started_at" type="date" :min="today" name="started_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+                            <Field id="started_at" type="date" :min="values.started_at || today" name="started_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                             <ErrorMessage name="started_at" class="mt-1 text-sm text-red-600 block" />
                         </div>
                         <div>
                             <label for="ended_at">End Date</label>
-                            <Field id="ended_at" :disabled="isEndDateDisabled" type="date" :min="disabledDaysBeforeStarted" name="ended_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+                            <Field id="ended_at" :disabled="isEndDateDisabled" type="date" :min="values.ended || disabledDaysBeforeStarted" name="ended_at" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
                             <ErrorMessage name="ended_at" class="mt-1 text-sm text-red-600 block" />
                         </div>
                         <div>
@@ -165,13 +180,13 @@ onMounted(() => {
                                     class="mt-1 capitalize block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                     :class="{ 'border-red-500': errors.length }"
                                     >
-                                    <option value="">Select priority</option>
+                                    <option value="" disabled selected>Select priority</option>
                                     <option 
-                                        v-for="priority in store.projectPriorityLevels" 
-                                        :key="priority" 
-                                        :value="priority"
+                                        v-for="priority in getProjectPriorityOptions()" 
+                                        :key="priority.value" 
+                                        :value="priority.value"
                                     >
-                                        {{ priority }}
+                                        {{ priority.label }}
                                     </option>
                                 </select>
                                 <ErrorMessage name="priority" class="mt-1 text-sm text-red-600" />
@@ -184,12 +199,12 @@ onMounted(() => {
                                     class="mt-1 capitalize block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                         :class="{ 'border-red-500': errors.length }"
                                     >
-                                    <option value="">Select Status</option>
+                                    <option value="" disabled selected>Select Status</option>
                                     <option
-                                        v-for="status in store.projectStatuses"
-                                        :key="status"
-                                        :value="status">
-                                        {{ status }}
+                                        v-for="status in getProjectStatusOptions()"
+                                        :key="status.value"
+                                        :value="status.value">
+                                        {{ status.label }}
                                     </option>
                                 </select>
                                 <ErrorMessage name="status" class="mt-1 text-sm text-red-600" />
