@@ -87,7 +87,7 @@ export const useTaskComments = defineStore("task-comments", () => {
                 comments.value.data[index] = data.data;
             }
         } catch(e) {
-            comments.value.data.filter(c => !c.id.startWith('temp-'))
+            comments.value.data = comments.value.data.filter(c => !c.id.startWith('temp-'))
             Object.assign(error, {
                 hasError: true,
                 message: e.response?.data?.message || 'Failed to create new comment',
