@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import ReadMore from './ReadMore.vue';
 import UserAvatar from './UserAvatar.vue';
 import { formatDateDistance } from '@/composables/useFormatters';
+import { Icon } from '@iconify/vue';
 const props = defineProps({
     id: {
         type: [String, Number],
@@ -30,10 +31,16 @@ const props = defineProps({
     }
 })
 
-defineEmits(['menu-toggle']);
+defineEmits(['menu-toggle', 'edit-comment', 'delete-comment']);
 
 const timeCreated = computed(() => props.created_at?.trim().length > 0 ? formatDateDistance(props.created_at) : '');
-
+const prepareCommentData = () => ({
+    id: props.id,
+    content: props.content,
+    author_name: props.author_name,
+    avatar: props.avatar,
+    created_at: props.created_at
+});
 </script>
 <template>
     <div class="relative">
@@ -49,9 +56,7 @@ const timeCreated = computed(() => props.created_at?.trim().length > 0 ? formatD
                     @click.stop="$emit('menu-toggle', id)"
                     class="p-1 cursor-pointer rounded-full hover:bg-gray-200 focus:outline-none"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01" />
-                    </svg>
+                   <Icon icon="ph:dots-three" width="20" height="20" />
                 </button>
                 
                 <!-- Dropdown menu -->
@@ -60,12 +65,16 @@ const timeCreated = computed(() => props.created_at?.trim().length > 0 ? formatD
                     class="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200"
                 >
                     <button 
-                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        @click.stop="$emit('edit-comment', prepareCommentData())"
+                        type="button"
+                        class="block w-full text-left cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                         Edit
                     </button>
                     <button 
-                        class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                        type="button"
+                        @click.stop="$emit('delete-comment', prepareCommentData())"
+                        class="block w-full text-left cursor-pointer px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                     >
                         Delete
                     </button>

@@ -18,7 +18,15 @@ const hasMore = computed(() => taskCommentStore.comments?.meta?.current_page < t
 
 
 const onSubmit = async (value) => {
-    await taskCommentStore.addComment(value, props.taskId)
+    if (taskCommentStore.editingComment) {
+        const success = await taskCommentStore.editComment(taskCommentStore.editingComment?.id, value);
+        if (success) {
+            taskCommentStore.editingComment = null;
+            activeMenuId.value = null
+        };
+    } else {
+        await taskCommentStore.addComment(value, props.taskId)
+    }
  
 }
 const hanndleMenuToggle = (commentId) => {
@@ -44,11 +52,15 @@ const hanndleMenuToggle = (commentId) => {
                         :content="comment.content"
                         :author_name="comment.user?.name"
                         :is-menu-open="activeMenuId === comment.id"
+                        @cancel-editing="taskCommentStore.cancelEdit"
                         :avatar="comment.avatar?.['thumb-60']"
+                        @edit-comment="(value) => taskCommentStore.setEditingComment(value)"
+                        @delete-comment="(values) => taskCommentStore.deleteComment(values.id)"
                     />
                     <div class="flex justify-center mt-4">
                         <button 
                             v-if="hasMore && !taskCommentStore.isFetching"
+                            type="button"
                             @click="taskCommentStore.loadComments(taskId, true)"
                             class="hover:text-blue-500 cursor-pointer text-gray-600 font-semibold"
                         >
@@ -61,7 +73,12 @@ const hanndleMenuToggle = (commentId) => {
                 </template>
                 <div v-else class="text-center text-gray-500">No comments yet. Be the first to comment!</div>
             </div>
-            <comment-form @comment-submit="(values) => taskCommentStore.addComment(values, taskId)" :loading="taskCommentStore.loading"/>
+            <comment-form 
+                @comment-submit="onSubmit" 
+                :loading="taskCommentStore.loading"
+                :editingComment="taskCommentStore.editingComment"
+                @cancel-editing="taskCommentStore.editingComment = null"
+            />
         </div>
     </div>
 </template>
