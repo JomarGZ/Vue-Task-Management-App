@@ -62,12 +62,6 @@ onBeforeUnmount(() => projectTaskStore.task = {})
             />
         </div>
         <TaskCommentSection 
-            :comments="taskCommentStore.comments || {}" 
-            @load-more="() => taskCommentStore.loadComments($route.params?.taskId, true)"
-            @comment-submit="(values) => taskCommentStore.addComment(values, $route.params?.taskId)"
-            :loading="taskCommentStore.loading"
-            :error="taskCommentStore.error"
-            :isFetching="taskCommentStore.isFetching"
-            :hasMore="taskCommentStore.comments?.meta?.current_page < taskCommentStore.comments?.meta?.last_page"/>
+            :taskId="$route.params?.taskId"/>
     </div>
   </template>
