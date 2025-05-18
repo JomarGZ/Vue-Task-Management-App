@@ -39,13 +39,11 @@ const needsExpand = ref(false)
 const checkOverflow = () => {
   nextTick(() => {
     if (contentRef.value) {
-      // Temporarily remove height restriction to measure full content height
       const prevMaxHeight = contentRef.value.style.maxHeight
       contentRef.value.style.maxHeight = 'none'
       const fullHeight = contentRef.value.scrollHeight
       contentRef.value.style.maxHeight = prevMaxHeight
 
-      // Check if content exceeds max height when collapsed
       const currentMaxHeight = parseFloat(props.maxHeight) || 100
       const unit = props.maxHeight.replace(/[0-9.]/g, '') || 'px'
       const maxHeightPx = unit === 'px' 
@@ -53,16 +51,15 @@ const checkOverflow = () => {
         : convertToPx(currentMaxHeight, unit)
       
       needsExpand.value = fullHeight > maxHeightPx
-      showToggle.value = true // Always show if checking
+      showToggle.value = true 
     }
   })
 }
 
-// Helper function to convert other units to px (simplified)
 const convertToPx = (value, unit) => {
   if (unit === 'rem') return value * 16
-  if (unit === 'em') return value * 16 // Simplified
-  return value // Default to px
+  if (unit === 'em') return value * 16
+  return value
 }
 
 const toggleExpanded = () => {

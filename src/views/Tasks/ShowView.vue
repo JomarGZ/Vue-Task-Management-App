@@ -15,6 +15,7 @@ const taskCommentStore = useTaskComments();
 const route = useRoute();
 onMounted(async() => {
     await projectTaskStore.getTask(route.params.taskId);
+    await taskCommentStore.loadComments(route.params?.taskId);
 });
 onBeforeUnmount(() => projectTaskStore.task = {})
 </script>
@@ -60,6 +61,13 @@ onBeforeUnmount(() => projectTaskStore.task = {})
                 :assignees="projectTaskStore.task?.assigned_users"
             />
         </div>
-        <TaskCommentSection :comments="taskCommentStore.comments" @load-more="taskCommentStore.loadMore"/>
+        <TaskCommentSection 
+            :comments="taskCommentStore.comments || {}" 
+            @load-more="() => taskCommentStore.loadComments($route.params?.taskId, true)"
+            @comment-submit="(values) => taskCommentStore.addComment(values, $route.params?.taskId)"
+            :loading="taskCommentStore.loading"
+            :error="taskCommentStore.error"
+            :isFetching="taskCommentStore.isFetching"
+            :hasMore="taskCommentStore.comments?.meta?.current_page < taskCommentStore.comments?.meta?.last_page"/>
     </div>
   </template>
