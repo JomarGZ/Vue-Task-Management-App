@@ -83,13 +83,16 @@ export const useTaskComments = defineStore("task-comments", () => {
                 }
             }
 
-             comments.value.data = [newComment, ...(comments.value.data || [])];
-
+            comments.value.data = [newComment, ...(comments.value.data || [])];
+            if (comments.value.meta) {
+                comments.value.meta.total += 1;
+            }
             const { data } = await window.axios.post('api/v1/comments', {
                 content: values.content,
                 commentable_id: taskId,
                 commentable_type: 'App\\Models\\Task'
             });
+  
             const commentIndex = comments.value?.data?.findIndex(c => c.id === newComment.id);
             if (commentIndex !== -1) {
                 comments.value.data[commentIndex] = data.data;
@@ -97,6 +100,10 @@ export const useTaskComments = defineStore("task-comments", () => {
             return true;
         } catch(e) {
             comments.value.data = comments.value.data.filter(c => !c.id.startsWith('temp-'))
+            if (comments.value.meta) {
+                comments.value.meta.total = Math.max(0, comments.value.meta.total - 1);
+            }
+
             Object.assign(error, {
                 hasError: true,
                 message: e.response?.data?.message || 'Failed to create new comment',
@@ -152,7 +159,7 @@ export const useTaskComments = defineStore("task-comments", () => {
 
                         await window.axios.delete(`api/v1/comments/${commentId}`);
                         comments.value.data = comments.value.data.filter(c => c.id !== commentId);
-                        comments.value.meta.total = comments.value.meta.total - 1;
+                        comments.value.meta.total--
                         showToast('Comment deleted successfuly');
                     } catch (e) {
                         Object.assign(error, {

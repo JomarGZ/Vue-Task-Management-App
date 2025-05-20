@@ -1,10 +1,16 @@
 <script setup>
 import { cleanHTML } from '@/composables/useUtil';
 import { getTaskPriorityByValue, getTaskStatusByValue, getTaskStatusOptions } from '@/constants/task';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
+import { useTaskStore } from '@/stores/taskStore';
 import { Icon } from '@iconify/vue';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
+    taskId: {
+        type: [Number, String],
+        required: true
+    },
     priority: {
         type: String,
         default: ''
@@ -32,9 +38,12 @@ const props = defineProps({
 
 })
 const daysLeft = ref('');
+const selectedStatus = ref(props.status || '');
 const readMore = ref(false);
 const descriptionContainer = ref(null);
 const needsToggle = ref(false);
+defineEmits(['status-change'])
+const projectTaskStore = useProjectTaskStore();
 const checkDescriptionHeight = async () => {
   await nextTick();
   if (descriptionContainer.value) {
@@ -47,7 +56,14 @@ const toggleReadMore = () => {
 watch(() => props.description, () => {
   checkDescriptionHeight();
 });
+watch(() => props.status, (newStatus) => {
+  selectedStatus.value = newStatus;
+}, { immediate: true });
 
+const changeStatus = async (value) => {
+   await projectTaskStore.updateStatus(props.taskId, selectedStatus.value)
+}
+// watch(selectedStatus, async (newStatus) => await projectTaskStore.updateStatus(props.taskId, newStatus))
 const statusConfig = computed(() => props.status?.trim().length > 0 ? getTaskStatusByValue(props.status) : {});
 const priorityConfig = computed(() => props.priority?.trim().length > 0 ? getTaskPriorityByValue(props.priority) : {}) 
 const startedDate = computed(() => props.startDate?.trim().length > 0 ? new Date(props.startDate).toLocaleDateString('en-US',{
@@ -106,7 +122,7 @@ onBeforeUnmount(() => {
                     <h2 class="text-2xl font-semibold text-gray-800 capitalize">{{ title }}</h2>
                 </div>
                 <div class="relative">
-                    <select class="block appearance-none bg-gray-50 cursor-pointer border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500">
+                    <select v-model="selectedStatus" @change="changeStatus" class="block appearance-none bg-gray-50 cursor-pointer border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500">
                         <option value="" selected disabled>Select status</option>
                         <option 
                             v-for="status in getTaskStatusOptions()"

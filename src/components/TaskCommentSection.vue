@@ -13,10 +13,13 @@ const props = defineProps({
 
 const taskCommentStore = useTaskComments();
 const activeMenuId = ref(null);
-const remainingCount = computed(() => taskCommentStore.comments?.data?.length > 0 ? taskCommentStore.comments?.meta?.total - taskCommentStore.comments?.data?.length : 0)
-const hasMore = computed(() => taskCommentStore.comments?.meta?.current_page < taskCommentStore.comments?.meta?.last_page)
-
-
+const hasMoreComments = computed(() => {
+    return taskCommentStore.comments?.meta?.current_page < taskCommentStore.comments?.meta?.last_page;
+});
+const remainingCommentsCount = computed(() => {
+    if (!taskCommentStore.comments?.meta) return 0;
+    return Math.max(0, taskCommentStore.comments?.meta?.total - taskCommentStore.comments?.data?.length);
+})
 const onSubmit = async (value) => {
     if (taskCommentStore.editingComment) {
         const success = await taskCommentStore.editComment(taskCommentStore.editingComment?.id, value);
@@ -57,21 +60,22 @@ const hanndleMenuToggle = (commentId) => {
                         @edit-comment="(value) => taskCommentStore.setEditingComment(value)"
                         @delete-comment="(values) => taskCommentStore.deleteComment(values.id)"
                     />
-                    <div class="flex justify-center mt-4">
-                        <button 
-                            v-if="hasMore && !taskCommentStore.isFetching"
-                            type="button"
-                            @click="taskCommentStore.loadComments(taskId, true)"
-                            class="hover:text-blue-500 cursor-pointer text-gray-600 font-semibold"
-                        >
-                            Load More ( {{ remainingCount }} remaining)
-                        </button>
-                        <div v-if="taskCommentStore.isFetching" class="text-gray-400 text-2xl">
-                            <Icon icon="eos-icons:three-dots-loading" width="100" height="50" />
-                        </div>
-                    </div>
+                  
                 </template>
                 <div v-else class="text-center text-gray-500">No comments yet. Be the first to comment!</div>
+                <div class="flex justify-center mt-4">
+                    <button 
+                        v-if="hasMoreComments && !taskCommentStore.isFetching"
+                        type="button"
+                        @click="taskCommentStore.loadComments(taskId, true)"
+                        class="hover:text-blue-500 cursor-pointer text-gray-600 font-semibold"
+                    >
+                        Load More ( {{remainingCommentsCount}} remaining)
+                    </button>
+                    <div v-if="taskCommentStore.isFetching" class="text-gray-400 text-2xl">
+                        <Icon icon="eos-icons:three-dots-loading" width="100" height="50" />
+                    </div>
+                </div>
             </div>
             <comment-form 
                 @comment-submit="onSubmit" 

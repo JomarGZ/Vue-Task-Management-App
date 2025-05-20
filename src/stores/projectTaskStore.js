@@ -155,13 +155,28 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         }
     }
     
-    async function updateStatus (task) {
-        return window.axios.patch(`api/v1/tasks/${task.id}/status`, {status: selectedStatus.value})
-            .then(response => {
-                showToast("Task status updated successfully");
-           
-            })
-            .catch((error) => console.log("error:", error))
+    async function updateStatus (taskId, status) {
+        if (loading.value) return;
+        loading.value = true;
+
+        try {
+            if (!taskId) {
+                throw new Error(`Task ID is required  to update task status. Recieved: ${taskId}`)
+            }
+            if (!status) {
+                throw new Error(`Status is required to update task status. Recieved: ${status}`)
+            }
+            await window.axios.patch(`api/v1/tasks/${taskId}/status`, {status: status})
+            showToast('Task status updated successfully');
+        } catch (e) {
+            console.error('task status update failed', e)
+            showToast('Task status update failed', 'error');
+
+            throw e
+        } finally {
+            loading.value = false
+        }
+      
     }
     
     async function fetchStatuses () {

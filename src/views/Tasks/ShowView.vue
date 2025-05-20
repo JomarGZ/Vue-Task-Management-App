@@ -48,6 +48,7 @@ onBeforeUnmount(() => projectTaskStore.task = {})
         </div>
         <div class="bg-gray-50 rounded-xl shadow-md overflow-hidden mb-6">
             <TaskMainDetails
+                :taskId="$route.params.taskId"
                 :priority="projectTaskStore.task?.priority_level"
                 :status="projectTaskStore.task?.status"
                 :title="projectTaskStore.task?.title || ''"
