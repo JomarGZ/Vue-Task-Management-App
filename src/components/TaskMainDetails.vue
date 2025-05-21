@@ -61,9 +61,9 @@ watch(() => props.status, (newStatus) => {
 }, { immediate: true });
 
 const changeStatus = async (value) => {
-   await projectTaskStore.updateStatus(props.taskId, selectedStatus.value)
+    const success = await projectTaskStore.updateStatus(props.taskId, selectedStatus.value)
+    if (success)  await projectTaskStore.getTask(props.taskId);
 }
-// watch(selectedStatus, async (newStatus) => await projectTaskStore.updateStatus(props.taskId, newStatus))
 const statusConfig = computed(() => props.status?.trim().length > 0 ? getTaskStatusByValue(props.status) : {});
 const priorityConfig = computed(() => props.priority?.trim().length > 0 ? getTaskPriorityByValue(props.priority) : {}) 
 const startedDate = computed(() => props.startDate?.trim().length > 0 ? new Date(props.startDate).toLocaleDateString('en-US',{

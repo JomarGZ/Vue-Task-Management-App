@@ -20,7 +20,7 @@ export const TASK_STATUS = {
     },
     IN_PROGRESS: {
         value: 'in progress',
-        label: 'in progress',
+        label: 'In Progress',
         badgeClass: 'bg-yellow-100 text-yellow-800',
         dropdownClass: 'text-yellow-700'
     },
@@ -218,10 +218,53 @@ export const TASK_CATEGORY = {
   }
 };
 
+export const TASK_LINK_TYPE = {
+  GOOGLE_DOCUMENT: {
+    value: 'google document',
+    pattern: /^https:\/\/docs\.google\.com\/document\/.*/,
+    label: 'Google Document',
+    placeholder: 'https://docs.google.com/document/...',
+    color: 'text-blue-700',
+    icon: 'catppuccin:ms-word',     
+    badgeClass: 'bg-blue-100 text-blue-900 border border-blue-200'
+  },
+  GOOGLE_SLIDE: {
+    value: 'google slide',
+    pattern: /^https:\/\/docs\.google\.com\/presentation\/.*/,
+    label: 'Google Slide',
+    placeholder: 'https://docs.google.com/presentation/...',
+    color: 'text-yellow-700',
+    icon: 'logos:slides',     
+    badgeClass: 'bg-yellow-100 text-yellow-900 border border-yellow-200'
+  },
+  GITHUB_PR_ISSUE: {
+    value: 'github pr/issue',
+    pattern: /^https:\/\/github\.com\/[^/]+\/[^/]+\/(pull|pulls|issue)\/\d+/,
+    label: 'GitHub PR/Issue',
+    placeholder: 'https://github.com/user/repo/pull/00',
+    color: 'text-gray-700',
+    icon: 'skill-icons:github-dark',     
+    badgeClass: 'bg-gray-100 text-gray-900 border border-gray-200'
+  },
+  FIGMA_DESIGN: {
+    value: 'figma design',
+    pattern: /^https:\/\/(www\.)?figma\.com\/(file|design)\/[a-zA-Z0-9_-]+(\/.*)?/,
+    label: 'Figma Design',
+    placeholder: 'https://www.figma.com/design/...',
+    color: 'text-slate-700',
+    icon: 'material-icon-theme:figma',     
+    badgeClass: 'bg-slate-100 text-slate-900 border border-slate-200'
+  },
+}
+
 export const getTaskStatusOptions = () => Object.values(TASK_STATUS);
 export const getTaskPriorityOptions = () => Object.values(TASK_PRIORITY);
 export const getTaskCategoryOptions = () => Object.values(TASK_CATEGORY);
+export const getTaskLinkTypeOptions = () => Object.values(TASK_LINK_TYPE);
 
+export const getTaskLinkTypeValue = (value) => {
+  return Object.values(TASK_LINK_TYPE).find(type => type.value === value) || TASK_LINK_TYPE.OTHER
+}
 export const getTaskStatusByValue = (value) => {
   return Object.values(TASK_STATUS).find(status => status.value === value) || TASK_STATUS.NOT_STARTED
 }
@@ -231,6 +274,10 @@ export const getTaskPriorityByValue = (value) => {
 export const getTaskCategoryByValue = (value) => {
     return Object.values(TASK_CATEGORY).find(category => category.value === value) || TASK_CATEGORY.OTHER
 }
+
+export const VALID_TASK_LINKS = Object.values(TASK_LINK_TYPE).map(
+  type => type.value
+);
 
 export const VALID_TASK_CATEGORIES = Object.values(TASK_CATEGORY).map(
     category => category.value

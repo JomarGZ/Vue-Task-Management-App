@@ -168,6 +168,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
             }
             await window.axios.patch(`api/v1/tasks/${taskId}/status`, {status: status})
             showToast('Task status updated successfully');
+            return true;
         } catch (e) {
             console.error('task status update failed', e)
             showToast('Task status update failed', 'error');

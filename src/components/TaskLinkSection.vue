@@ -1,56 +1,65 @@
+<script setup>
+import { computed, ref } from 'vue';
+import TaskAddLinkModal from './TaskAddLinkModal.vue';
+import TaskLinkItem from './TaskLinkItem.vue';
+import TaskEditLinkModal from './TaskEditLinkModal.vue';
+import { useTaskLink } from '@/stores/taskLinkStore';
+import { useProjectTaskStore } from '@/stores/projectTaskStore';
+import { useRoute } from 'vue-router';
+const props = defineProps({
+    links: {
+        type: Array,
+        default: () => ([])
+    }
+})
+const taskLinkStore = useTaskLink();
+const projectTaskStore = useProjectTaskStore();
+const route = useRoute();
+const isAddFormModalShow = ref(false);
+const isEditFormModalShow = ref(false);
+const linksCount = computed(() => props.links.length);
+const onDeleteLink = async (id) => {
+    const success = await taskLinkStore.deleteLink(id);
+    if (success) {
+        await projectTaskStore.getTask(route.params.taskId)
+    };
+}
+const onEdit = (link) => {
+    taskLinkStore.editingLink = link
+    isEditFormModalShow.value = true
+}
+</script>
 <template>
       <div class="p-6 border-b border-gray-200">
         <div class="flex justify-between items-center mb-3">
-            <h3 class="text-lg font-medium text-gray-800">Related Links</h3>
-            <button class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
-                <i class="fas fa-plus mr-1"></i> Add Link
-            </button>
+            <h3 class="text-lg font-medium text-gray-800">Related Links ({{ linksCount }}/4)</h3>
+            <TaskAddLinkModal
+                :linksCount="linksCount" 
+                :isAddFormModalShow="isAddFormModalShow"
+                :taskId="$route.params?.taskId"
+                @modal-show="isAddFormModalShow = true"
+                @modal-hide="isAddFormModalShow = false"
+            />
         </div>
         <div class="space-y-3">
-            <div class="flex items-center justify-between group p-3 hover:bg-gray-50 rounded-lg">
-                <div class="flex items-center">
-                    <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                        <i class="fab fa-google-drive text-blue-600 text-xl"></i>
-                    </div>
-                    <div>
-                        <a href="#" class="text-blue-600 hover:underline font-medium">Project Proposal Draft</a>
-                        <p class="text-xs text-gray-500">Google Docs - Last edited 2 hours ago</p>
-                    </div>
-                </div>
-                <button class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="flex items-center justify-between group p-3 hover:bg-gray-50 rounded-lg">
-                <div class="flex items-center">
-                    <div class="bg-purple-100 p-2 rounded-lg mr-3">
-                        <i class="fab fa-github text-purple-600 text-xl"></i>
-                    </div>
-                    <div>
-                        <a href="#" class="text-blue-600 hover:underline font-medium">PR #42: Authentication fixes</a>
-                        <p class="text-xs text-gray-500">GitHub - Merged yesterday</p>
-                    </div>
-                </div>
-                <button class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="flex items-center justify-between group p-3 hover:bg-gray-50 rounded-lg">
-                <div class="flex items-center">
-                    <div class="bg-red-100 p-2 rounded-lg mr-3">
-                        <i class="fab fa-google-drive text-red-600 text-xl"></i>
-                    </div>
-                    <div>
-                        <a href="#" class="text-blue-600 hover:underline font-medium">Client Presentation Deck</a>
-                        <p class="text-xs text-gray-500">Google Slides - Shared</p>
-                    </div>
-                </div>
-                <button class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+            <TaskLinkItem
+                v-for="link in links"
+                :key="link.id"
+                :id="link.id"
+                :title="link.title"
+                :description="link.description"
+                :type="link.type"
+                :url="link.url"
+                @delete-item="onDeleteLink"
+                :loading="taskLinkStore.loading"
+                @edit-item="() => onEdit(link)"
+            />
         </div>
+        <TaskEditLinkModal
+            :taskId="$route.params.taskId"
+            :isEditFormModalShow="isEditFormModalShow"
+            @modal-hide="isEditFormModalShow = false"
+        />
     </div>
+  
 </template>

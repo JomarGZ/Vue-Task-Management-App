@@ -57,7 +57,9 @@ onBeforeUnmount(() => projectTaskStore.task = {})
                 :description="projectTaskStore.task?.description || ''"
             />
             <TaskProgressSection/>
-            <TaskLinkSection/>
+            <TaskLinkSection
+                :links="projectTaskStore.task?.links"
+            />
             <task-assignees-section
                 :assignees="projectTaskStore.task?.assigned_users"
             />
