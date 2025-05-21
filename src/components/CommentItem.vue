@@ -1,56 +1,90 @@
 <script setup>
 import { computed, ref } from 'vue';
-import CommentForm from './forms/CommentForm.vue';
-import CommentOption from './CommentOption.vue';
-import CommentBlock from './CommentBlock.vue';
-import CommentReplyForm from './forms/CommentReplyForm.vue';
-import { getInitials } from '@/composables/useFormatters';
-import { useAuth } from '@/stores/auth';
-import DefaultUserPic from './DefaultUserPic.vue';
+import ReadMore from './ReadMore.vue';
+import UserAvatar from './UserAvatar.vue';
+import { formatDateDistance } from '@/composables/useFormatters';
+import { Icon } from '@iconify/vue';
 const props = defineProps({
-    comment: Object,
-    replies: Array
+    id: {
+        type: [String, Number],
+        required: true
+    },
+    content: {
+        type: String,
+        required: true
+    },
+    author_name: {
+        type: String,
+        required: true
+    },
+    avatar: {
+        type: String,
+        default: ''
+    },
+    created_at: {
+        type: String,
+        required: true
+    },
+    isMenuOpen: {
+        type: Boolean,
+        default: false
+    }
 })
-const hasReplies = computed(() => props.replies?.length > 0);
-const replyCounts = computed(() => props.replies?.length || 0);
-const repliedLabel = computed(() => 
-  replyCounts.value > 1 ? `${props.replies[0]?.author?.name} and others replied • ${replyCounts.value} replies` : `${props.replies[0]?.author?.name} replied • ${replyCounts.value} reply`
-);
 
-const isRepliesOpen = ref(false);
+defineEmits(['menu-toggle', 'edit-comment', 'delete-comment']);
 
-const handleToggleReplies = () => {
-    isRepliesOpen.value = ! isRepliesOpen.value;
-}
-const replyclicked = () => {
-    handleToggleReplies()
-}
+const timeCreated = computed(() => props.created_at?.trim().length > 0 ? formatDateDistance(props.created_at) : '');
+const prepareCommentData = () => ({
+    id: props.id,
+    content: props.content,
+    author_name: props.author_name,
+    avatar: props.avatar,
+    created_at: props.created_at
+});
 </script>
 <template>
-    <div class="flex gap-4 group">
-        <img v-if="comment.author?.avatar?.['thumb-60']" :src="comment.author?.avatar?.['thumb-60']" class="w-10 h-10 rounded-full shadow-sm" alt="User avatar"/>
-        <DefaultUserPic v-else :name="comment.author?.name" class="w-10 h-10 border-2"/>
-        <div class="flex-grow">
-            <CommentBlock
-              :comment="comment"
-              :author="comment?.author"
-              @clicked-reply="replyclicked"
-              />
-            <div v-if="hasReplies" class="ml-4">
-                <button @click="handleToggleReplies" class="hover:underline text-gray-700">{{ repliedLabel }}</button>
-             </div>
-            <!-- Nested Reply -->
-            <div v-if="false" class="mt-4 ml-6 gap-4 flex flex-col">
-                <template v-if="hasReplies && isRepliesOpen">
-                    <div v-for="reply in replies" :key="reply" class="flex">
-                        <img src="https://i.pravatar.cc/40" class="w-8 h-8 rounded-full shadow-sm" alt="User avatar"/>
-                        <div class="flex-grow">
-                            <CommentBlock :comment="reply" :author="reply?.author" @clicked-reply="handleToggleReplies"/>
-                        </div>
-                    </div>
-                </template>
-                <CommentReplyForm v-if="isRepliesOpen" class="flex gap-4"/>
+    <div class="relative">
+        <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-1.5 border border-white"></div>
+        <div class="flex items-center mb-1 min-w-0">
+            <user-avatar :name="author_name" :avatar="avatar"/>
+            <span class="font-medium text-sm truncate">{{ author_name }}</span>
+            <span class="text-xs text-gray-500 ml-2 shrink-0">{{ timeCreated }}</span>
+            
+            <!-- Three-dot menu -->
+            <div class="ml-auto relative shrink-0">
+                <button 
+                    @click.stop="$emit('menu-toggle', id)"
+                    class="p-1 cursor-pointer rounded-full hover:bg-gray-200 focus:outline-none"
+                >
+                   <Icon icon="ph:dots-three" width="20" height="20" />
+                </button>
+                
+                <!-- Dropdown menu -->
+                <div 
+                    v-if="isMenuOpen"
+                    class="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200"
+                >
+                    <button 
+                        @click.stop="$emit('edit-comment', prepareCommentData())"
+                        type="button"
+                        class="block w-full text-left cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                        Edit
+                    </button>
+                    <button 
+                        type="button"
+                        @click.stop="$emit('delete-comment', prepareCommentData())"
+                        class="block w-full text-left cursor-pointer px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                        Delete
+                    </button>
+                </div>
             </div>
+        </div>
+        <div class="bg-gray-100 p-3 rounded-lg text-sm text-gray-600 ml-8">
+            <ReadMore max-height="120px">
+                <p>{{ content }}</p>
+            </ReadMore> 
         </div>
     </div>
 </template>

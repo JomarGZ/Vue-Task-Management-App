@@ -4,8 +4,6 @@ import { useProjectTeamStore } from '@/stores/projectTeamStore';
 import { Icon } from '@iconify/vue'
 import DefaultUserPic from './DefaultUserPic.vue';
 const props = defineProps({
-    isModalShow: Boolean,
-    project: Object,
     teamAssignees: {
         type: Array,
         default: () => ([])
@@ -15,11 +13,9 @@ const props = defineProps({
         default: false
     }
 })
-const emit = defineEmits(['update:isModalShow', 'data-added', 'close-modal', 'open-modal', 'submit']);
+const emit = defineEmits(['data-added', 'close-modal', 'open-modal', 'submit']);
 
 const projectTeamStore = useProjectTeamStore();
-projectTeamStore.project = props.project;
-const validationError = ref('');
 
 const onSelectMember = (member) => {
     projectTeamStore.selectedMembers.push(member)
@@ -30,9 +26,17 @@ const onRemoveSelectedMember = (selected) => {
     projectTeamStore.selectedMembers = projectTeamStore.selectedMembers.filter(m => m.id !== selected.id);
 }
 
-watch(() => props.show, (bool) => bool ?  projectTeamStore.fetchMembers() : '');
-watch(() => props.show, (bool) => !bool ?  projectTeamStore.selectedMembers = [] : '');
-
+watch(() => props.show, (isVisible) => {
+    if (!isVisible) {
+        projectTeamStore.clearSelectedMembers()
+        projectTeamStore.validationError = ''
+    } else {
+        projectTeamStore.fetchMembers()
+    }
+});
+watch(() => projectTeamStore.selectedMembers, (selected) => {
+  if (selected.length > 0) projectTeamStore.validationError = ''
+}, {deep: true})
 const memberList = computed(() => {
     let filteredMembers = props.teamAssignees
         ? projectTeamStore.teamMembers.filter(member => !props.teamAssignees.some(assignee => assignee.id === member.id)) 
@@ -49,20 +53,21 @@ const memberList = computed(() => {
 })
 
 const emitSubmit = () => {
-    validationError.value = "";
+    projectTeamStore.validationError = "";
 
     if (projectTeamStore.selectedMembers.length > 0) {
         emit('submit');
     } else {
-        validationError.value = "Please search and select a member to assign!";
+        projectTeamStore.validationError = "Please search and select a member to assign!";
     }
 
 }
 </script>
 
 <template>
-     <button @click="$emit('open-modal')" class="px-3 py-1 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm">
-        <i class="fas fa-user-plus mr-1"></i>Add Member
+     <button @click="$emit('open-modal')" class="px-3 py-1 gap-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm">
+        <Icon icon="heroicons-solid:user-add" width="20" height="20" />
+        <span>Add Member</span>
     </button>
     <teleport to='body'>
         <transition
@@ -104,7 +109,7 @@ const emitSubmit = () => {
                                     placeholder="Search members..."
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
-                                <p v-if="validationError.length > 0" class="text-red-600 text-xs p-2">{{ validationError }}</p>
+                                <p v-if="projectTeamStore.validationError?.trim().length > 0" class="text-red-600 text-xs p-2">{{ projectTeamStore.validationError }}</p>
                                 <!-- Dropdown Results -->
                                 <div v-if="projectTeamStore.searchQuery" class="absolute z-10 mt-1 w-full overflow-y-auto bg-white shadow-lg rounded-md max-h-[200px] py-1 border border-gray-200">
                                     <div v-for="member in memberList" :key="member.id" @click="onSelectMember(member)" class="cursor-pointer hover:bg-blue-50 px-4 py-2">

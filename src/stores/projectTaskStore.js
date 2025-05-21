@@ -1,5 +1,4 @@
 import { useSweetAlert } from "@/composables/useSweetAlert2";
-import { AxiosError } from "axios";
 
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
@@ -10,15 +9,48 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     const selectedPriority = ref('');
     const statuses = ref([]);
     const priorityLevels = ref([]);
+    const projectTeamMembers = ref([]);
     const tasks = ref({});
     const isFetching = ref(false);
+    const selectedTaskAssignees = ref([]);
     const loading = ref(false);
     const error = ref({});
     const categories = reactive({});
+    const validationError = ref('');
+    const search = ref('');
     const { showToast, showConfirmDialog } = useSweetAlert();
 
+    const clearSelectedAssignees = () => {
+        selectedTaskAssignees.value = [];
+    }
+    const onSelectTaskAssignee = (member) => {
+        if (!member && typeof member !== 'object') {
+            console.warn('Member is required and must be an object to add in selected assignees')
+            return;
+        }
+        const alreadyExists = selectedTaskAssignees.value.some(
+            existing => existing.id === member.id  
+        )
+        if (alreadyExists) {
+            showToast("Already exist on the selected assignee", 'warning');
+            return;
+        }
+        selectedTaskAssignees.value.push(member)
+        search.value = ''
+    }
+    const onRemoveSelectedTaskAssignee = (selected) => {
+        if (!selected && typeof selected !== 'object') {
+            console.warn('Selected assignee is required and must be an object to remove selected assignee');
+            return;
+        }
+        const isExists = selectedTaskAssignees.value.some(
+            existing => existing.id === selected.id
+        )
+        if (isExists) {
+            selectedTaskAssignees.value = selectedTaskAssignees.value.filter(s => s.id !== selected.id);
+        }
+    }
     const getTask = async (taskId) => {
-       
         if (loading.value) return;
         isFetching.value = true;
 
@@ -55,6 +87,9 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
                 }),
                 ...(filters.priority?.trim().length > 0 && {
                     priority_level: filters.priority?.trim()
+                }),
+                ...(filters.assigneeId && {
+                    assigneeId: filters.assigneeId
                 })
             });
             const response = await window.axios.get(`api/v1/projects/${projectId}/tasks?${params.toString()}`)
@@ -120,13 +155,29 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         }
     }
     
-    async function updateStatus (task) {
-        return window.axios.patch(`api/v1/tasks/${task.id}/status`, {status: selectedStatus.value})
-            .then(response => {
-                showToast("Task status updated successfully");
-           
-            })
-            .catch((error) => console.log("error:", error))
+    async function updateStatus (taskId, status) {
+        if (loading.value) return;
+        loading.value = true;
+
+        try {
+            if (!taskId) {
+                throw new Error(`Task ID is required  to update task status. Recieved: ${taskId}`)
+            }
+            if (!status) {
+                throw new Error(`Status is required to update task status. Recieved: ${status}`)
+            }
+            await window.axios.patch(`api/v1/tasks/${taskId}/status`, {status: status})
+            showToast('Task status updated successfully');
+            return true;
+        } catch (e) {
+            console.error('task status update failed', e)
+            showToast('Task status update failed', 'error');
+
+            throw e
+        } finally {
+            loading.value = false
+        }
+      
     }
     
     async function fetchStatuses () {
@@ -189,10 +240,82 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         } 
     }
 
+    const getProjectTeamMembers = async (projectId) => {
+        if (isFetching.value) return;
+        isFetching.value = true;
+        error.value = {}
+        try {
+            if (!projectId) {
+                throw new Error(`Project ID is required. Recieved: ${projectId}`)
+            }
+            const response = await window.axios.get(`api/v1/projects/${projectId}/team-members`)
+            projectTeamMembers.value = response.data?.data || []
+        } catch (e) {
+            console.error('Failed to fetch project team members', e)
+            throw e;
+        } finally {
+            isFetching.value = false
+        }
+    }
+
+    const assignMemberToTask = async (taskId) => {
+        if (loading.value) return;
+        loading.value = true;
+        try {
+            if (!taskId) {
+                throw new Error(`task ID is required to assign member. Recieved ${taskId}`)
+            }
+            const response = await window.axios.post(`api/v1/tasks/${taskId}/assignment`, {assigneeIds: selectedTaskAssignees.value.map(m => m.id)});
+            task.value = response.data?.data || {}
+            showToast('Assigned successfully');
+            return true;
+        } catch(e) {
+            if (e && e.response && e.response?.status === 422) {
+                validationError.value = e.response?.data?.message || 'Failed to assign a task'
+            } else {
+                console.error('Error on assigning user to task', e)
+                throw e;
+            }
+        } finally {
+            loading.value = false;
+        }
+    }
+    const removeAssignee = async (taskId, assigneeId) => {
+        if (loading.value) return;
+        loading.value = true;
+        try {
+            if (!taskId) {
+                throw new Error(`Task ID is required to remove assignee from task. Recieved: ${taskId}`);
+            }
+            if (!assigneeId) {
+                 throw new Error(`assingee ID is required to remove assignee from task. Recieved: ${taskId}`);
+            }
+            return await showConfirmDialog()
+                .then((async result => {
+                    if (!result.isConfirmed) {
+                        return
+                    }
+                    try {
+                        const response = await window.axios.delete(`api/v1/tasks/${taskId}/unassignment?assigneeId=${assigneeId}`)
+                        task.value = response.data?.data || {};
+                        showToast('Removed assignee successfully')
+                        return true;
+                    } catch (e) {
+                        showToast('Removing assignee from task failed', 'error');
+                        throw e;
+                    }
+                }))
+        } finally {
+            loading.value = false
+        }
+        
+    }
     return {
         fetchStatuses,
         updateTaskLinks,
         updateTask,
+        selectedTaskAssignees,
+        removeAssignee,
         storeTask,
         deleteTask,
         updateStatus,
@@ -200,6 +323,14 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
         fetchPriorityLevels,
         getTask,
         getTasks,
+        getProjectTeamMembers,
+        onSelectTaskAssignee,
+        onRemoveSelectedTaskAssignee,
+        assignMemberToTask,
+        validationError,
+        clearSelectedAssignees,
+        projectTeamMembers,
+        search,
         task,
         selectedPriority,
         selectedStatus,

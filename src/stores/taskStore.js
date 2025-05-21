@@ -7,11 +7,9 @@ import { useRoute } from "vue-router";
 export const useTaskStore = defineStore('tasks', () => {
     const { updateRouteParams, replaceParams } = useUtil();
     const route = useRoute();
-    const statuses = ref([]);
     const loading = ref(false);
     const isError = ref(false);
     const tasks = ref([]);
-    const priorityLevels = ref([]);
     const selectedAssigneeId = ref(route?.params?.assigneeId || '');
     const selectedPriority = ref(route?.query?.priority_level || '');
     const selectedStatus = ref(route?.query?.status || '');
@@ -101,46 +99,19 @@ export const useTaskStore = defineStore('tasks', () => {
         }
 
     }
-
-    const fetchStatuses = async () => {
-        return window.axios.get('api/v1/tasks-statuses')
-            .then((response) => {
-                statuses.value = response?.data?.data;
-            })
-            .catch((error) => {
-                console.error("errors",error)
-            });
-    }
-
-    const fetchPriorityLevels = async () => {
-        return window.axios.get('api/v1/task-priority-levels')
-            .then((response) => {
-                priorityLevels.value = response?.data?.data || [];
-            })
-            .catch((error) => {
-                console.error("there is an error on fetching the priority levels:", error)
-            });
-    }
-
-  
-
     return {
         tasks,
         pagination,
         getTasks,
         debounceSearch,
         searchInput,
-        priorityLevels,
         selectedAssigneeId,
-        statuses,
         isError,
         loading,
         selectedPriority,
         selectedStatus,
         resetFilters,
-        fetchStatuses,
         onChangeFilter,
-        fetchPriorityLevels,
         fetchTasks,
         changePage,
     }

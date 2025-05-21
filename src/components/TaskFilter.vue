@@ -16,8 +16,8 @@
                 class="px-4 py-2 border border-gray-300 capitalize rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
                 <option value="">Select Priority</option>
-                <option v-for="priority in taskStore?.priorityLevels" :key="priority" :value="priority">
-                    {{ priority }}
+                <option v-for="priority in getTaskPriorityOptions()" :key="priority.value" :value="priority.value">
+                    {{ priority.label }}
                 </option>
             </select>
             <select 
@@ -25,8 +25,8 @@
                 class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 capitalize focus:ring-blue-500 focus:border-blue-500"
             >
                 <option value="">Select Status</option>
-                <option v-for="status in taskStore?.statuses" :key="status" :value="status">
-                    {{ status }}
+                <option v-for="status in getTaskStatusOptions()" :key="status.value" :value="status.value">
+                    {{ status.label }}
                 </option>
             </select>
         </div>
@@ -46,6 +46,7 @@
     </div>
 </template>
 <script setup>
+import { getTaskPriorityOptions, getTaskStatusOptions } from "@/constants/task";
 import { useMemberStore } from "@/stores/memberStore";
 import { useTaskStore } from "@/stores/taskStore";
 import { Icon } from "@iconify/vue";
@@ -95,8 +96,6 @@ watch([
 
 onMounted(async() => {
   await Promise.all([
-    taskStore.fetchStatuses(),
-    taskStore.fetchPriorityLevels(),    
     memberStore.getMemberListWithoutPagination()
   ]);
 });
