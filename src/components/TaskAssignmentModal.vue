@@ -15,6 +15,10 @@ const props = defineProps({
     taskAssignees: {
         type: Array,
         default: () => ([])
+    },
+    isMaxxAssignees: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -55,7 +59,7 @@ const emitSubmit = () => {
 }
 </script>
 <template>
-     <button @click="$emit('open-modal')" class="px-3 py-1 cursor-pointer gap-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm">
+     <button @click="$emit('open-modal')" v-if="!isMaxxAssignees" class="px-3 py-1 cursor-pointer gap-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm">
         <Icon icon="heroicons-solid:user-add" width="20" height="20" />
         <span>Assign a Member</span>
     </button>

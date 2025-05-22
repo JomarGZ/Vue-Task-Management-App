@@ -18,7 +18,7 @@ export const useProjectStore = defineStore("project", () => {
     const route = useRoute();
     const project = ref({});
     const searchInput = ref(route.query.search || '');
-    const {showToast} = useSweetAlert();
+    const {showToast, showConfirmDialog} = useSweetAlert();
     const loading = ref(false);
     const form = reactive({
         name: '',
@@ -158,6 +158,33 @@ export const useProjectStore = defineStore("project", () => {
        }
     }
 
+    const deleteProject = async (projectId) => {
+        if (loading.value) return;
+        loading.value = true;
+        try {
+            if (!projectId) {
+                throw new Error(`Project ID is required to delete a project. Recieved: ${projectId}`)
+            }
+            return await showConfirmDialog()
+                .then((async result => {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+                    try {
+                        await window.axios.delete(`api/v1/projects/${projectId}`)
+                        showToast('Project deleted successfully');
+                        return true;
+                    } catch (e) {
+                        console.error('Failed to delete project', e);
+                        throw e;
+                    }
+                }))
+        } finally {
+            loading.value = false;
+        }
+
+    }
+
     const getStatuses = async () => {
         try {
             const response = await window.axios.get("api/v1/project-statuses");
@@ -178,6 +205,7 @@ export const useProjectStore = defineStore("project", () => {
     
     return {
         getProjects,
+        deleteProject,
         storeProject,
         changePage,
         getProject,
