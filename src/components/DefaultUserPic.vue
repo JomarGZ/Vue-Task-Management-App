@@ -9,7 +9,7 @@ const props = defineProps({
 </script>
 <template>
     <span 
-        class=" rounded-full border-white border-2 shadow-lg  bg-blue-300 text-blue-600 flex items-center justify-center font-bold"
+        class=" rounded-full border-white border-2 shadow-lg text-xs bg-blue-300 text-blue-600 flex items-center justify-center font-bold"
         >
         {{ getInitials(name) }}
     </span>

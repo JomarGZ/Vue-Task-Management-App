@@ -36,6 +36,7 @@ const handleAssignMembers = async () => {
         <div class="flex justify-between items-center mb-3">
             <h3 class="text-lg font-medium text-gray-800">Team</h3>
             <TaskAssignmentModal
+                :isMaxxAssignees="assignees?.length >= 5"
                 :taskAssignees="assignees" 
                 :projectId="$route.params?.projectId"
                 :show="isTaskAssignmentModalShow"
@@ -46,7 +47,7 @@ const handleAssignMembers = async () => {
         </div>
         <!-- Assignees -->
         <div class="mb-2 relative">
-            <div class="text-xs text-gray-500 font-medium mb-2">ASSIGNEES ({{ props.assignees?.length || 0 }})</div>
+            <div class="text-xs text-gray-500 font-medium mb-2">ASSIGNEES ({{ assignees?.length || 0 }}/5)</div>
             <div class="space-y-2">
                 <task-assignee-item
                     v-for="assignee in firstTwoAssignees"

@@ -11,6 +11,10 @@ const props = defineProps({
     show: {
         type: Boolean,
         default: false
+    },
+    isMaxAssignees: {
+        type: Boolean,
+        default: false
     }
 })
 const emit = defineEmits(['data-added', 'close-modal', 'open-modal', 'submit']);
@@ -65,7 +69,7 @@ const emitSubmit = () => {
 </script>
 
 <template>
-     <button @click="$emit('open-modal')" class="px-3 py-1 gap-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm">
+     <button @click="$emit('open-modal')" v-if="!isMaxAssignees" class="px-3 py-1 gap-2 cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center text-sm">
         <Icon icon="heroicons-solid:user-add" width="20" height="20" />
         <span>Add Member</span>
     </button>

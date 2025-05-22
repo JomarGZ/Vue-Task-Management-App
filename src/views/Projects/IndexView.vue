@@ -2,7 +2,7 @@
 import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { onMounted, watch } from 'vue';
-
+import ProjectItem from '@/components/ProjectItem.vue';
 const store = useProjectStore();
 const handleFilterProjects = async ([status, priority]) => {
     store.filterProjects({status: status, priority: priority})
@@ -22,12 +22,18 @@ onMounted(async() => {
         store.getPriorityLevels()
     ]);
 })
+const handleProjectDelete = async (projectId) => {
+    const success = await store.deleteProject(projectId);
+    if (success) {
+        await store.getProjects();
+    }
+}
 </script>
 <template>
-     <div class="max-w-7xl mx-auto">
+     <div class="max-w-7xl mx-auto bg-gray-50 p-4 rounded-2xl">
         <!-- Header with Create Button -->
         <div class="mb-6 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Projects</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Projects Management</h1>
             <RouterLink :to="{ name: 'projects.create'}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
                 <IconSVG name="plus-svg"/>
                 Create Project
@@ -55,15 +61,14 @@ onMounted(async() => {
         </div>
 
         <!-- Table -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="bg-white rounded-lg shadow">
             <table class="min-w-full">
                 <thead>
                     <tr class="bg-gray-50">
                         <th @click="store.orderBy('name')" class="cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project Name</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -82,46 +87,17 @@ onMounted(async() => {
                         </td>
                     </tr>
                     <template v-else-if="store.projects?.length > 0">
-                        <tr 
+                       <ProjectItem
                             v-for="project in store.projects"
                             :key="project.id"
-                        >
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-mobile-alt text-purple-600"></i>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">{{ project?.name }}</div>
-                                        <div class="text-sm text-gray-500">Client: {{ project?.client_name }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    {{ project?.status }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                    {{ project?.priority }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 30%"></div>
-                                </div>
-                                <span class="text-sm text-gray-600">30%</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm flex items-center font-medium space-x-2">
-                                <RouterLink :to="{ name: 'projects.edit', params: {projectId: project.id}}" class="text-blue-600 hover:text-blue-900" title="Edit">
-                                    <IconSVG name="edit-svg"/>
-                                </RouterLink>
-                                <RouterLink :to="{ name: 'projects.show', params: {projectId: project.id}}" class="text-green-600 hover:text-green-900" title="View project">
-                                    <IconSVG name="eye-svg"/>
-                                </RouterLink>
-                            </td>
-                        </tr>
+                            :name="project.name"
+                            :client_name="project.client_name"
+                            :status="project.status"
+                            :priority="project.priority"
+                            :id="project.id"
+                            :assignees="project.assigned_members"
+                            @delete-project="handleProjectDelete"
+                       />
                     </template>
                     <tr v-else >
                         <td colspan="100%" class="p-4">

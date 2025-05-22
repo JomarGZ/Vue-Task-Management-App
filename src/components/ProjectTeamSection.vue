@@ -42,8 +42,9 @@ const handleAssignSubmission = async () => {
 <template>
     <div class="p-6 border-b border-gray-200">
         <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium text-gray-800">Project Team</h3>
-            <AssignProjectTeamModal 
+            <h3 class="text-lg font-medium text-gray-800">Project Team ({{ teamAssignees.length }}/20)</h3>
+            <AssignProjectTeamModal
+                :isMaxAssignees="teamAssignees.length >= 20"
                 @submit="handleAssignSubmission"
                 :teamAssignees="teamAssignees"
                 @open-modal="isAddAssigneeFormModalShow = !isAddAssigneeFormModalShow" 
