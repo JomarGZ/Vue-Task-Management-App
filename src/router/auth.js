@@ -27,12 +27,6 @@ export default {
         name: 'profile.index',
         component: () => import('@/views/Auth/ProfileView.vue'),
     },
-    {
-        path: '/positions',
-        name: 'positions.index',
-        component: () => import('@/views/Position/IndexView.vue'),
-    },
-
     ...projectRoutes,
     ...taskRoutes,
     ...memberRoutes,

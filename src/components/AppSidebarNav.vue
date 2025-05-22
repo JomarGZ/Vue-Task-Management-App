@@ -17,11 +17,6 @@ const navLinks = [
         to: {name: 'members.index'},
         icon: 'tdesign:member'
     },
-    {
-        name: 'Positions',
-        to: {name: 'positions.index'},
-        icon: 'oui:app-users-roles'
-    },
 ]
 </script>
 <template>

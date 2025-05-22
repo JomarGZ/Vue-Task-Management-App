@@ -17,6 +17,10 @@ const props = defineProps({
         type: String,
         required: true
     },
+    position: {
+        type: String,
+        default: ''
+    },
     avatar: {
         type: String,
         default: ''
@@ -47,8 +51,11 @@ const prepareCommentData = () => ({
         <div class="absolute w-3 h-3 bg-gray-200 rounded-full -left-1.5 border border-white"></div>
         <div class="flex items-center mb-1 min-w-0">
             <user-avatar :name="author_name" :avatar="avatar"/>
-            <span class="font-medium text-sm truncate">{{ author_name }}</span>
-            <span class="text-xs text-gray-500 ml-2 shrink-0">{{ timeCreated }}</span>
+            <div class="font-medium text-sm truncate flex flex-col">
+                <span>{{ author_name }}</span>
+                <span class="text-xs text-gray-500 font-light">{{ position }}</span>
+            </div>
+            <span class="text-xs text-gray-500 ml-2 shrink-0 self-end">{{ timeCreated }}</span>
             
             <!-- Three-dot menu -->
             <div class="ml-auto relative shrink-0">

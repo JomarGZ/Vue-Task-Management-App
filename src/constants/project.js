@@ -1,4 +1,3 @@
-// src/constants/taskStatus.js
 export const PROJECT_STATUS = {
     NOT_STARTED: {
         value: 'not started',
