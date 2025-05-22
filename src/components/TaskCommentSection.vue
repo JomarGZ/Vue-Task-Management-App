@@ -52,6 +52,7 @@ const hanndleMenuToggle = (commentId) => {
                         :key="comment.id"
                         :id="comment.id"
                         :created_at="comment.created_at"
+                        :position="comment.user?.position"
                         :content="comment.content"
                         :author_name="comment.user?.name"
                         :is-menu-open="activeMenuId === comment.id"

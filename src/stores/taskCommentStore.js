@@ -77,6 +77,7 @@ export const useTaskComments = defineStore("task-comments", () => {
                 user: {
                     id: auth.user?.id,
                     name: auth.user?.name,
+                    position: auth.user?.position,
                     avatar: {
                         'thumb-60': auth.user?.avatar?.['thumb-60'] || ""
                     }

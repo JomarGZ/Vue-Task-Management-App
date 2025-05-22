@@ -1,4 +1,5 @@
 <script setup>
+import { getPositionsOption, VALID_POSITIONS } from '@/constants/user';
 import { useAuth } from '@/stores/auth';
 import { useChangeProfile } from '@/stores/changeProfile';
 import { usePosition } from '@/stores/positionStore';
@@ -15,7 +16,15 @@ const positionStore = usePosition();
 const schema = z.object({
     name: z.string().min(1, 'Name is required').max(50, 'Name must be less than 50 characters'),
     email: z.string().email('Invalid email address').max(50, 'Email must be less than 50 characters'),
-    position_id: z.number().optional()
+    position: z
+        .string()
+        .optional()
+        .transform(val => val === "" ? undefined : val)
+        .pipe(
+            z.enum(VALID_POSITIONS, {
+                errorMap: () => ({message: 'Selected position is invalid.'})
+            })
+        )
 })
 
 const {handleSubmit, resetForm, isSubmitting, setFieldError} = useForm({validationSchema: toTypedSchema(schema)});
@@ -34,7 +43,7 @@ onMounted(() => {
         values: {
             name: auth.user?.name || '',
             email: auth.user?.email || '', 
-            position_id: auth.user?.position?.id || '', 
+            position: auth.user?.position || '', 
         }
     })
     positionStore.fetchUnpaginatedPositions();
@@ -61,19 +70,19 @@ onMounted(() => {
             <Field
                 as="select"
                 id="position"
-                name="position_id"
+                name="position"
                 class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
                 <option value="">Select a position</option>
                 <option 
                     class="text-gray-900 capitalize"
-                    v-for="position in positionStore.unpaginatedPositions" 
-                    :key="position.id" 
-                    :value="position.id">
-                    {{ position.name }}
+                    v-for="position in getPositionsOption()" 
+                    :key="position.value" 
+                    :value="position.value">
+                    {{ position.label }}
                 </option>
             </Field>
-            <ErrorMessage name="position_id" class="mt-1 text-sm text-red-600 block"/>
+            <ErrorMessage name="position" class="mt-1 text-sm text-red-600 block"/>
         </div>
         <!-- Email Field -->
         <div class="mb-6">
