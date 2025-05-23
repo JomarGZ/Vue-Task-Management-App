@@ -42,8 +42,8 @@ onMounted(store.getMembers);
                     <tr class="bg-gray-50">
                         <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Position</th>
-                        <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Update Position</th>
-                        <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skills</th>
+                        <th v-if="auth.user?.role === 'admin'" class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Update Position</th>
+                        <!-- <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skills</th> -->
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">

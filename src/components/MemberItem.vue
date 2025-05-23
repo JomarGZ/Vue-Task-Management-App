@@ -57,7 +57,7 @@ const auth = useAuth();
                 :class="positionConfig.badgeClass"
             >{{ positionConfig.label || 'Not set' }}</span>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap">
+        <td class="px-6 py-4 whitespace-nowrap" v-if="auth.user?.role === 'admin'">
             <div class="relative">
                 <select v-model="selectedPosition" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary rounded-md">
                     <option value="" selected disabled>Select new Position</option>
@@ -69,13 +69,13 @@ const auth = useAuth();
                 </select>
             </div>
         </td>
-        <td class="px-6 py-4">
+        <!-- <td class="px-6 py-4">
             <div class="flex flex-wrap gap-1">
                 <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Figma</span>
                 <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Sketch</span>
                 <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Adobe XD</span>
             </div>
-        </td>
+        </td> -->
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex">
             <RouterLink :to="{name: 'members.show', params: {id: id}}" class="text-green-600 hover:text-green-900 hover:bg-green-100 flex items-center justify-center p-1 rounded-md">
                 <Icon icon="lets-icons:view" width="24" height="24" />

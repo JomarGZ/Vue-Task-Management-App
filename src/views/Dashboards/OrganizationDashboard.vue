@@ -3,7 +3,7 @@ import TaskActivityFeed from "@/components/TaskActivityFeed.vue";
 import UpcomingTaskDeadlines from "@/components/UpcomingTaskDeadlines.vue";
 import { useUserTasks } from "@/stores/userTaskStore";
 import debounce from "lodash.debounce";
-import { onMounted, watch, provide, onBeforeUnmount, ref, computed } from "vue";
+import { onMounted, watch, provide, onBeforeUnmount, computed } from "vue";
 import CountsPanel from "@/components/CountsPanel.vue";
 import TaskStatusDistributionChart from "@/components/PieChart.vue";
 import AreaChart from "@/components/AreaChart.vue";
