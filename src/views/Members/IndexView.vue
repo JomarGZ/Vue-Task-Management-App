@@ -1,6 +1,5 @@
 <script setup>
-import DefaultUserPic from '@/components/DefaultUserPic.vue';
-import { getInitials } from '@/composables/useFormatters';
+import MemberItem from '@/components/MemberItem.vue';
 import { useAuth } from '@/stores/auth';
 import { useMemberStore } from '@/stores/memberStore';
 import { onMounted, watch } from 'vue';
@@ -41,9 +40,10 @@ onMounted(store.getMembers);
             <table class="min-w-full">
                 <thead>
                     <tr class="bg-gray-50">
-                        <th @click="store.orderBy('name')" class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th @click="store.orderBy('email')" class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Position</th>
+                        <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Update Position</th>
+                        <th class=" cursor-pointer px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skills</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -63,40 +63,16 @@ onMounted(store.getMembers);
                         </td>
                      </tr>
                      <template v-else-if="store?.members?.length > 0">
-                        <tr 
-                        v-for="member in store?.members"
-                        :key="member.id"
-                        >
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <img v-if="member.avatar?.['thumb-60']" :src="member.avatar?.['thumb-60']" class="h-10 w-10 border-2 rounded-full border-white outline outline-2 outline-blue-400" alt="">
-                                    <DefaultUserPic v-else :name="member.name" class="h-10 w-10 border-2 border-white outline outline-2 outline-blue-400"/>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">{{ member.name }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ member.email }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 flex">
-                                <RouterLink :to="{name: 'members.show', params: {id: member.id}}" class="text-purple-600 hover:text-purple-900">
-                                    <IconSVG name="user-svg"/>
-                                </RouterLink>
-                                <button 
-                                    v-if="auth.user?.role == 'admin'"
-                                    @click="store.deleteMember(member)" 
-                                    :class="{
-                                        'text-red-600 hover:text-red-900':! store.loading,
-                                        'text-red-400': store.loading,
-                                    }" 
-                                    title="Delete"
-                                    :disabled="store.loading"
-                                >
-                                    <IconSVG name="trash-svg"/>
-                                </button>
-                            </td>
-                        </tr>
+                        <MemberItem
+                            v-for="member in store?.members"
+                            :key="member.id"
+                            :id="member.id"
+                            :name="member.name"
+                            :email="member.email"
+                            :position="member.position"
+                            @delete-member="() => store.deleteMember(member)"
+                            @save-member="(selectedPosition) => store.changePosition(member.id, selectedPosition)"
+                        />
                      </template>
                      <tr v-else >
                         <td colspan="100%" class="p-4">
