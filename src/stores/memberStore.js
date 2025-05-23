@@ -197,8 +197,35 @@ export const useMemberStore = defineStore("memberStore", () => {
       }))
   }
 
+  const changePosition = async (memberId, position) => {
+    if (loading.value) return;
+    loading.value = true;
+    try {
+      if (!memberId) {
+        throw new Error(`Member ID is required to update member position. Recieved: ${memberId}`)
+      }
+      if (!position) {
+        throw new Error(`Selected position is required to update member position. Recieved: ${position}`)
+      }
+      const { data } = await window.axios.patch(`api/v1/tenant-member/position/update/${memberId}`, {position : position})
+      const memberIndex = members.value.findIndex(m => m.id === memberId);
+      if (memberIndex !== -1) {
+        members.value[memberIndex] = data.data;
+      }
+      showToast('Member position updated successfully')
+      return true;
+    } catch (e) {
+      showToast('Failed to update position', 'error');
+      console.error('Failed to update member position', e);
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   return {
       resetForm,
+      changePosition,
       handleSubmit,
       getMembers,
       changePage,
