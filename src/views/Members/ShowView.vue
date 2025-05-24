@@ -1,47 +1,30 @@
 <script setup>
 import DefaultUserPic from '@/components/DefaultUserPic.vue';
 import TaskActivityFeed from '@/components/TaskActivityFeed.vue';
+import TaskTable from '@/components/TaskTable.vue';
 import { capWords } from '@/composables/useUtil';
 import { useAuth } from '@/stores/auth';
 import { useMemberStore } from '@/stores/memberStore';
 import { useUserTasks } from '@/stores/userTaskStore';
-import debounce from 'lodash.debounce';
-import { onBeforeUnmount, onMounted, provide, watch } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import SelectMemberPosition from '@/components/SelectMemberPosition.vue';
 const auth = useAuth();
 const useMember = useMemberStore();
 const userTaskStore = useUserTasks();
 const route = useRoute();
 
-const handleDebounceSearch = debounce(async(search) => {
-    userTaskStore.clearFilters();
-    await userTaskStore.fetchAssignedTasks({
-        search: search
-    })
-}, 300)
-
-const handleAssignedTaskFilter =  ([selectedStatus, selectedPriority]) => {
-    userTaskStore.fetchAssignedTasks({
-        status: selectedStatus,
-        priority_level: selectedPriority,
-    })
+const handleDeleteTask = () => {
 
 }
 
-watch(() => userTaskStore.searchQuery, handleDebounceSearch)
-watch(() => [userTaskStore.selectedStatus, userTaskStore.selectedPriority], handleAssignedTaskFilter);
-
+onMounted(() => {
+    userTaskStore.getAssignedTasks(route?.params?.id);
+    useMember.fetchMember({id: route.params?.id});
+})
 onBeforeUnmount(() => {
     userTaskStore.clearFilters();
     useMember.resetMember();
 })
-onMounted(() => {
-    userTaskStore.fetchAssignedTasks({user_id: route.params?.id});
-    useMember.fetchMember({id: route.params?.id});
-})
-provide('pagination', userTaskStore.pagination);
-provide('handlePageChange', userTaskStore.handlePageChange);
 </script>
 <template>
     <div class="container mx-auto px-4 py-8">
@@ -53,14 +36,12 @@ provide('handlePageChange', userTaskStore.handlePageChange);
             <DefaultUserPic v-else class="w-24 h-24 border-white border-4 text-3xl" :name="useMember?.member?.name ?? ''"/>
             <!-- Profile Details -->
             <div>
-                <h2 class="text-2xl font-semibold text-gray-800">{{ capWords(useMember.member?.name) }}</h2>
-                <p class="text-gray-600">Software Engineer</p>
+                <h2 class="text-2xl font-semibold text-gray-800 capitalize">{{ useMember.member?.name }}</h2>
+                <p class="text-gray-600 capitalize">{{ useMember.member?.position }}</p>
                 <p class="text-gray-500">{{ useMember.member?.email }}</p>
             </div>
         </div>
-        <div>
-            <SelectMemberPosition/>
-        </div>
+    
      </div>
 
      <!-- Team Section -->
@@ -90,15 +71,27 @@ provide('handlePageChange', userTaskStore.handlePageChange);
              </div>
          </div>
      </div> -->
-     <TaskActivityFeed
+     <!-- <TaskActivityFeed
         :activities="userTaskStore.assignedTasks"
         :isLoading="userTaskStore.isAssignedTasksLoading"
         :isError="userTaskStore.isAssignedTasksError"
         v-model:searchQuery="userTaskStore.searchQuery"
         v-model:selectedStatus="userTaskStore.selectedStatus"
         v-model:selectedPriority="userTaskStore.selectedPriority"
-    />
-
+    /> -->
+    <div class="bg-white rounded-lg shadow-md">
+        <h2 class="m-2 text-2xl font-bold p-7 text-gray-700">Tasks Assignments</h2>
+         <TaskTable
+            :tasks="userTaskStore.tasks"
+            @submit-filters="(filters) => userTaskStore.getAssignedTasks(route.params?.id, 1, filters)"
+            @delete-task="handleDeleteTask"
+            @onPaginate="(page) => userTaskStore.getAssignedTasks(route.params?.id, page)"
+            :loading="userTaskStore.loading"
+            :isFetching="userTaskStore.isAssignedTasksLoading"
+            @retry="userTaskStore.getAssignedTasks(route.params?.id)"
+            :error="userTaskStore.error"
+        />
+    </div>
      <!-- Tasks Section -->
     <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
          <div class="bg-white rounded-lg shadow-md p-6">

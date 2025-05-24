@@ -17,45 +17,21 @@ export const useUserTasks = defineStore('user-tasks', () => {
     const assignedTasks = ref([]);
     const priorityTimeline = ref([]);
     const taskCounts = ref({});
-    
+    const error = ref();
     const {showToast} = useSweetAlert();
-
-    const pagination = reactive({
-        current_page: 1,
-        last_page: 0,
-        links: {},
-        from: 0,
-        to: 0,
-        total: 0,
-    })
-    
+    const loading = ref(false);
+    const tasks = ref([]);
     const clearFilters = () => {
         selectedStatus.value = "";
         selectedPriority.value = "";
     };
 
-    const setPagination = (data) => {
-        if (!data) return;
-        pagination.current_page = data.current_page;
-        pagination.last_page = data.last_page;
-        pagination.links = data.links;
-        pagination.from = data.from;
-        pagination.to = data.to;
-        pagination.total = data.total;
-    }
-    const setAssignedTasks = (data) => {
-        if (!data) return;
-        assignedTasks.value = data
-    }
-  
+ 
     const setUpcomingTaskDeadlines = (data) => {
         if (!data) return;
         upcomingTasksDeadline.value = data;
     }
 
-    const handlePageChange = async (page) => {
-        await fetchAssignedTasks({page: page});
-    };
 
     const fetchUpcomingTaskDeadlines = async () => {
         await handleAsyncRequestOperation(getUpcomingTaskDeadlines, (response) => {
@@ -63,20 +39,40 @@ export const useUserTasks = defineStore('user-tasks', () => {
         }, isUpcomingDeadlinesLoading, isUpcomingDeadlinesError);
     }
 
-    const fetchAssignedTasks = async (params = {page: 1}) => {
-        await handleAsyncRequestOperation(
-            () => getAssignedTasks(params), (response) => {
-            setAssignedTasks(response.data?.data)
-            setPagination(response.data?.meta);
-        }, isAssignedTasksLoading, isAssignedTasksError)
-    }
-
-    const getAssignedTasks = async (params = {}) => {
-       
-        if (typeof params === 'object' && params !== null) {
-            return window.axios.get("api/v1/user/assigned-tasks", { params });
+    const getAssignedTasks = async (userId, page = 1, filters = {}) => {
+        if (isAssignedTasksLoading.value) return;
+        isAssignedTasksLoading.value = true;
+        error.value = {};
+        try {
+            if (!userId) {
+                throw new Error(`User ID is required to get assigned tasks. Recieved: ${userId}`);
+            }
+              const params = new URLSearchParams({
+                page: page,
+                ...(filters.search?.trim().length > 0 && {
+                    search: filters.search?.trim()
+                }),
+                ...(filters.status?.trim().length > 0 && {
+                    status: filters.status?.trim()
+                }),
+                ...(filters.priority?.trim().length > 0 && {
+                    priority_level: filters.priority?.trim()
+                }),
+                ...(filters.assigneeId && {
+                    assigneeId: filters.assigneeId
+                })
+            });
+            const response = await window.axios.get(`api/v1/user/${userId}/tasks?${params.toString()}`);
+            tasks.value = response.data || []
+        } catch (e) {
+            console.error('Failed to get assigned tasks', e);
+            error.value = e; 
+            throw e;
+        } finally {
+            isAssignedTasksLoading.value = false
         }
     }
+  
     const getTaskCounts = async () => {
         if (isTaskCountsLoading.value) return;
         isTaskCountsLoading.value = true;
@@ -111,18 +107,18 @@ export const useUserTasks = defineStore('user-tasks', () => {
         assignedTasks,
         isAssignedTasksLoading,
         isUpcomingDeadlinesLoading,
+        tasks,
         isAssignedTasksError,
         searchQuery,
+        loading,
         selectedStatus,
         isTaskCountsLoading,
         isUpcomingDeadlinesError,
         isTaskCountsError,
         upcomingTasksDeadline,
-        pagination,
         selectedPriority,
-        handlePageChange,
+        getAssignedTasks,
         fetchPriorityTimeline,
-        fetchAssignedTasks,
         fetchUpcomingTaskDeadlines,
         clearFilters,
     }

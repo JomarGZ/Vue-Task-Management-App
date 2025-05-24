@@ -4,6 +4,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { computed, watch } from 'vue';
 import { getTaskCategoryByValue, getTaskPriorityByValue, getTaskStatusByValue } from '@/constants/task';
 import AvatarGroup from './AvatarGroup.vue';
+import { useAuth } from '@/stores/auth';
 const props = defineProps({
     id: {
         type: [Number, String],
@@ -36,9 +37,13 @@ const props = defineProps({
     loading: {
         type: Boolean,
         default: false
+    },
+    projectId: {
+        type: [Number, String],
+        required: true
     }
 })
-
+const auth = useAuth();
 const daysLeft = ref('');
 const categoryConfig = computed(() => props.category?.trim().length > 0 ? getTaskCategoryByValue(props.category) : '');
 const statusConfig = computed(() => getTaskStatusByValue(props.status))
@@ -108,10 +113,9 @@ onMounted(() => {
             </span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap flex items-center justify-center gap-2">
-            
-            <router-link :to="{name: 'tasks.show', params: {taskId: id}}" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="material-icon-theme:folder-vm-open" width="20" height="20" /></router-link>
-            <router-link :to="{name: 'tasks.edit', params: {taskId: id}}" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="emojione:pencil" width="20" height="20" /></router-link>
-            <button @click="onDeleteTask(id)" :disabled="loading" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2">
+            <router-link :to="{name: 'tasks.show', params: {taskId: id, projectId: projectId}}" class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="material-icon-theme:folder-vm-open" width="20" height="20" /></router-link>
+            <router-link :to="{name: 'tasks.edit', params: {taskId: id, projectId: projectId}}" v-if="auth?.user?.role === 'admin'"  class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2"><Icon icon="emojione:pencil" width="20" height="20" /></router-link>
+            <button @click="onDeleteTask(id)" :disabled="loading" v-if="auth?.user?.role === 'admin'"  class="hover:bg-gray-200 rounded-sm duration-200 transition-all hover:scale-110 cursor-pointer p-2">
                 <span v-if="loading"><Icon icon="eos-icons:loading" width="24" height="24" /></span>
                 <span v-else><Icon icon="icon-park:delete" width="20" height="20" /></span>
             </button>
