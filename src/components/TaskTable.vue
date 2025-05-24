@@ -6,7 +6,7 @@ import TaskFilter from './TaskFilter.vue';
 const props = defineProps({
     projectId: {
         type: [Number, String],
-        required: true
+        default: ''
     },
     tasks: {
         type: Object,
@@ -34,7 +34,7 @@ const handleFilters = (filters) => {
 </script>
 <template>
      <div class="p-6">
-        <div class="flex justify-between items-center mb-4">
+        <div v-if="projectId" class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium text-gray-800">Project Tasks</h3>
             <router-link :to="{name: 'tasks.create', params: {projectId: projectId}}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center">
                 <Icon icon="line-md:plus" width="24" height="24" />Create Task
@@ -70,6 +70,7 @@ const handleFilters = (filters) => {
                         @delete-task="(taskId) => $emit('delete-task', taskId)"
                         :loading="loading"
                         :assignees="task.assigned_users"
+                        :projectId="projectId || task.project?.id"
                     />
                 </tbody>
             </table>

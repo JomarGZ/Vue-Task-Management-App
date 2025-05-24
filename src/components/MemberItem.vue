@@ -59,7 +59,7 @@ const auth = useAuth();
         </td>
         <td class="px-6 py-4 whitespace-nowrap" v-if="auth.user?.role === 'admin'">
             <div class="relative">
-                <select v-model="selectedPosition" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary rounded-md">
+                <select v-model="selectedPosition" class="block w-full cursor-pointer hover:bg-gray-100 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary rounded-md">
                     <option value="" selected disabled>Select new Position</option>
                     <option 
                         v-for="position in getPositionsOption()"
