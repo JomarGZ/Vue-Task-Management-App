@@ -61,6 +61,7 @@ const handleAssignSubmission = async () => {
                     :name="assignee.name"
                     :avatar="assignee.avatar?.['thumb-60']"
                     :position="assignee.position"
+                    :tasks_count="assignee.tasks_count"
                     @remove-member="handleRemoveAssignedMember"
                 />
             </template>

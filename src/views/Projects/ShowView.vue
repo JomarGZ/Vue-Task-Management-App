@@ -60,7 +60,9 @@ const handleDeleteTask = async (taskId) => {
                 :clientName="projectStore.project?.client_name || ''"
                 :budget="projectStore.project?.budget || ''"
                 :description="projectStore.project?.description || ''"
-                status="active"
+                :status="projectStore.project?.status || ''"
+                :progress="projectStore.project?.progress"
+
             />
             <ProjectTeamSection 
                 :teamAssignees="projectStore.project?.assigned_members" 

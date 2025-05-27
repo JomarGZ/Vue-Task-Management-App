@@ -105,8 +105,13 @@ const isDeadlineInputDisabled = computed(() => values.started_at?.trim().length 
 const emitSubmit = handleSubmit((values) => {
     emit('submit', values);
 })
+watch(() => props.task.started_at, (startedDate) => {
+    if (startedDate) {
+        today.value = props.task.started_at ?  new Date(props.task.started_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    }
+})
 onMounted(() => {
-    today.value = new Date().toISOString().split('T')[0];
+    today.value = props.task.started_at ?  new Date(props.task.started_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 })
 </script>
 <template>
