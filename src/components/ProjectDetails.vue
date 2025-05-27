@@ -35,12 +35,16 @@ const props = defineProps({
     description: {
         type: String,
         required: true
+    },
+    progress: {
+        type: Number,
+        default: 0
     }
 })
 const readMore = ref(false);
 const descriptionContainer = ref(null);
 const needsToggle = ref(false);
-
+const projectProgress = computed(() => props.progress ? `${props.progress}%` : '0%');
 const timeline = computed(() => props.startedDate && props.endDate ? `${new Date(props.startedDate).toLocaleDateString('en-US',{month: 'long', day: 'numeric'})} - ${new Date(props.endDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})}` : 'Not set')
 const formattedStartedAt = computed(() => props.startedDate ? new Date(props.startedDate).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : 'Not Started')
 const budgetInDollar = computed(() => props.budget ? new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(Number(props.budget)) : '$ 0');
@@ -116,10 +120,10 @@ onBeforeUnmount(() => {
             <div class="text-xs text-gray-500 font-medium mb-1">PROGRESS</div>
             <div class="flex items-center">
                 <i class="fas fa-tasks text-gray-400 mr-2"></i>
-                <span class="font-medium">42%</span>
+                <span class="font-medium">{{ projectProgress }}</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                <div class="bg-green-500 h-1.5 rounded-full" style="width: 42%"></div>
+                <div class="bg-green-500 h-1.5 rounded-full" :style="`width: ${projectProgress}`"></div>
             </div>
         </div>
     </div>

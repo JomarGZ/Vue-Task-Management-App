@@ -10,7 +10,7 @@
         </div>
         <div class="flex justify-between text-sm min-w-0">
             <span class="text-gray-600 capitalize truncate">{{ team }}</span>
-            <span class="text-blue-600 shrink-0">{{ taskCount }} tasks</span>
+            <span class="text-blue-600 shrink-0">{{ tasks_count }} tasks</span>
         </div>
         <button @click="$emit('remove-member', id)" :disabled="projectTeamStore.loading" class="transition-all duration-300 ease-in-out transform hover:scale-110 absolute right-5 cursor-pointer hover:bg-gray-300 p-2 rounded-full flex items-center justify-center top-8 text-gray-500">
             <Icon v-if="projectTeamStore.loading" icon="eos-icons:loading" width="20" height="20" />
@@ -45,12 +45,11 @@ const props = defineProps({
         type: String,
         default: ''
     },
-    tasks: {
-        type: Array,
-        default: () => ([])
+    tasks_count: {
+        type: [Number, String],
+        default: 0
     }
 })
 const projectTeamStore = useProjectTeamStore();
 defineEmits(['remove-member']);
-const taskCount = computed(() => props.tasks?.length ?? 0);
 </script>

@@ -1,24 +1,24 @@
 <script setup>
-import { useUserTasks } from '@/stores/userTaskStore';
 import { Icon } from '@iconify/vue';
 import { computed, onMounted, ref } from 'vue';
 import LineChart from '@/components/LineChart.vue';
+import { useTaskStats } from '@/stores/taskStats';
 
 
-const userTaskStore = useUserTasks();
+const taskStatsStore = useTaskStats();
 const isMounted = ref(false);
 const weekLabels = computed(() => {
-    return userTaskStore.taskCounts?.weekly_data?.map(week => {
+    return taskStatsStore.weeklyData?.map(week => {
         const start = new Date(week.week_start);
         const end = new Date(week.week_end);
         return `${start.toLocaleString('default', {month: 'short'})} ${start.getDate()}-${end.getDate()}`
     })
 })
 const getWeeklyData = (metric) => {
-    return userTaskStore.taskCounts.weekly_data?.map(week => week[metric] || 0);
+    return taskStatsStore.weeklyData?.map(week => week[metric] || 0);
 } 
-onMounted(async () => {
-    await userTaskStore.getTaskCounts();
+onMounted( () => {
+    taskStatsStore.getTaskStats();
     isMounted.value = true;
 })
 </script>
@@ -32,13 +32,13 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Task Completed</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.current_totals?.completed || 0 }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ taskStatsStore.currentTotals?.completed || 0 }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
                  <LineChart 
-                    v-if="isMounted && !userTaskStore.isTaskCountsLoading"
+                    v-if="isMounted && !taskStatsStore.fetching"
                     :colors="['#10B981']"
                     :data="getWeeklyData('completed')"
                     name="Completed"
@@ -58,13 +58,13 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Task In-progress</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.current_totals?.in_progress || 0 }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ taskStatsStore.currentTotals?.in_progress || 0 }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
-                        v-if="isMounted && !userTaskStore.isTaskCountsLoading"
+                        v-if="isMounted && !taskStatsStore.fetching"
                         :colors="['#F59E0B']"
                         :data="getWeeklyData('in_progress')"   
                         name="In Progress"    
@@ -84,13 +84,13 @@ onMounted(async () => {
                     </div>
                     <h2 class="font-bold text-gray-600">Total Tasks</h2>
                 </div>
-                <div class="text-2xl font-bold text-gray-700">{{ userTaskStore.taskCounts?.current_totals?.total || 0 }}</div>
+                <div class="text-2xl font-bold text-gray-700">{{ taskStatsStore.currentTotals?.total || 0 }}</div>
             </div>
             <div class="scale-y-50 h-0.5 w-full bg-gray-300 my-5"></div>
             <div class="flex justify-between items-center">
                 <div class="">
                     <LineChart 
-                        v-if="isMounted && !userTaskStore.isTaskCountsLoading"
+                        v-if="isMounted && !taskStatsStore.fetching"
                         :colors="['#3B82F6']"
                         :data="getWeeklyData('total')"   
                         name="Total" 
