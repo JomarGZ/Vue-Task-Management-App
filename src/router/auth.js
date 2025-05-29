@@ -4,6 +4,7 @@ import taskRoutes from '@/router/task';
 import memberRoutes from '@/router/member';
 import teamRoutes from '@/router/team';
 import accountRoutes from '@/router/account';
+import notifictionRoutes from '@/router/notification';
 function auth(to, from, next) {
     if (!localStorage.getItem("access_token")) {
       return next({ name: "login" });
@@ -31,6 +32,8 @@ export default {
     ...taskRoutes,
     ...memberRoutes,
     ...teamRoutes,
-    ...accountRoutes
+    ...accountRoutes,
+    ...notifictionRoutes
+
     ]
   };
