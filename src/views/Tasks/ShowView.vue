@@ -13,13 +13,10 @@ import { useTaskComments } from '@/stores/taskCommentStore';
 const projectTaskStore = useProjectTaskStore();
 const taskCommentStore = useTaskComments();
 const route = useRoute();
-const test = async () => {
-    await window.axios.get('dashboard/task-completion/statistic');
-}
+
 onMounted(async() => {
     await projectTaskStore.getTask(route.params.taskId);
     await taskCommentStore.loadComments(route.params?.taskId);
-    test();
 });
 
 onBeforeUnmount(() => projectTaskStore.task = {})
