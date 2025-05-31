@@ -30,22 +30,17 @@ onMounted(async() => {
             <div class="flex items-center justify-between mb-10">
                 <h2 class="text-2xl font-bold text-gray-800">Task Achievement Dashboard</h2>
             </div>
-            <AreaChart :rawTasks="taskStats.tasks"/>
+            <AreaChart />
           </div>
         </div>
 
         <div class="col-span-12 space-y-6 lg:col-span-4">
-          <!-- <UpcomingTaskDeadlines
-              :isUpcomingDeadlinesLoading="userTaskStore.isUpcomingDeadlinesLoading"
-              :isUpcomingDeadlinesError="userTaskStore.isUpcomingDeadlinesError"
-              :upcomingTasksDeadline="userTaskStore.upcomingTasksDeadline"
-          /> -->
-          <TaskStatusDistributionChart
-              v-if="!taskStats.fetching"
-              :chartData="taskCountSData" 
-              title="Task Status Distribution" 
-              subtitle="January 2025"
-            />
+          <div class="bg-gray-50 rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between mb-10">
+                <h2 class="text-2xl font-bold text-gray-800">Task Status Distribution</h2>
+            </div>
+               <TaskStatusDistributionChart/>
+          </div>
         </div>
       </div>
     </div>
