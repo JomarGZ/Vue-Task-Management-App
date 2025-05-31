@@ -27,10 +27,9 @@ export const NOTIFICATION_TYPE = {
    TASK_DEADLINE_ALERT: {
         value: 'task deadline alert',
         type: 'task deadline alert',
-        icon: 'ic:round-system-update-alt',
-        badgeClass: 'bg-purple-100 text-purple-800'
+        icon: 'lucide:circle-alert',
+        badgeClass: 'bg-red-100 text-red-800'
    },
-
    DEFAULT: {
     value: 'default',
     icon: 'iconoir:bell-notification-solid',
