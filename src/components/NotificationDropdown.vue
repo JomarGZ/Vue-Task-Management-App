@@ -6,16 +6,18 @@ import { useNotificationAction } from '@/stores/notificationActionStore'
 import { useAuth } from '@/stores/auth'
 import NotificationItem from './NotificationItem.vue'
 import { useNotificationDropdown } from '@/stores/notificationDropdown'
+import { useNotificationList } from '@/stores/notificationListStore'
 
 const menu = ref(null);
 
 const notificationDropdownStore = useNotificationDropdown();
 const notificationActionStore = useNotificationAction();
+
 const auth = useAuth();
 
 window.Echo.private(`App.Models.User.${auth.user?.id}`)
     .notification((notification) => {
-      if (notification && typeof notification === 'object') {
+      if (notification && typeof notification === 'object') { 
         notificationDropdownStore.getNotificationDrodDownData()
       }
     });
@@ -38,7 +40,7 @@ const deleteNotification = async (notification) => {
 const markAllAsRead = async () => {
  const success = await notificationActionStore.markAllAsRead();
  if (success) {
-   await notificationDropdownStore.getNotificationDrodDownData()
+   await notificationDropdownStore.getNotificationDrodDownData();
  }
 }
 </script>
@@ -62,7 +64,7 @@ const markAllAsRead = async () => {
         leave-from-class="transform scale-100 opacity-100"
         leave-to-class="transform scale-95 opacity-0"
       >
-        <MenuItems v-slot="{ close }" class="absolute right-0 mt-2 w-80 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
+        <MenuItems class="absolute right-0 mt-2 w-80 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
           <!-- Header -->
           <div class="p-3 bg-gray-50 flex justify-between items-center">
             <h3 class="font-medium">Notifications</h3>
@@ -75,7 +77,6 @@ const markAllAsRead = async () => {
                     v-for="notification in notificationDropdownStore.unreadNotifications"
                     :key="notification.id"
                     :type="notification.data?.type"
-                    :close="close"
                     :data="notification.data"
                     :date="notification.created_at"
                     :redirectTo="notification.data?.link"
