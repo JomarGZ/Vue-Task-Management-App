@@ -35,7 +35,11 @@ const onSubmit = async (value) => {
 const hanndleMenuToggle = (commentId) => {
     activeMenuId.value = activeMenuId.value === commentId ? null : commentId
 }
-
+window.Echo.channel('task.comment.created')
+    .listen('CommentCreated', (data) => {
+        if (!data?.data) return;
+        taskCommentStore.comments?.data?.unshift(data.data);
+    });
 </script>
 
 <template>
