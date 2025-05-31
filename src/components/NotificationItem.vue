@@ -56,11 +56,11 @@ const formatTimeRemaining = computed(() => {
   const deadline = parseISO(props.data.deadline);
   const diffDays = differenceInDays(deadline, now);
 
-  if (diffDays > 1) return `${diffDays} days remaining`;
-  if (diffDays === 1) return '1 day remaining';
+  if (diffDays > 1) return `${diffDays} days`;
+  if (diffDays === 1) return '1 day';
   const diffHours = differenceInHours(deadline, now);
-  if (diffHours > 1) return `${diffHours} hours remaining`;
-  if (diffHours === 1) return '1 hour remaining';
+  if (diffHours > 1) return `${diffHours} hours`;
+  if (diffHours === 1) return '1 hour';
   return 'Due soon';
 })
 const priorityConfig = computed(() => props.data?.priority ? getTaskPriorityByValue(props.data?.priority) : {});

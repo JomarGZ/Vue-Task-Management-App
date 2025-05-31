@@ -5,8 +5,7 @@ import { useNotificationDropdown } from '@/stores/notificationDropdown';
 import { useNotificationList } from '@/stores/notificationListStore';
 import { Icon } from '@iconify/vue';
 import { isBefore, isSameDay, parseISO, startOfDay, subDays } from 'date-fns';
-import { computed, onMounted, ref } from 'vue';
-const filterType = ref('all'); // Default filter type
+import { computed, onMounted } from 'vue';
 
 const notificationsListStore = useNotificationList();
 const notificationDropdownStore = useNotificationDropdown();
@@ -16,7 +15,7 @@ onMounted(async() => {
   await notificationsListStore.getNotifications();
 })
 const changeFilterType = (type) => {
-  filterType.value = type;
+  notificationsListStore.filterType = type;
   notificationsListStore.getNotifications(1, {type: type === 'all' ? null : type});
 }
 const getAllTodayNotifications = computed(() => {
@@ -97,7 +96,7 @@ const handleMarkAsRead = async (id) => {
               :key="type"
               @click="changeFilterType(type)"
               class="px-3 py-1 text-sm font-medium cursor-pointer rounded-full capitalize"
-              :class="filterType === type ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800'"
+              :class="notificationsListStore.filterType === type ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800'"
               >
                 {{ type }}
           </button>
@@ -151,7 +150,7 @@ const handleMarkAsRead = async (id) => {
         />
         <div v-if="notificationsListStore.notifications?.meta?.current_page < notificationsListStore.notifications?.meta?.last_page" class="px-6 py-4 text-center bg-gray-50">
           <div v-if="notificationsListStore.isFetchLoading"><Icon icon="eos-icons:three-dots-loading" width="24" height="24" /></div>
-          <button v-else type="button" :disabled="notificationsListStore.isFetchLoading" @click="notificationsListStore.getNotifications(notificationsListStore.notifications?.meta?.current_page + 1)" class="inline-flex cursor-pointer items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+          <button v-else type="button" :disabled="notificationsListStore.isFetchLoading" @click="notificationsListStore.getNotifications(notificationsListStore.notifications?.meta?.current_page + 1, {type: notificationsListStore.filterType})" class="inline-flex cursor-pointer items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
             Load More Notifications
           </button>
         </div>

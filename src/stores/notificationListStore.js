@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
 
 export const useNotificationList  = defineStore("NotificationList", () => {
+    const filterType = ref('all'); // Default filter type
     const notifications = reactive({
         data: [],
         links: {},
@@ -31,6 +32,7 @@ export const useNotificationList  = defineStore("NotificationList", () => {
     }
     return {
         getNotifications,
+        filterType,
         notifications,
         isFetchLoading
     }

@@ -12,6 +12,8 @@ const menu = ref(null);
 
 const notificationDropdownStore = useNotificationDropdown();
 const notificationActionStore = useNotificationAction();
+const notificationsListStore = useNotificationList();
+
 
 const auth = useAuth();
 
@@ -19,6 +21,7 @@ window.Echo.private(`App.Models.User.${auth.user?.id}`)
     .notification((notification) => {
       if (notification && typeof notification === 'object') { 
         notificationDropdownStore.getNotificationDrodDownData()
+        notificationsListStore.getNotifications(1, { type: notificationsListStore.filterType });
       }
     });
 
