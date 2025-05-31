@@ -4,6 +4,7 @@ import { getTaskPriorityByValue, getTaskStatusByValue, getTaskStatusOptions } fr
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { useTaskStore } from '@/stores/taskStore';
 import { Icon } from '@iconify/vue';
+import { differenceInDays, differenceInHours } from 'date-fns';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -83,15 +84,15 @@ watch(() => props.dueDate, updateCountDown, {deep: true});
 
 const estimatedHours = computed(() => {
     if (!props.startDate?.trim() || !props.dueDate?.trim()) return 'No estimation';
-    
     const start = new Date(props.startDate);
     const due = new Date(props.dueDate);
-    const diff = due - start;
-    
-    if (diff <= 0) return 'No estimation';
-    
-    const totalHours = Math.floor(diff / (1000 * 60 * 60));
-    return `${totalHours} ${totalHours !== 1 ? 'hours' : 'hour'}`;
+    const diffDays = differenceInDays(due, start);
+    if (diffDays > 1) return `${diffDays} days`;
+    if (diffDays === 1) return '1 day';
+    const diffHours = differenceInHours(due, start);
+    if (diffHours > 1) return `${diffHours} hours`;
+    if (diffHours === 1) return '1 hour';    
+    return 'Less than an hour';
 });
 onMounted(() => {
     updateCountDown(props.dueDate)
