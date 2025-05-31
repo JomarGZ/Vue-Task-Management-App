@@ -41,7 +41,6 @@ onMounted(async() => {
             </div>
                <TaskStatusDistributionChart/>
           </div>
-       
         </div>
       </div>
     </div>

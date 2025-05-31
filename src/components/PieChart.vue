@@ -1,4 +1,3 @@
-<!-- PieChart.vue -->
 <template>
   <div class="flex items-center justify-center">
       <apexchart
@@ -15,9 +14,7 @@ import { useTaskDistrubutionStore } from '@/stores/taskDistributionStore';
 import { onMounted, ref } from 'vue';
 
 const taskDistributionStore = useTaskDistrubutionStore();
-// Mock API response structure
 
-// Process mock data like real API response
 const series = ref([0, 0, 0, 0]);
 
 const chartOptions = ref({
