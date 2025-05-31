@@ -1,7 +1,7 @@
 <script setup>
 import NotificationItem from '@/components/NotificationItem.vue';
-import notification from '@/router/notification';
 import { useNotificationAction } from '@/stores/notificationActionStore';
+import { useNotificationDropdown } from '@/stores/notificationDropdown';
 import { useNotificationList } from '@/stores/notificationListStore';
 import { Icon } from '@iconify/vue';
 import { isBefore, isSameDay, parseISO, startOfDay, subDays } from 'date-fns';
@@ -9,6 +9,8 @@ import { computed, onMounted, ref } from 'vue';
 const filterType = ref('all'); // Default filter type
 
 const notificationsListStore = useNotificationList();
+const notificationDropdownStore = useNotificationDropdown();
+
 const notificationActionStore = useNotificationAction();
 onMounted(async() => {
   await notificationsListStore.getNotifications();
@@ -44,21 +46,31 @@ const handleMarkAllAsRead = async () => {
   const success = await notificationActionStore.markAllAsRead();
   if (success) {
     await notificationsListStore.getNotifications();
+    await notificationDropdownStore.getNotificationDrodDownData();
   }
 }
 const handleDeleteAll = async () => {
   const success = await notificationActionStore.deleteAllNotifications();
   if (success) {
     await notificationsListStore.getNotifications();
+    await notificationDropdownStore.getNotificationDrodDownData();
   }
 }
 const handleDelete = async (id) => {
   const success = await notificationActionStore.deleteNotification(id);
   if (success) {
       await notificationsListStore.getNotifications();
+      await notificationDropdownStore.getNotificationDrodDownData();
   }
 }
 
+const handleMarkAsRead = async (id) => {
+  const success = await notificationActionStore.markAsReadNotification(id);
+  if (success) {
+    notificationsListStore.getNotifications();
+    notificationDropdownStore.getNotificationDrodDownData();
+  }
+}
 
 </script>
 
@@ -103,7 +115,7 @@ const handleDelete = async (id) => {
           :redirectTo="notification.data?.link"
           :data="notification.data"
           :date="notification.created_at"
-          @read-notification="notificationActionStore.markAsReadNotification(notification.id)"
+          @read-notification="handleMarkAsRead(notification.id)"
           @dismiss="handleDelete(notification.id)"
           :readAt="notification.read_at"
        />

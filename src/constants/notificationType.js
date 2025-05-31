@@ -24,6 +24,13 @@ export const NOTIFICATION_TYPE = {
         icon: 'ic:round-system-update-alt',
         badgeClass: 'bg-purple-100 text-purple-800'
    },
+   TASK_DEADLINE_ALERT: {
+        value: 'task deadline alert',
+        type: 'task deadline alert',
+        icon: 'ic:round-system-update-alt',
+        badgeClass: 'bg-purple-100 text-purple-800'
+   },
+
    DEFAULT: {
     value: 'default',
     icon: 'iconoir:bell-notification-solid',
@@ -34,3 +41,9 @@ export const NOTIFICATION_TYPE = {
 export const getNotificationTypeByValue = (value) => {
  return  Object.values(NOTIFICATION_TYPE).find(n => n.type === value?.toLowerCase()) || NOTIFICATION_TYPE.DEFAULT;
 } 
+
+export const VALID_NOTIFICATION_TYPES = Object.values(NOTIFICATION_TYPE).map(n => n.type);
+
+export const isValidNotificationType = (type) => {
+     return VALID_NOTIFICATION_TYPES.includes(type?.toLowerCase());
+}

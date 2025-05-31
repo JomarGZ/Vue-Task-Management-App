@@ -2,19 +2,15 @@
 import { Icon } from '@iconify/vue'
 import { formatDateDistance } from '@/composables/useFormatters'
 import { computed } from 'vue'
-import { getNotificationTypeByValue } from '@/constants/notificationType'
+import { getNotificationTypeByValue, isValidNotificationType } from '@/constants/notificationType'
 import { getTaskPriorityByValue } from '@/constants/task'
+import { differenceInDays, differenceInHours, parseISO } from 'date-fns'
 
 const props = defineProps({
   type: {
     type: String,
     required: true,
-    validator: value => [
-      'task assignment',
-      'project assignment',
-      'task comment',
-      'system'
-    ].includes(value)
+    validator: isValidNotificationType
   },
   data: {
     type: Object,
@@ -53,6 +49,20 @@ const sizeClasses = {
 }[props.size]
 
 defineEmits(['read-notification', 'dismiss'])
+const formatTimeRemaining = computed(() => {
+  const now = new Date();
+
+  if (!props.data?.deadline) return 'No deadline set';
+  const deadline = parseISO(props.data.deadline);
+  const diffDays = differenceInDays(deadline, now);
+
+  if (diffDays > 1) return `${diffDays} days remaining`;
+  if (diffDays === 1) return '1 day remaining';
+  const diffHours = differenceInHours(deadline, now);
+  if (diffHours > 1) return `${diffHours} hours remaining`;
+  if (diffHours === 1) return '1 hour remaining';
+  return 'Due soon';
+})
 const priorityConfig = computed(() => props.data?.priority ? getTaskPriorityByValue(props.data?.priority) : {});
 const configType = computed(() => props.type ? getNotificationTypeByValue(props.type) : {});
 </script>
@@ -110,6 +120,15 @@ const configType = computed(() => props.type ? getNotificationTypeByValue(props.
           <p :class="['text-gray-500 mt-1 line-clamp-2', sizeClasses.textSize]">
             {{ data.message }}
           </p>
+        </template>
+        <template v-else-if="type === 'task deadline alert'">
+            <p :class="['font-medium text-gray-900 truncate', sizeClasses.textSize]">
+              <span class="font-semibold">Deadline approaching:</span> {{ data.taskTitle }} 
+            </p>
+            <p :class="['mt-1', sizeClasses.textSize]">
+              Due in {{ formatTimeRemaining }} • {{ data.projectName || '' }}
+              <span v-if="data.priority" class="ml-2" :class="priorityConfig.color">{{ priorityConfig.label }} Priority</span>
+            </p>
         </template>
         <p :class="['text-gray-400 mt-1', sizeClasses.textSize]">
           {{ formatDateDistance(date) }}
