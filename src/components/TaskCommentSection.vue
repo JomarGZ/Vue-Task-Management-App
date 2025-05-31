@@ -4,6 +4,7 @@ import CommentItem from './CommentItem.vue';
 import { computed, ref } from 'vue';
 import { useTaskComments } from '@/stores/taskCommentStore';
 import CommentForm from './CommentForm.vue';
+import { useAuth } from '@/stores/auth';
 const props = defineProps({
     taskId: {
         type: [String, Number],
@@ -12,6 +13,7 @@ const props = defineProps({
 })
 
 const taskCommentStore = useTaskComments();
+const auth = useAuth();
 const activeMenuId = ref(null);
 const hasMoreComments = computed(() => {
     return taskCommentStore.comments?.meta?.current_page < taskCommentStore.comments?.meta?.last_page;
@@ -35,9 +37,13 @@ const onSubmit = async (value) => {
 const hanndleMenuToggle = (commentId) => {
     activeMenuId.value = activeMenuId.value === commentId ? null : commentId
 }
-window.Echo.channel('task.comment.created')
+window.Echo.channel(`task.${props.taskId}.comments`)
     .listen('CommentCreated', (data) => {
-        if (!data?.data) return;
+        const commentData = data.data;
+        if(!commentData || commentData?.user?.id === auth?.authId) return;
+        const receivedTaskId = Number(data.task_id ?? 0);
+        const currentTaskId = Number(props.taskId ?? 0);
+        if (!receivedTaskId || !currentTaskId || receivedTaskId !== currentTaskId) return;
         taskCommentStore.comments?.data?.unshift(data.data);
     });
 </script>

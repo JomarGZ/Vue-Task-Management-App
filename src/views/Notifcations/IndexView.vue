@@ -149,7 +149,7 @@ const handleMarkAsRead = async (id) => {
             :readAt="notification.read_at"
         />
         <div v-if="notificationsListStore.notifications?.meta?.current_page < notificationsListStore.notifications?.meta?.last_page" class="px-6 py-4 text-center bg-gray-50">
-          <div v-if="notificationsListStore.isFetchLoading"><Icon icon="eos-icons:three-dots-loading" width="24" height="24" /></div>
+          <div v-if="notificationsListStore.isFetchLoading" class="flex items-center justify-center"><Icon icon="eos-icons:three-dots-loading" width="24" height="24" /></div>
           <button v-else type="button" :disabled="notificationsListStore.isFetchLoading" @click="notificationsListStore.getNotifications(notificationsListStore.notifications?.meta?.current_page + 1, {type: notificationsListStore.filterType})" class="inline-flex cursor-pointer items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
             Load More Notifications
           </button>

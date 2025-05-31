@@ -53,7 +53,7 @@ const prepareCommentData = () => ({
             <user-avatar :name="author_name" :avatar="avatar"/>
             <div class="font-medium text-sm truncate flex flex-col">
                 <span>{{ author_name }}</span>
-                <span class="text-xs text-gray-500 font-light">{{ position }}</span>
+                <span class="text-xs text-gray-500 font-light capitalize">{{ position }}</span>
             </div>
             <span class="text-xs text-gray-500 ml-2 shrink-0 self-end">{{ timeCreated }}</span>
             
