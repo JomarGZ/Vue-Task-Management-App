@@ -53,23 +53,19 @@ const schema = z.object({
     started_at: z.string().optional(),  
     ended_at: z.string().optional(),
     priority: z
-        .string()
-        .optional()
-        .transform((val) => val === "" ? undefined : val)
-        .pipe(
-            z.enum(VALID_PROJECT_PRIORITY, {
-                errorMap: () => ({message: 'Invalid priority'})
-            })
-        ),
+       .union([
+        z.literal(''), 
+        z.enum(VALID_PROJECT_PRIORITY, {
+            errorMap: () => ({message: 'Invalid project priority'})
+        })
+    ]),
     status: z
-        .string()
-        .optional()
-        .transform((val) => val === "" ? undefined : val)
-        .pipe(
-            z.enum(VALID_PROJECT_STATUS, {
-                errorMap: () => ({message: 'Invalid Status'})
-            })
-        ),
+        .union([
+        z.literal(''), 
+        z.enum(VALID_PROJECT_STATUS, {
+            errorMap: () => ({message: 'Invalid project status'})
+        })
+    ]),
     budget: z.coerce
     .number()
     .max(9999999999, 'Budget must be 10 digits or less')
