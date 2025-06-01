@@ -1,14 +1,11 @@
 <script setup>
 import DefaultUserPic from '@/components/DefaultUserPic.vue';
-import TaskActivityFeed from '@/components/TaskActivityFeed.vue';
 import TaskTable from '@/components/TaskTable.vue';
-import { capWords } from '@/composables/useUtil';
-import { useAuth } from '@/stores/auth';
+import { getPositionByValue } from '@/constants/user';
 import { useMemberStore } from '@/stores/memberStore';
 import { useUserTasks } from '@/stores/userTaskStore';
-import { onBeforeUnmount, onMounted } from 'vue';
+import { computed, onBeforeUnmount, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-const auth = useAuth();
 const useMember = useMemberStore();
 const userTaskStore = useUserTasks();
 const route = useRoute();
@@ -25,19 +22,17 @@ onBeforeUnmount(() => {
     userTaskStore.clearFilters();
     useMember.resetMember();
 })
+const positionConfig = computed(() => useMember.member?.position ? getPositionByValue(useMember.member?.position) : {});
 </script>
 <template>
     <div class="container mx-auto px-4 py-8">
-     <!-- Profile Header -->
      <div class=" flex  justify-between bg-white rounded-lg shadow-md p-6 mb-6">
         <div class="flex items-center space-x-6">
-            <!-- Profile Picture -->
             <img v-if="useMember.member?.avatar?.['thumb-200']" :src="useMember.member?.avatar?.['thumb-200']" alt="Profile Picture" class="w-24 h-24 border-4 border-white outline outline-4 outline-blue-500 rounded-full">
             <DefaultUserPic v-else class="w-24 h-24 border-white border-4 text-3xl" :name="useMember?.member?.name ?? ''"/>
-            <!-- Profile Details -->
             <div>
                 <h2 class="text-2xl font-semibold text-gray-800 capitalize">{{ useMember.member?.name }}</h2>
-                <p class="text-gray-600 capitalize">{{ useMember.member?.position }}</p>
+                <p class="text-gray-600 capitalize">{{ positionConfig.label }}</p>
                 <p class="text-gray-500">{{ useMember.member?.email }}</p>
             </div>
         </div>
