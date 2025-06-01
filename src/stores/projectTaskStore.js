@@ -232,7 +232,7 @@ export const useProjectTaskStore = defineStore("project-tasks", () => {
     }
     const updateTaskLinks = async (task, links) => {
         try {
-            const response = await window.axios.post(`api/v1/tasks/${task.id}}/links`, links);
+            await window.axios.post(`api/v1/tasks/${task.id}}/links`, links);
             showToast("Links has been added successfully");
         } catch (error) {
             console.error("Error adding links:", error);

@@ -160,7 +160,6 @@ onBeforeUnmount(() => {
                     <div class="flex items-center">
                         <Icon icon="mingcute:time-line" width="20" height="20" class="mr-2"/>
                         <span class="font-medium">{{ estimatedHours }}</span>
-                        <span class="ml-auto text-sm text-gray-500">4h logged</span>
                     </div>
                 </div>
             </div>

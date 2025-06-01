@@ -3,7 +3,9 @@ import { capWords } from '@/composables/useUtil';
 import { useProjectStore } from '@/stores/projectStore';
 import { onMounted, watch } from 'vue';
 import ProjectItem from '@/components/ProjectItem.vue';
+import { useAuth } from '@/stores/auth';
 const store = useProjectStore();
+const auth = useAuth();
 const handleFilterProjects = async ([status, priority]) => {
     store.filterProjects({status: status, priority: priority})
 }
@@ -34,7 +36,7 @@ const handleProjectDelete = async (projectId) => {
         <!-- Header with Create Button -->
         <div class="mb-6 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-800">Projects Management</h1>
-            <RouterLink :to="{ name: 'projects.create'}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
+            <RouterLink v-if="auth.isAdmin" :to="{ name: 'projects.create'}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2">
                 <IconSVG name="plus-svg"/>
                 Create Project
             </RouterLink>

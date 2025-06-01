@@ -8,10 +8,6 @@ const props = defineProps({
         type: String,
         required: true
     },
-    subTitle: {
-        type: String,
-        required: true
-    },
     startedDate: {
         type: String,
         default: ''
@@ -81,11 +77,7 @@ onBeforeUnmount(() => {
                 <h2 class="text-2xl font-semibold text-gray-800 break-words capitalize"> 
                     {{ title }}
                 </h2>
-                <p class="text-gray-600 mt-1 break-words"> 
-                    {{ subTitle }}
-                </p>
             </div>
-         
         </div>
     </div>
 

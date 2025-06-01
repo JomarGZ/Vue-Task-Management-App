@@ -49,24 +49,24 @@ const schema = z.object({
     description: nonEmptyHtml,
     deadline_at: z.string().optional(),
     started_at: z.string().optional(),
-    priority_level: z
-        .string()
-        .optional()
-        .transform((val) => (val === "" ? undefined : val))
-        .pipe(
-            z.enum(VALID_TASK_PRIORITY, {
-                errorMap: () => ({message: 'Invalid task priority'})
-            })
-        ),
+   priority_level: z
+    .union([
+        z.literal(''), // Allow empty string
+        z.enum(VALID_TASK_PRIORITY, {
+            errorMap: () => ({message: 'Invalid task priority'})
+        })
+    ])
+    .optional()
+    .transform((val) => (val === "" ? undefined : val)),
     status: z
-        .string()
-        .optional()
-        .transform((val) => (val === "" ? undefined : val))
-        .pipe(
-            z.enum(VALID_TASK_STATUS, {
-                errorMap: () => ({ message: 'Invalid task status'})
-            })
-        ),
+        .union([
+        z.literal(''), // Allow empty string
+        z.enum(VALID_TASK_STATUS, {
+            errorMap: () => ({message: 'Invalid task status'})
+        })
+    ])
+    .optional()
+    .transform((val) => (val === "" ? undefined : val)),
     category: z.string()
         .min(1, 'Category is required')
         .transform((val) => (val === "" ? undefined : val)) // Treat empty as undefined

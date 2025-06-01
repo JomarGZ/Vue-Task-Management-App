@@ -4,7 +4,7 @@
             <user-avatar :name="name" :avatar="avatar" class="shrink-0"/>
             <div class="min-w-0 overflow-hidden max-w-[500px]">
                 <div class="font-medium text-sm capitalize truncate">{{ name }}</div>
-                <div class="text-xs text-gray-500 capitalize truncate">{{ position }}</div>
+                <div class="text-xs text-gray-500 capitalize truncate">{{ positionConfig.label }}</div>
             </div>
         </div>
         <button @click="$emit('delete-item', id)" :disabled="loading" type="button" class="text-gray-400 hover:text-red-500 bg-red-50 p-2 rounded-full hover:bg-red-100 cursor-pointer transition-all duration-200 hover:scale-105 shrink-0">
@@ -14,9 +14,11 @@
     </div>
 </template>
 <script setup>
+import { getPositionByValue } from '@/constants/user';
 import { Icon } from '@iconify/vue';
+import { computed } from 'vue';
 import UserAvatar from './UserAvatar.vue';
-defineProps({
+const props = defineProps({
     id: {
         type: [String, Number],
         required: true
@@ -39,4 +41,6 @@ defineProps({
     }
 })
 defineEmits(['delete-item']);
+
+const positionConfig = computed(() => props.position ? getPositionByValue(props.position) : {});
 </script>
