@@ -3,12 +3,14 @@ import PageHeader from '@/components/PageHeader.vue';
 import ProjectDetails from '@/components/ProjectDetails.vue';
 import ProjectTeamSection from '@/components/ProjectTeamSection.vue';
 import TaskTable from '@/components/TaskTable.vue'
+import { useAuth } from '@/stores/auth';
 import { useProjectStore } from '@/stores/projectStore';
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import {Icon} from '@iconify/vue';
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
+const auth = useAuth();
 const projectStore = useProjectStore();
 const projectTaskStore = useProjectTaskStore();
 onMounted(async () => {
@@ -43,7 +45,7 @@ const handleDeleteTask = async (taskId) => {
                 </nav>
             </page-header>
             <div class="flex space-x-3">
-                <router-link :to="{name: 'projects.edit', params: {projectId: projectStore.project?.id}}" class="px-4 py-2 bg-blue-600 flex gap-2 items-center justify-center text-white rounded-lg hover:bg-blue-700 transition">
+                <router-link v-if="auth.isAdmin" :to="{name: 'projects.edit', params: {projectId: projectStore.project?.id}}" class="px-4 py-2 bg-blue-600 flex gap-2 items-center justify-center text-white rounded-lg hover:bg-blue-700 transition">
                     <Icon icon="bxs:edit" width="24" height="24" />Edit Project
                 </router-link>
             </div>
@@ -54,7 +56,6 @@ const handleDeleteTask = async (taskId) => {
             <!-- Project Header Section -->
             <ProjectDetails
                 :title="projectStore.project?.name || ''"
-                subTitle="Complete redesign and development of the company's online store with new features"
                 :startedDate="projectStore.project?.started_at || ''"
                 :endDate="projectStore.project?.ended_at || ''"
                 :clientName="projectStore.project?.client_name || ''"

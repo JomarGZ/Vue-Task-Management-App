@@ -10,6 +10,7 @@ export const useAuth = defineStore("auth", () => {
   const user = ref(null);
 
   const authId = computed(() => user.value?.id);
+  const isAdmin = computed(() => user.value?.role === 'admin');
   const avatar = computed(() => user.value?.avatar);
   const userName = computed(() => user.value?.name);
   const userEmail = computed(() => user.value?.email);
@@ -66,7 +67,8 @@ export const useAuth = defineStore("auth", () => {
     user,
     userName,
     userPhoneNumber,
-    destroyTokenAndRedirectTo 
+    destroyTokenAndRedirectTo,
+    isAdmin
   };
 }, {
   persist: {

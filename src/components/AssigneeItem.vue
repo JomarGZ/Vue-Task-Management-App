@@ -5,7 +5,7 @@
             <DefaultUserPic v-else :name="name" class="w-10 h-10 mr-3" />
             <div class="overflow-hidden flex-1 min-w-0">
                 <div class="font-medium capitalize truncate">{{ name }}</div>
-                <div class="text-sm text-gray-500 capitalize truncate">{{ position }}</div>
+                <div class="text-sm text-gray-500 capitalize truncate">{{ positionConfg.label }}</div>
             </div>
         </div>
         <div class="flex justify-between text-sm min-w-0">
@@ -19,10 +19,11 @@
     </div>
 </template>
 <script setup>
-import { computed } from 'vue';
 import DefaultUserPic from './DefaultUserPic.vue';
 import { Icon } from '@iconify/vue';
 import { useProjectTeamStore } from '@/stores/projectTeamStore';
+import { computed } from 'vue';
+import { getPositionByValue } from '@/constants/user';
 
 const props = defineProps({
     id: {
@@ -52,4 +53,5 @@ const props = defineProps({
 })
 const projectTeamStore = useProjectTeamStore();
 defineEmits(['remove-member']);
+const positionConfg = computed(() => props.position ? getPositionByValue(props.position) : {});
 </script>
