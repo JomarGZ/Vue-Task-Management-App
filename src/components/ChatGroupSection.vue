@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-
+defineEmits(['on-general-channel'])
 </script>
-
 <template>
     <div class="w-20 md:w-64 bg-gray-50 border-r border-gray-200 flex flex-col ">
         <!-- Project Logo/Icon -->
@@ -11,7 +10,7 @@ import { Icon } from '@iconify/vue';
                 <Icon icon="fluent-color:chat-add-48" width="48" height="48" />
             </button>
             <div class="hidden md:block ml-3">
-                <h1 class="text-lg font-semibold">Add Group Chat</h1>
+                <button type="button" @click="$emit('on-general-channel')" class="text-lg cursor-pointer hover:bg-sky-100 py-1 px-2 rounded-lg font-semibold">General Chat</button>
             </div>
         </div>
         

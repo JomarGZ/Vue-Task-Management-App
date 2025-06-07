@@ -1,7 +1,9 @@
-<script setup lang="ts">
+<script setup>
 import { Icon } from '@iconify/vue';
 import ChatMemberList from './ChatMemberList.vue';
+import { useChannelParticipant } from '@/stores/channelParticipantStore';
 
+const channelParticipantStore = useChannelParticipant();
 </script>
 
 <template>
@@ -24,22 +26,13 @@ import ChatMemberList from './ChatMemberList.vue';
                     <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                     Online — 5
                 </h3>
-                <ChatMemberList/>
-            </div>
-            
-            <!-- Offline Members -->
-            <div class="p-3 border-t border-gray-100">
-                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center">
-                    <span class="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
-                    Offline — 15
-                </h3>
-                <ChatMemberList/>
-                <button class="w-full mt-2 text-xs text-primary-600 hover:text-primary-800 text-center py-1">
-                    Show all 15 members
-                </button>
+                <ChatMemberList 
+                    :participants="channelParticipantStore.participants?.data"
+                    :isFetching="channelParticipantStore.isFetching"
+                    :error="channelParticipantStore.error"
+                />
             </div>
         </div>
-        
         <!-- Quick Actions -->
         <div class="p-4 border-t border-gray-200">
             <button class="w-full bg-primary-50 text-primary-600 py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center hover:bg-primary-100 transition-colors">
