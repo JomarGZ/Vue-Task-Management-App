@@ -13,14 +13,28 @@ export const useMessage = defineStore('message', () => {
     const resetErrorState = () => {
         error.value = null
     }
-    // const getMessages = async () => {
-    //     if(isFetching.value) return;
-    //     isFetching.value = true;
-    //     resetErrorState()
-    //     try {
-    //         const resposen = await window.axios.get(``)
-    //     }
-    // };
+    const getMessages = async (channelId) => {
+        if(isFetching.value) return;
+        isFetching.value = true;
+        resetErrorState()
+        try {
+            if(!channelId) {
+                throw new Error(`Channel ID is required to get messages. Recieved: ${channelId}`)
+            }
+            const response = await window.axios.get(`api/v1/chat/channels/${channelId}/messages`)
+            const messagesData = response.data || {}
+            messages.data = (messagesData?.data || []).slice().reverse()
+            messages.links = messagesData?.links || {}
+            messages.meta = messagesData?.meta || {}
+            return true;
+        } catch(e) {
+            console.error('Failed to get messages. ', e)
+            error.value = e?.messaage || 'Error request'
+            throw e;
+        } finally {
+            isFetching.value = false
+        }
+    };
   
 
     const removeMessage = async (messageId) => {
@@ -74,7 +88,7 @@ export const useMessage = defineStore('message', () => {
     return {
         isFetching,
         updateMessage,
-        storeMessage,
+        getMessages,
         error,
         removeMessage,
         messages

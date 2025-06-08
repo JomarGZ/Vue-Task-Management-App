@@ -1,9 +1,9 @@
 <template>
-    <div class="relative shrink-0">
+    <div class="relative shrink-0 h-10 w-10 rounded-full flex items-center justify-center">
         <img v-if="avatar" :src="avatar" alt="User" class="h-9 w-9 rounded-full">
         <div
             v-else 
-            class="bg-sky-500 text-white h-8 w-8 flex items-center justify-center rounded-full"
+            class="bg-sky-500 text-white h-9 w-9 flex items-center justify-center rounded-full"
             :class="{
                 'bg-purple-500': ['A','B','C','D'].includes(initial),
                 'bg-blue-500': ['E','F','G','H'].includes(initial),

@@ -4,16 +4,21 @@ import ChatMainSection from '@/components/ChatMainSection.vue';
 import ChatMembersSection from '@/components/ChatMembersSection.vue';
 import { useChannelParticipant } from '@/stores/channelParticipantStore';
 import { useGeneralChannel } from '@/stores/generalChannelStore';
+import { useMessage } from '@/stores/MessageStore';
 import { onMounted, ref } from 'vue';
 
 const generaChannelStore = useGeneralChannel();
 const channelParticipantStore = useChannelParticipant();
+const messageStore = useMessage();
+
 const currentChannel = ref({});
 const onGeneralChannel = async () => {
   const success = await generaChannelStore.getGeneralChannel();
   if (success) {
     channelParticipantStore.getParticipants(generaChannelStore.generalChannel?.id,);
     currentChannel.value = generaChannelStore.generalChannel || {}
+    messageStore.getMessages(currentChannel.value?.id)
+
   }
 }
 const loadMore = async () => {
@@ -25,7 +30,8 @@ const loadMore = async () => {
 }
 
 onMounted(() => {
-  onGeneralChannel();
+  onGeneralChannel()
+    ;
 })
 </script>
 <template>
@@ -39,7 +45,7 @@ onMounted(() => {
           :participants="channelParticipantStore?.participants || {}"
           :isFetching="channelParticipantStore.isFetching"
           :hasMore="channelParticipantStore.participants?.hasMore"
-          @on-search="(query) => channelParticipantStore.getParticipants(currentChannelId, null, query.query)"
+          @on-search="(query) => channelParticipantStore.getParticipants(currentChannel.id, null, query.query)"
         />
     </div>
 </template>
