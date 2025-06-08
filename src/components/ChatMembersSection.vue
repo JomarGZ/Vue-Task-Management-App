@@ -1,9 +1,29 @@
 <script setup>
 import { Icon } from '@iconify/vue';
-import ChatMemberList from './ChatMemberList.vue';
-import { useChannelParticipant } from '@/stores/channelParticipantStore';
+import { onMounted, ref } from 'vue';
+import { useInfiniteScroll } from '@vueuse/core';
+import debounce from 'lodash.debounce';
+import ChatMemberItem from './ChatMemberItem.vue';
+const props = defineProps({
+    participants: {
+        type: Object,
+        default: () => ({data: []})
+    },
+    isFetching: {
+        type: Boolean,
+        default: false
+    },
+    error: {
+        type: String,
+        default: null
+    },
+    hasMore: {
+        type: Boolean,
+        default: false
+    }
+})
+defineEmits(['load-more']);
 
-const channelParticipantStore = useChannelParticipant();
 </script>
 
 <template>
@@ -26,14 +46,25 @@ const channelParticipantStore = useChannelParticipant();
                     <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                     Online — 5
                 </h3>
-                <ChatMemberList 
-                    :participants="channelParticipantStore.participants?.data"
-                    :isFetching="channelParticipantStore.isFetching"
-                    :error="channelParticipantStore.error"
-                />
+                <ul  
+                    class="min-h-96"
+                    >
+                    <ChatMemberItem  
+                        v-for="participant in participants.data"
+                        :key="participant?.id"
+                        :position="participant?.position"
+                        :name="participant?.name"
+                        :avatar="participant.avatar?.['thumb-60']"
+                    />
+                    <li v-if="isFetching" class="flex items-center justify-center">
+                        <Icon icon="eos-icons:three-dots-loading" width="100%" height="40" />
+                    </li>
+                    <li v-else-if="hasMore" class="flex items-center justify-center"><button @click="$emit('load-more')" class="hover:bg-sky-100 w-full py-2 cursor-pointer">Load More</button></li>
+                    <li v-else class="text-center">No more items to load</li>
+                  
+                </ul>
             </div>
         </div>
-        <!-- Quick Actions -->
         <div class="p-4 border-t border-gray-200">
             <button class="w-full bg-primary-50 text-primary-600 py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center hover:bg-primary-100 transition-colors">
                 <i class="fas fa-user-plus mr-2"></i>
