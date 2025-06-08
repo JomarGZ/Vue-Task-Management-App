@@ -8,18 +8,18 @@ import { onMounted, ref } from 'vue';
 
 const generaChannelStore = useGeneralChannel();
 const channelParticipantStore = useChannelParticipant();
-const currentChannelId = ref(null);
+const currentChannel = ref({});
 const onGeneralChannel = async () => {
   const success = await generaChannelStore.getGeneralChannel();
   if (success) {
     channelParticipantStore.getParticipants(generaChannelStore.generalChannel?.id,);
-    currentChannelId.value = generaChannelStore.generalChannel.id || null
+    currentChannel.value = generaChannelStore.generalChannel || {}
   }
 }
 const loadMore = async () => {
-  if (!currentChannelId.value) return
+  if (!currentChannel.value) return
     await channelParticipantStore.getParticipants(
-      currentChannelId.value, 
+      currentChannel.value?.id, 
       channelParticipantStore.participants?.meta?.next_cursor || null
     );
 }
@@ -33,7 +33,7 @@ onMounted(() => {
         <ChatGroupSection
           @on-general-channel="onGeneralChannel"
         />
-        <ChatMainSection/>
+        <ChatMainSection :channel="currentChannel"/>
         <ChatMembersSection 
           @load-more="loadMore"
           :participants="channelParticipantStore?.participants || {}"

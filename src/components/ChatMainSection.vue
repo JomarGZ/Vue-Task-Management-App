@@ -1,6 +1,41 @@
-<script setup lang="ts">
+<script setup>
 import { Icon } from '@iconify/vue';
+import ChatForm from './ChatForm.vue';
+import { useGeneralMessage } from '@/stores/generalMessageStore';
+import { ref } from 'vue';
+const props = defineProps({
+    channel: {
+        type: Object,
+        required: true
+    }
+})
+const generalMessageStore = useGeneralMessage();
+const isSending = ref(false);
+const channelHandler = {
+    general: async (content) => {
+        if(isSending.value) return;
+        isSending.value = true;
+        try {
+           return await generalMessageStore.storeMessage(content)
+        } finally {
+            isSending.value = false
+        }
 
+    },
+    group: () => console.log('group channel'),
+    direct: () => console.log('direct channel'),
+}
+const onMessageSend = (value) => {
+    console.log(props.channel)
+    console.log(value)
+    const handler = channelHandler[props.channel.type] || (() => console.log('Unknown type'));
+    const success = handler(value.content);
+    if (success) {
+        console.log('Message sent')
+    } else {
+        console.log('message not sent')
+    }
+}
 </script>
 
 <template>
@@ -161,25 +196,6 @@ import { Icon } from '@iconify/vue';
         </div>
         
         <!-- Message Input -->
-        <div class="bg-white border-t border-gray-200 p-4">
-            <div class="flex items-center bg-gray-50 rounded-xl px-4 py-2">
-                <button class="text-gray-500 hover:text-primary-600 mx-1">
-                    <Icon icon="icon-park-outline:link" width="20" height="20" />
-                </button>
-                <button class="text-gray-500 hover:text-primary-600 mx-1">
-                    <Icon icon="line-md:at" width="20" height="20" />
-                </button>
-                <div class="flex-1 mx-2">
-                    <input type="text" placeholder="Type a message..." class="w-full bg-transparent border-none focus:outline-none focus:ring-0 placeholder-gray-400">
-                </div>
-                <button class="text-gray-500 cursor-pointer hover:text-primary-600 mx-1">
-                    <Icon icon="line-md:emoji-smile-wink" width="20" height="20" />
-                </button>
-                <button class="ml-2 bg-sky-500 text-white rounded-lg px-4 py-2 hover:bg-primary-600 flex gap-1 cursor-pointer hover:bg-sky-600 items-center">
-                    <span>Send</span>
-                    <Icon icon="fa:send" width="18" height="18" />
-                </button>
-            </div>
-        </div>
+       <ChatForm :isLoading="isSending" @submit-message="onMessageSend"/>
     </div>
 </template>

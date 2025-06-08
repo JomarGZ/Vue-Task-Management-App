@@ -1,0 +1,82 @@
+import { defineStore } from "pinia";
+import { reactive, ref } from "vue";
+
+export const useMessage = defineStore('message', () => {
+    const isFetching = ref(false);
+    const isActionLoading = ref(false);
+    const error = ref(null);
+    const messages = reactive({
+        data: [],
+        links: {},
+        meta: {}
+    });
+    const resetErrorState = () => {
+        error.value = null
+    }
+    // const getMessages = async () => {
+    //     if(isFetching.value) return;
+    //     isFetching.value = true;
+    //     resetErrorState()
+    //     try {
+    //         const resposen = await window.axios.get(``)
+    //     }
+    // };
+  
+
+    const removeMessage = async (messageId) => {
+        if (isActionLoading.value) return;
+        isActionLoading.value = true;
+        resetErrorState();
+        try {
+            if(!messageId) {
+                throw new Error(`Message ID is required to delete a message. Recieved: ${messageId}`)
+            }
+            await window.axios.delete(`api/v1/chat/messages/${messageId}`);
+            return true;
+        } catch (e) {
+            console.error('Failed to delete a message: ', e);
+            error.value = e?.message || 'Error request'
+            throw e
+        } finally {
+            isActionLoading.value = false
+        }
+    }
+    const updateMessage = async (type, messageId, content, channelId = null) => {
+        if (isActionLoading.value) return;
+        isActionLoading.value = true;
+        resetErrorState();
+        try {
+            if (!messageId) {
+                throw new Error(`Message ID is required to update a message. Recieved: ${messageId}`);
+            }
+            if (!type) {
+                throw new Error(`Message type is required to update a message. Recieved: ${type}`);
+            }
+            const response = await window.axios.put(`api/v1/chat/messages/${messageId}`, {
+                message_type: type,
+                content: content,
+                channel_id: channelId
+            });
+
+            const messageIndex = messages.data.findIndex(m => m.id === messageId);
+            if (messageIndex !== -1) {
+                messages.data[messageIndex] = response.data?.data
+            }
+            return true;
+        } catch (e) {
+            console.error('Failed to update the message. ', e);
+            error.value = e?.message || 'Error request'
+            throw e;
+        } finally {
+            isActionLoading.value = false
+        }
+    }
+    return {
+        isFetching,
+        updateMessage,
+        storeMessage,
+        error,
+        removeMessage,
+        messages
+    }
+});
