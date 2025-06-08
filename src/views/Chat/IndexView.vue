@@ -23,6 +23,7 @@ const loadMore = async () => {
       channelParticipantStore.participants?.meta?.next_cursor || null
     );
 }
+
 onMounted(() => {
   onGeneralChannel();
 })
@@ -38,6 +39,7 @@ onMounted(() => {
           :participants="channelParticipantStore?.participants || {}"
           :isFetching="channelParticipantStore.isFetching"
           :hasMore="channelParticipantStore.participants?.hasMore"
+          @on-search="(query) => channelParticipantStore.getParticipants(currentChannelId, null, query.query)"
         />
     </div>
 </template>

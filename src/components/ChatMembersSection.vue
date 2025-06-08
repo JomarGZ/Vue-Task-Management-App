@@ -1,10 +1,9 @@
 <script setup>
 import { Icon } from '@iconify/vue';
-import { onMounted, ref } from 'vue';
-import { useInfiniteScroll } from '@vueuse/core';
-import debounce from 'lodash.debounce';
 import ChatMemberItem from './ChatMemberItem.vue';
-const props = defineProps({
+import { ref, watch } from 'vue';
+import debounce from 'lodash.debounce';
+defineProps({
     participants: {
         type: Object,
         default: () => ({data: []})
@@ -22,8 +21,13 @@ const props = defineProps({
         default: false
     }
 })
-defineEmits(['load-more']);
+const query = ref('');
+const emit = defineEmits(['load-more', 'on-search']);
+const searchDebounce = debounce((query) => {
+    emit('on-search', {query : query})
+}, 300);
 
+watch(query, searchDebounce);
 </script>
 
 <template>
@@ -34,8 +38,8 @@ defineEmits(['load-more']);
                 Team Members
             </h2>
             <div class="relative mt-2">
-                <input type="text" placeholder="Search members..." class="w-full bg-gray-50 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary-100">
-                <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                <input type="text" v-model="query"  placeholder="Search members..." class="w-full bg-gray-50 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary-100">
+                <Icon class="absolute left-3 top-2" icon="flat-color-icons:search" width="25" height="25" />
             </div>
         </div>
         
@@ -47,7 +51,6 @@ defineEmits(['load-more']);
                     Online — 5
                 </h3>
                 <ul  
-                    class="min-h-96"
                     >
                     <ChatMemberItem  
                         v-for="participant in participants.data"
