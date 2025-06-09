@@ -58,8 +58,6 @@ useInfiniteScroll(
     messagesContainer,
     async () => {
         if (isLoadingMore.value || !messageStore.messages?.hasMore) return;
-        console.log('trigger');
-        
         isLoadingMore.value = true;
         try {
             await messageStore.getMessages(props.channel?.id, messageStore.messages?.meta?.next_cursor);
