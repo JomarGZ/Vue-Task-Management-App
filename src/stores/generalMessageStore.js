@@ -18,7 +18,11 @@ export const useGeneralMessage = defineStore('general-message', () => {
                 message_type: 'general',
                 content: content,
             });
-            return true;
+            return {
+                'success':true,
+                'message': response.data?.data || {}
+            }
+               
         } catch(e) {
             console.error('Failed to store a message: ',e);
             error.value = e?.message || 'Error request'

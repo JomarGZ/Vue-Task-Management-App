@@ -45,6 +45,10 @@ export const useMessage = defineStore('message', () => {
         }
     };
   
+    const appendMessage = (message) => {
+        console.log(message);
+        messages.data.unshift(message);
+    }
 
     const removeMessage = async (messageId) => {
         if (isActionLoading.value) return;
@@ -99,6 +103,7 @@ export const useMessage = defineStore('message', () => {
         updateMessage,
         getMessages,
         error,
+        appendMessage,
         removeMessage,
         messages
     }

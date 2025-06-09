@@ -2,7 +2,7 @@
 import { Icon } from '@iconify/vue';
 import ChatForm from './ChatForm.vue';
 import { useGeneralMessage } from '@/stores/generalMessageStore';
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { useAuth } from '@/stores/auth';
 import ChatItem from './ChatItem.vue';
 import { useInfiniteScroll } from '@vueuse/core';
@@ -35,17 +35,22 @@ const channelHandler = {
     group: () => console.log('group channel'),
     direct: () => console.log('direct channel'),
 }
-
-const onMessageSend = (value) => {
-    console.log(props.channel)
-    console.log(value)
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (messagesContainer.value) {
+      messagesContainer.value.scrollTop = 0; 
+    }
+  });
+};
+const onMessageSend = async (value) => {
     const handler = channelHandler[props.channel.type] || (() => console.log('Unknown type'));
-    const success = handler(value.content);
-    if (success) {
-        console.log('Message sent')
-        messageStore.getMessages(props.channel?.id);
+    const response = await handler(value.content);
+    if (response.success) {
+        messageStore.appendMessage(response.message);
+        await nextTick();
+        scrollToBottom();
     } else {
-        console.log('message not sent')
+        console.error('message not sent')
     }
 }
 

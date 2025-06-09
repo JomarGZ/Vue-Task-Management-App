@@ -4,7 +4,7 @@ import ChatMainSection from '@/components/ChatMainSection.vue';
 import ChatMembersSection from '@/components/ChatMembersSection.vue';
 import { useChannelParticipant } from '@/stores/channelParticipantStore';
 import { useGeneralChannel } from '@/stores/generalChannelStore';
-import { useMessage } from '@/stores/MessageStore';
+import { useMessage } from '@/stores/messageStore';
 import { onMounted, ref } from 'vue';
 
 const generaChannelStore = useGeneralChannel();
