@@ -8,12 +8,13 @@ export const useMessage = defineStore('message', () => {
     const messages = reactive({
         data: [],
         links: {},
-        meta: {}
+        meta: {},
+        hasMore: false
     });
     const resetErrorState = () => {
         error.value = null
     }
-    const getMessages = async (channelId) => {
+    const getMessages = async (channelId, cursor = null, searchQuery = '') => {
         if(isFetching.value) return;
         isFetching.value = true;
         resetErrorState()
@@ -21,11 +22,19 @@ export const useMessage = defineStore('message', () => {
             if(!channelId) {
                 throw new Error(`Channel ID is required to get messages. Recieved: ${channelId}`)
             }
-            const response = await window.axios.get(`api/v1/chat/channels/${channelId}/messages`)
+            const params = new URLSearchParams();
+            if(cursor) params.append('cursor', cursor);
+            if(searchQuery) params.append('query', searchQuery);
+            const response = await window.axios.get(`api/v1/chat/channels/${channelId}/messages?${params}`)
             const messagesData = response.data || {}
-            messages.data = (messagesData?.data || []).slice().reverse()
+            if(cursor !== null) {
+                messages.data = [...messages.data, ...(messagesData?.data || [])]
+            } else {
+                messages.data = messagesData?.data || []
+            }
             messages.links = messagesData?.links || {}
             messages.meta = messagesData?.meta || {}
+            messages.hasMore = messagesData?.meta?.next_cursor ? true : false
             return true;
         } catch(e) {
             console.error('Failed to get messages. ', e)
