@@ -46,7 +46,6 @@ export const useMessage = defineStore('message', () => {
     };
   
     const appendMessage = (message) => {
-        console.log(message);
         messages.data.unshift(message);
     }
 

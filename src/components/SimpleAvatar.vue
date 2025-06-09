@@ -32,6 +32,6 @@ const props = defineProps({
         default: ''
     }
 })
-const initial = computed(() => props.name.charAt(0).toUpperCase());
+const initial = computed(() => props.name?.charAt(0).toUpperCase());
 
 </script>

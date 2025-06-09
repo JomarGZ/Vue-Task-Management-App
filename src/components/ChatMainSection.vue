@@ -7,6 +7,7 @@ import { useAuth } from '@/stores/auth';
 import ChatItem from './ChatItem.vue';
 import { useInfiniteScroll } from '@vueuse/core';
 import { useMessage } from '@/stores/messageStore';
+import { useMessageReply } from '@/stores/messageReplyStore';
 
 const props = defineProps({
     channel: {
@@ -17,17 +18,20 @@ const props = defineProps({
 
 const auth = useAuth();
 const generalMessageStore = useGeneralMessage();
+const replyStore = useMessageReply();
 const messageStore = useMessage();
 const isSending = ref(false);
 const isLoadingMore = ref(false);
+const isReplyMode = ref(false);
+const messageToReply = ref({});
 const messagesContainer = ref(null);
 
 const channelHandler = {
-    general: async (content) => {
+    general: async (values) => {
         if(isSending.value) return;
         isSending.value = true;
         try {
-           return await generalMessageStore.storeMessage(content)
+           return await generalMessageStore.storeMessage(values.content, values.replyTo?.id)
         } finally {
             isSending.value = false
         }
@@ -42,9 +46,9 @@ const scrollToBottom = () => {
     }
   });
 };
-const onMessageSend = async (value) => {
+const onMessageSend = async (values) => {
     const handler = channelHandler[props.channel.type] || (() => console.log('Unknown type'));
-    const response = await handler(value.content);
+    const response = await handler(values);
     if (response.success) {
         messageStore.appendMessage(response.message);
         await nextTick();
@@ -53,7 +57,16 @@ const onMessageSend = async (value) => {
         console.error('message not sent')
     }
 }
+const onReplyMode = (message) => {
+    if (!message) return;
+    isReplyMode.value = true
+    messageToReply.value = message
+}
 
+const cancelReply = () => {
+    isReplyMode.value = false
+    messageToReply.value = {}
+}
 useInfiniteScroll(
     messagesContainer,
     async () => {
@@ -70,6 +83,14 @@ useInfiniteScroll(
         distance: 100,
     }
 );
+const onShowReplies = async (id) => {
+    if(!id) return;
+    const success = await replyStore.getReplies(id);
+    if(success) {
+        console.log('show replies');
+        console.log(replyStore.replies[id])
+    }
+}
 </script>
 <template>
     <div class="flex-1 flex flex-col bg-white">
@@ -108,10 +129,17 @@ useInfiniteScroll(
                 v-for="m in messageStore.messages.data"
                 :key="m.id"
                 :IsChatOwner="m.user?.id === auth.authId"
+                :id="m.id"
                 :author-name="m.user?.name"
                 :avatar="m.user?.avatar?.['thumb-60']"
                 :created_at="m.created_at"
                 :content="m.content"
+                :like_count="m.reaction_count"
+                :replies="replyStore.replies[m.id]"
+                @show-replies="onShowReplies"
+                :reply_count="m.reply_count"
+                @on-reply="onReplyMode(m)"
+                @on-like="console.log('On Like')"
             />
             <div v-if="isLoadingMore" class="text-center py-4 text-gray-500 flex items-center justify-center">
                 <Icon icon="eos-icons:loading" width="30" height="30"/>
@@ -120,6 +148,12 @@ useInfiniteScroll(
                 No more message to load!
             </div>
         </div>
-        <ChatForm :isLoading="isSending" @submit-message="onMessageSend"/>
+        <ChatForm 
+            :isLoading="isSending" 
+            @submit-message="onMessageSend"
+            :reply-mode="isReplyMode"
+            :reply-to="isReplyMode ? messageToReply : {}"
+            @cancel-reply="cancelReply"
+        />
     </div>
 </template>

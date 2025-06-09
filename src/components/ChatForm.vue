@@ -8,9 +8,17 @@ const props = defineProps({
     isLoading: {
         type: Boolean,
         default: false
+    },
+    replyMode: {
+        type: Boolean,
+        default: false
+    },
+    replyTo: {
+        type: Object,
+        default: () => ({})
     }
 })
-const emit = defineEmits(['submit-message'])
+const emit = defineEmits(['submit-message', 'cancel-reply'])
 const schema = z.object({
     content: z.string().min(1, 'Message is required').max(1000, 'Message must be 1000 characteres or less')
 })
@@ -19,12 +27,24 @@ const {handleSubmit, isSubmitting, resetForm} = useForm({
 })
 const isDisabled = computed(() => props.isLoading || isSubmitting.value);
 const onSubmit = handleSubmit((value) => {
-    emit('submit-message', value)
+    emit('submit-message', {
+        replyMode: props.replyMode,
+        replyTo: props.replyTo,
+        content: value.content
+    })
+    emit('cancel-reply')
     resetForm()
 })
 </script>
 <template>
     <div class="bg-white border-t border-gray-200 p-4">
+        <div v-if="replyMode" class="bg-gray-200 rounded-md py-1 px-2 min-w-0 flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-semibold">Replying to {{ replyTo.user?.name || 'user' }}</h2>
+                <p class="text-xs text-gray-500 truncate max-w-[700px]">{{ replyTo.content }}</p>
+            </div>
+            <button type="button" @click="$emit('cancel-reply')" class="bg-gray-300 p-0.5 rounded-full cursor-pointer hover:bg-gray-400 flex items-center justify-center"><Icon icon="iwwa:delete" width="13" height="13" /></button>
+        </div>
         <form @submit.prevent="onSubmit" class="flex items-center bg-gray-50 rounded-xl px-4 py-2">
             <div class="flex-1 mx-2">
                 <Field type="text" name="content" placeholder="Type a message..." class="w-full bg-transparent border-none focus:outline-none focus:ring-0 placeholder-gray-400"/>

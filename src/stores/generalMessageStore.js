@@ -8,15 +8,15 @@ export const useGeneralMessage = defineStore('general-message', () => {
     const resetErrorState = () => {
         error.value = null
     }
-    const storeMessage = async (content) => {
+    const storeMessage = async (content, replyToMessgeId = null) => {
         if (isActionLoading.value) return;
         isActionLoading.value = true;
         resetErrorState();
-
         try {
             const response = await window.axios.post(`api/v1/chat/messages`, {
                 message_type: 'general',
                 content: content,
+                parent_id: replyToMessgeId
             });
             return {
                 'success':true,
