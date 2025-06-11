@@ -65,6 +65,9 @@ const onReplyMode = (message) => {
     messageToReply.value = message
 }
 
+const onLikeMessage = async (messageId) => {
+    messageStore.onLikeMessage(messageId)
+}
 const cancelReply = () => {
     isReplyMode.value = false
     messageToReply.value = {}
@@ -136,8 +139,9 @@ const getReplies = async (id) => {
                 :replies="replyStore.replies[m.id]"
                 @show-replies="getReplies"
                 :reply_count="m.reply_count"
+                :is_liked="m.is_liked"
                 @on-reply="onReplyMode(m)"
-                @on-like="console.log('On Like')"
+                @on-like="onLikeMessage(m.id)"
             />
             <div v-if="isLoadingMore" class="text-center py-4 text-gray-500 flex items-center justify-center">
                 <Icon icon="eos-icons:loading" width="30" height="30"/>

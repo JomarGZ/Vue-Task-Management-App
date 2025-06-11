@@ -49,6 +49,39 @@ export const useMessage = defineStore('message', () => {
         messages.data.unshift(message);
     }
 
+    const onLikeMessage = async (messageId) => {
+        if (isActionLoading.value) return;
+        isActionLoading.value = true;
+        resetErrorState();
+
+        try {
+            if(!messageId) {
+                throw new Error(`Message ID is required to like a message. Recieved: ${messageId}`);
+            }
+            const messageIndex = messages.data.findIndex(m => m.id === messageId);
+            if (messageIndex === -1) return;
+            const message = messages.data[messageIndex];
+            messages.data[messageIndex] = {
+                ...message,
+                is_liked: !message.is_liked,
+                reaction_count: message.is_liked
+                    ? Math.max(0, message.reaction_count - 1)
+                    : message.reaction_count + 1
+            }
+            const response = await window.axios.post(`api/v1/chat/channel/messages/${messageId}/like`)
+            const updatedMessage = response.data?.data;
+            if (updatedMessage) {
+                messages.data[messageIndex] = updatedMessage;
+            }
+        } catch(e) {
+            console.error('Failed to like a message.', e)
+            error.value = e?.message || 'Error request'
+            throw e;
+        } finally {
+            isActionLoading.value = false
+        }
+    }
+
     const removeMessage = async (messageId) => {
         if (isActionLoading.value) return;
         isActionLoading.value = true;
@@ -101,6 +134,7 @@ export const useMessage = defineStore('message', () => {
         isFetching,
         updateMessage,
         getMessages,
+        onLikeMessage,
         error,
         appendMessage,
         removeMessage,

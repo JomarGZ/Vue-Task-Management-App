@@ -42,9 +42,13 @@ const props = defineProps({
     replies: {
         type: Array,
         default: () => ([])
+    },
+    is_liked: {
+        type:Boolean,
+        default: false
     }
 });
-const emit = defineEmits(['show-replies', 'on-reply'])
+const emit = defineEmits(['show-replies', 'on-reply', 'on-like'])
 const showReplies = ref(false);
 
 watch(() => props.replies, (newReplies) => {
@@ -82,7 +86,9 @@ const onShowReplies = () => {
                     <ChatMessageReaction
                         :like_count="like_count"
                         :reply_count="reply_count"
+                        :is_liked="is_liked"
                         @on-reply="$emit('on-reply')"
+                        @On-like="$emit('on-like')"
                     />
                     <button v-if="reply_count > 0" 
                             @click="onShowReplies"
@@ -115,6 +121,7 @@ const onShowReplies = () => {
                     <ChatMessageReaction
                         :like_count="like_count"
                         :reply_count="reply_count"
+                        :is_liked="is_liked"
                         @on-reply="$emit('on-reply')"
 
                     />
