@@ -20,7 +20,7 @@ const auth = useAuth();
 const generalMessageStore = useGeneralMessage();
 const replyStore = useMessageReply();
 const messageStore = useMessage();
-const isSending = ref(false);
+const isActionLoaded = ref(false);
 const isLoadingMore = ref(false);
 const isReplyMode = ref(false);
 const messageToReply = ref({});
@@ -28,12 +28,12 @@ const messagesContainer = ref(null);
 
 const channelHandler = {
     general: async (values) => {
-        if(isSending.value) return;
-        isSending.value = true;
+        if(isActionLoaded.value) return;
+        isActionLoaded.value = true;
         try {
            return await generalMessageStore.storeMessage(values.content, values.replyTo?.id)
         } finally {
-            isSending.value = false
+            isActionLoaded.value = false
         }
     },
     group: () => console.log('group channel'),
@@ -66,7 +66,13 @@ const onReplyMode = (message) => {
 }
 
 const onLikeMessage = async (messageId) => {
-    messageStore.onLikeMessage(messageId)
+    if (isActionLoaded.value) return;
+    isActionLoaded.value = true
+    try {
+        await messageStore.onLikeMessage(messageId)
+    } finally {
+        isActionLoaded.value = false
+    }
 }
 const cancelReply = () => {
     isReplyMode.value = false
@@ -134,6 +140,7 @@ const getReplies = async (id) => {
                 :author-name="m.user?.name"
                 :avatar="m.user?.avatar?.['thumb-60']"
                 :created_at="m.created_at"
+                :isActionLoaded="isActionLoaded"
                 :content="m.content"
                 :like_count="m.reaction_count"
                 :replies="replyStore.replies[m.id]"
@@ -151,7 +158,7 @@ const getReplies = async (id) => {
             </div>
         </div>
         <ChatForm 
-            :isLoading="isSending" 
+            :isLoading="isActionLoaded" 
             @submit-message="onMessageSend"
             :reply-mode="isReplyMode"
             :reply-to="isReplyMode ? messageToReply : {}"

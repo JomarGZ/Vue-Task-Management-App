@@ -46,6 +46,10 @@ const props = defineProps({
     is_liked: {
         type:Boolean,
         default: false
+    },
+    isActionLoaded: {
+        type: Boolean,
+        default: false
     }
 });
 const emit = defineEmits(['show-replies', 'on-reply', 'on-like'])
@@ -84,6 +88,7 @@ const onShowReplies = () => {
                <ChatReplies :showReplies="showReplies" :replies="replies"/>
                 <div class="flex justify-end mt-2">
                     <ChatMessageReaction
+                        :isActionLoaded="isActionLoaded"
                         :like_count="like_count"
                         :reply_count="reply_count"
                         :is_liked="is_liked"
