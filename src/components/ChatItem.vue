@@ -2,8 +2,9 @@
 import { formatDateDistance } from '@/composables/useFormatters';
 import SimpleAvatar from './SimpleAvatar.vue';
 import { Icon } from '@iconify/vue';
-import ChatReaction from './ChatReaction.vue';
-import { ref } from 'vue';
+import ChatMessageReaction from './ChatMessageReaction.vue';
+import { ref, watch } from 'vue';
+import ChatReplies from './ChatReplies.vue';
 
 const props = defineProps({
     id: {
@@ -46,6 +47,12 @@ const props = defineProps({
 const emit = defineEmits(['show-replies', 'on-reply'])
 const showReplies = ref(false);
 
+watch(() => props.replies, (newReplies) => {
+    if (newReplies.length > 0) {
+        showReplies.value = true;
+    }
+}, { deep: true });
+
 const onShowReplies = () => {
     if (!showReplies.value) {
         emit('show-replies', props.id)
@@ -70,28 +77,16 @@ const onShowReplies = () => {
                 </div>
                 
                 <!-- Reply List -->
-                <div v-if="showReplies && replies.length" class="mt-4 pl-6 border-l-2 border-sky-200 overflow-y-auto max-h-[400px]">
-                    <div v-for="reply in replies" :key="reply.id" class="mb-4">
-                        <div class="flex items-center mb-1">
-                            <SimpleAvatar :name="reply.user?.name" :avatar="reply.user?.avatar?.['thumb-60']" size="xs" class="mr-2"/>
-                            <span class="font-medium text-sm mr-2">{{ reply.user?.name }}</span>
-                            <span class="text-xs text-gray-500">{{ formatDateDistance(reply.created_at) }}</span>
-                        </div>
-                        <div class="bg-sky-50 p-3 rounded-lg text-sm text-gray-800">
-                            {{ reply.content }}
-                        </div>
-                    </div>
-                </div>
-
+               <ChatReplies :showReplies="showReplies" :replies="replies"/>
                 <div class="flex justify-end mt-2">
-                    <ChatReaction
+                    <ChatMessageReaction
                         :like_count="like_count"
                         :reply_count="reply_count"
                         @on-reply="$emit('on-reply')"
                     />
                     <button v-if="reply_count > 0" 
                             @click="onShowReplies"
-                            class="ml-2 text-xs text-sky-500 hover:text-sky-700">
+                            class="ml-2 text-xs text-sky-500 cursor-pointer hover:text-sky-700">
                         {{ showReplies ? 'Hide replies' : `Show replies (${reply_count})` }}
                     </button>
                 </div>
@@ -115,21 +110,9 @@ const onShowReplies = () => {
                 </div>
                 
                 <!-- Reply List -->
-                <div v-if="showReplies && replies.length" class="mt-4 pl-6 border-l-2 border-gray-200 overflow-y-auto max-h-[400px]">
-                    <div v-for="reply in replies" :key="reply.id" class="mb-4">
-                        <div class="flex items-center mb-1">
-                            <SimpleAvatar :name="reply?.user?.name" :avatar="reply?.user?.avatar?.['thumb-60']" size="xs" class="mr-2"/>
-                            <span class="font-medium text-sm mr-2">{{ reply.user?.name }}</span>
-                            <span class="text-xs text-gray-500">{{ formatDateDistance(created_at) }}</span>
-                        </div>
-                        <div class="bg-gray-50 p-3 rounded-lg text-sm">
-                            {{ reply.content }}
-                        </div>
-                    </div>
-                </div>
-
+                <ChatReplies :showReplies="showReplies" :replies="replies"/>
                 <div class="flex items-center mt-2">
-                    <ChatReaction
+                    <ChatMessageReaction
                         :like_count="like_count"
                         :reply_count="reply_count"
                         @on-reply="$emit('on-reply')"
@@ -137,7 +120,7 @@ const onShowReplies = () => {
                     />
                     <button v-if="reply_count > 0" 
                             @click="onShowReplies"
-                            class="ml-2 text-xs text-sky-500 hover:text-sky-700">
+                            class="ml-2 text-xs text-sky-500 cursor-pointer hover:text-sky-700">
                         {{ showReplies ? 'Hide replies' : `Show replies (${reply_count})` }}
                     </button>
                 </div>

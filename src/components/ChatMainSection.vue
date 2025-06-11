@@ -49,12 +49,14 @@ const scrollToBottom = () => {
 const onMessageSend = async (values) => {
     const handler = channelHandler[props.channel.type] || (() => console.log('Unknown type'));
     const response = await handler(values);
-    if (response.success) {
+    if (values.replyTo?.id) {
+        replyStore.appendReply(values.replyTo.id, response.message);
+    } else {
+        // Regular message
         messageStore.appendMessage(response.message);
         await nextTick();
         scrollToBottom();
-    } else {
-        console.error('message not sent')
+
     }
 }
 const onReplyMode = (message) => {
@@ -83,13 +85,9 @@ useInfiniteScroll(
         distance: 100,
     }
 );
-const onShowReplies = async (id) => {
+const getReplies = async (id) => {
     if(!id) return;
-    const success = await replyStore.getReplies(id);
-    if(success) {
-        console.log('show replies');
-        console.log(replyStore.replies[id])
-    }
+    await replyStore.getReplies(id);
 }
 </script>
 <template>
@@ -136,7 +134,7 @@ const onShowReplies = async (id) => {
                 :content="m.content"
                 :like_count="m.reaction_count"
                 :replies="replyStore.replies[m.id]"
-                @show-replies="onShowReplies"
+                @show-replies="getReplies"
                 :reply_count="m.reply_count"
                 @on-reply="onReplyMode(m)"
                 @on-like="console.log('On Like')"

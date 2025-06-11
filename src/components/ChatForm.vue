@@ -30,7 +30,7 @@ const onSubmit = handleSubmit((value) => {
     emit('submit-message', {
         replyMode: props.replyMode,
         replyTo: props.replyTo,
-        content: value.content
+        content: value.content,
     })
     emit('cancel-reply')
     resetForm()
