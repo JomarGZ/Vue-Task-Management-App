@@ -66,13 +66,7 @@ const onReplyMode = (message) => {
 }
 
 const onLikeMessage = async (messageId) => {
-    if (isActionLoaded.value) return;
-    isActionLoaded.value = true
-    try {
-        await messageStore.onLikeMessage(messageId)
-    } finally {
-        isActionLoaded.value = false
-    }
+    await messageStore.onLikeMessage(messageId)
 }
 const cancelReply = () => {
     isReplyMode.value = false
@@ -140,7 +134,7 @@ const getReplies = async (id) => {
                 :author-name="m.user?.name"
                 :avatar="m.user?.avatar?.['thumb-60']"
                 :created_at="m.created_at"
-                :isActionLoaded="isActionLoaded"
+                :isActionLoaded="messageStore.isActionLoading"
                 :content="m.content"
                 :like_count="m.reaction_count"
                 :replies="replyStore.replies[m.id]"

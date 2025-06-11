@@ -5,6 +5,7 @@ import { Icon } from '@iconify/vue';
 import ChatMessageReaction from './ChatMessageReaction.vue';
 import { ref, watch } from 'vue';
 import ChatReplies from './ChatReplies.vue';
+import { useMessageReply } from '@/stores/messageReplyStore';
 
 const props = defineProps({
     id: {
@@ -52,8 +53,12 @@ const props = defineProps({
         default: false
     }
 });
-const emit = defineEmits(['show-replies', 'on-reply', 'on-like'])
+
 const showReplies = ref(false);
+
+const messageReply = useMessageReply();
+
+const emit = defineEmits(['show-replies', 'on-reply', 'on-like'])
 
 watch(() => props.replies, (newReplies) => {
     if (newReplies.length > 0) {
@@ -66,6 +71,10 @@ const onShowReplies = () => {
         emit('show-replies', props.id)
     }
     showReplies.value = !showReplies.value
+}
+const onLikeReply = (reply) => {
+    if (!reply.id || !props.id) return;
+    messageReply.onLikeReply(reply.id, props.id)
 }
 </script>
 
@@ -84,8 +93,12 @@ const onShowReplies = () => {
                     <p>{{ content }}</p>
                 </div>
                 
-                <!-- Reply List -->
-               <ChatReplies :showReplies="showReplies" :replies="replies"/>
+               <ChatReplies 
+                    :showReplies="showReplies" 
+                    :replies="replies" 
+                    @on-like="onLikeReply" 
+                    :isActionLoaded="messageReply.isActionLoaded"
+                />
                 <div class="flex justify-end mt-2">
                     <ChatMessageReaction
                         :isActionLoaded="isActionLoaded"

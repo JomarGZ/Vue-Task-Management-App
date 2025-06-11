@@ -135,6 +135,7 @@ export const useMessage = defineStore('message', () => {
         updateMessage,
         getMessages,
         onLikeMessage,
+        isActionLoading,
         error,
         appendMessage,
         removeMessage,

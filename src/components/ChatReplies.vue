@@ -11,8 +11,13 @@ defineProps({
     replies: {
         type: Array,
         default: () => ([])
+    },
+    isActionLoaded: {
+        type: Boolean,
+        default: false
     }
 })
+defineEmits(['on-like']);
 </script>
 
 <template>
@@ -28,8 +33,10 @@ defineProps({
                     <p class="pr-6 text-gray-700">{{ reply.content }}</p>
                     <div class="absolute -bottom-3 right-2">
                         <ChatLike 
-                            @on-like="console.log('like')" 
-                            :like_count="reply.like_count"
+                            @on-like="$emit('on-like', reply)" 
+                            :like_count="reply.reaction_count"
+                            :is_liked="reply.is_liked"
+                            :isActionLoaded="isActionLoaded"
                         />
                     </div>
                 </div>
