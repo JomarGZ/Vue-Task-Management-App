@@ -24,7 +24,7 @@ defineEmits(['on-like']);
     <div v-if="showReplies && replies.length" class="mt-4 pl-6 border-l-2 flex flex-col-reverse border-sky-200 overflow-y-auto max-h-[400px]">
         <div v-for="reply in replies" :key="reply.id" class="mb-4 group relative">
             <div class="flex items-center mb-1 px-3 pt-3">
-                <SimpleAvatar :name="reply?.user?.name" :avatar="reply?.user?.avatar?.['thumb-60']" size="xs" class="mr-2"/>
+                <SimpleAvatar :name="reply?.user?.name" :avatar="reply?.user?.avatar?.['thumb-60']" size="sm" class="mr-2"/>
                 <span class="font-medium text-sm mr-2">{{ reply.user?.name }}</span>
                 <span class="text-xs text-gray-500">{{ formatDateDistance(reply.created_at) }}</span>
             </div>

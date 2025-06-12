@@ -1,5 +1,5 @@
 <template>
-    <div :class="`relative shrink-0 ${sizesConfig[size].container} rounded-full flex items-center justify-center`">
+    <div :class="`relative shrink-0 ${sizesConfig[size]?.container} rounded-full flex items-center justify-center`">
         <img v-if="avatar" :src="avatar" alt="User" class="h-9 w-9 rounded-full">
         <div
             v-else 
@@ -12,7 +12,7 @@
         >
             {{ getInitials(name) }}
         </div>
-        <span :class="`absolute bottom-0 right-0 block ${sizesConfig[size].onlineIndicator} rounded-full bg-green-500 border-2 border-white`"></span>
+        <span :class="`absolute bottom-0 right-0 block ${sizesConfig[size]?.onlineIndicator} rounded-full bg-green-500 border-2 border-white`"></span>
     </div>
 </template>
 <script setup>
@@ -34,7 +34,6 @@ const props = defineProps({
         validator: (value) => ['sm', 'md', 'lg'].includes(value)
     }
 })
-const initial = computed(() => props.name?.charAt(0).toUpperCase());
 
 const sizesConfig = {
     sm: {
@@ -81,6 +80,6 @@ const letterColorMap = {
 }
 const bgColorClass = computed(() => {
     const letter = props.name?.charAt(0).toUpperCase() || '';
-    return letterColorMap[letter] || ''
+    return letterColorMap[letter] || 'bg-gray-600'
 })
 </script>

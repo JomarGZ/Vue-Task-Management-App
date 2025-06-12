@@ -9,7 +9,6 @@ import { useInfiniteScroll } from '@vueuse/core';
 import { useMessage } from '@/stores/messageStore';
 import { useMessageReply } from '@/stores/messageReplyStore';
 import { useDirectMessage } from '@/stores/directMessageStore';
-import SimpleAvatar from './SimpleAvatar.vue';
 import ChatHeader from './ChatHeader.vue';
 
 const props = defineProps({
@@ -151,7 +150,7 @@ const getReplies = async (id) => {
                 <Icon icon="eos-icons:loading" width="30" height="30"/>
             </div>
             <div v-if="!messageStore.messages?.hasMore" class="text-center py-4 text-gray-500 flex items-center border-b border-b-sky-200 mb-6 justify-center">
-               <ChatHeader :type="channel.type" :channel="channel"/>
+               <ChatHeader v-if="channel?.type" :type="channel?.type" :channel="channel"/>
             </div>
         </div>
         <ChatForm 
