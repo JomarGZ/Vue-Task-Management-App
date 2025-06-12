@@ -61,7 +61,6 @@ export const useMessage = defineStore('message', () => {
             const messageIndex = messages.data.findIndex(m => m.id === messageId);
             if (messageIndex === -1) return;
             const message = messages.data[messageIndex];
-            console.log('message', message);
             messages.data[messageIndex] = {
                 ...message,
                 is_liked: !message.is_liked,
