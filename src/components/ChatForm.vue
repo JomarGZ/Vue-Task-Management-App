@@ -16,8 +16,25 @@ const props = defineProps({
     replyTo: {
         type: Object,
         default: () => ({})
+    },
+    channel: {
+        type: Object,
+        required: true
     }
 })
+const channelHandler = {
+    general: (props) => ({
+        replyMode: props.replyMode,
+        replyTo: props.replyTo,
+        type: 'general'
+    }),
+    direct: (props) => ({
+        recipientId: props.channel?.recipient.id,
+        replyMode: props.replyMode,
+        replyTo: props.replyTo,
+        type: 'direct'
+    })
+}
 const emit = defineEmits(['submit-message', 'cancel-reply'])
 const schema = z.object({
     content: z.string().min(1, 'Message is required').max(1000, 'Message must be 1000 characteres or less')
@@ -25,13 +42,15 @@ const schema = z.object({
 const {handleSubmit, isSubmitting, resetForm} = useForm({
     validationSchema: toTypedSchema(schema)
 })
+
 const isDisabled = computed(() => props.isLoading || isSubmitting.value);
 const onSubmit = handleSubmit((value) => {
-    emit('submit-message', {
-        replyMode: props.replyMode,
-        replyTo: props.replyTo,
+    const handler =  channelHandler[props.channel.type];
+    const messageData = {
+        ...handler(props), 
         content: value.content,
-    })
+    };
+    emit('submit-message', messageData)
     emit('cancel-reply')
     resetForm()
 })

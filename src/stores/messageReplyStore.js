@@ -30,7 +30,6 @@ export const useMessageReply = defineStore('message-reply', () => {
         if (isActionLoaded.value) return;
         isActionLoaded.value = true;
         resetErrorState();
-      
 
         try {
             if(!replyId) {

@@ -8,6 +8,9 @@ import ChatItem from './ChatItem.vue';
 import { useInfiniteScroll } from '@vueuse/core';
 import { useMessage } from '@/stores/messageStore';
 import { useMessageReply } from '@/stores/messageReplyStore';
+import { useDirectMessage } from '@/stores/directMessageStore';
+import SimpleAvatar from './SimpleAvatar.vue';
+import ChatHeader from './ChatHeader.vue';
 
 const props = defineProps({
     channel: {
@@ -18,6 +21,7 @@ const props = defineProps({
 
 const auth = useAuth();
 const generalMessageStore = useGeneralMessage();
+const directMessageStore = useDirectMessage();
 const replyStore = useMessageReply();
 const messageStore = useMessage();
 const isActionLoaded = ref(false);
@@ -36,8 +40,8 @@ const channelHandler = {
             isActionLoaded.value = false
         }
     },
-    group: () => console.log('group channel'),
-    direct: () => console.log('direct channel'),
+    group: (values) => console.log('group message', values),
+    direct:(values) => directMessageStore.storeMessage(values.content, values.recipientId, values.replyTo?.id),
 }
 const scrollToBottom = () => {
   nextTick(() => {
@@ -52,11 +56,9 @@ const onMessageSend = async (values) => {
     if (values.replyTo?.id) {
         replyStore.appendReply(values.replyTo.id, response.message);
     } else {
-        // Regular message
         messageStore.appendMessage(response.message);
         await nextTick();
         scrollToBottom();
-
     }
 }
 const onReplyMode = (message) => {
@@ -101,8 +103,9 @@ const getReplies = async (id) => {
                     <Icon icon="fluent-color:people-32" width="32" height="32" />
                 </div>
                 <div>
-                    <h2 v-if="channel.type === 'general'" class="text-lg font-semibold">General Discussion</h2>
-                    <h2 v-else class="text-lg font-semibold">Team Discussion</h2>
+                    <h2 v-if="channel.type === 'direct'" class="text-lg font-semibold">{{ channel.recipient?.name }}</h2>
+                    <h2 v-else-if="channel.type === 'group'" class="text-lg font-semibold">{{ channel.name }}</h2>
+                    <h2 v-else class="text-lg font-semibold">General Discussion</h2>
                     <!-- <p class="text-xs text-gray-500">Active now: 5 members</p> -->
                 </div>
             </div>
@@ -147,13 +150,14 @@ const getReplies = async (id) => {
             <div v-if="isLoadingMore" class="text-center py-4 text-gray-500 flex items-center justify-center">
                 <Icon icon="eos-icons:loading" width="30" height="30"/>
             </div>
-            <div v-if="!messageStore.messages?.hasMore" class="text-center py-4 text-gray-500 flex items-center justify-center">
-                No more message to load!
+            <div v-if="!messageStore.messages?.hasMore" class="text-center py-4 text-gray-500 flex items-center border-b border-b-sky-200 mb-6 justify-center">
+               <ChatHeader :type="channel.type" :channel="channel"/>
             </div>
         </div>
         <ChatForm 
             :isLoading="isActionLoaded" 
             @submit-message="onMessageSend"
+            :channel="channel"
             :reply-mode="isReplyMode"
             :reply-to="isReplyMode ? messageToReply : {}"
             @cancel-reply="cancelReply"

@@ -3,22 +3,35 @@ import ChatGroupSection from '@/components/ChatGroupSection.vue';
 import ChatMainSection from '@/components/ChatMainSection.vue';
 import ChatMembersSection from '@/components/ChatMembersSection.vue';
 import { useChannelParticipant } from '@/stores/channelParticipantStore';
+import { useChannel } from '@/stores/channelStore';
+import { useDirectChannel } from '@/stores/directChannelStore';
 import { useGeneralChannel } from '@/stores/generalChannelStore';
 import { useMessage } from '@/stores/messageStore';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 const generaChannelStore = useGeneralChannel();
+const directChannelStore = useDirectChannel();
 const channelParticipantStore = useChannelParticipant();
+const channelStore = useChannel();
 const messageStore = useMessage();
 
 const currentChannel = ref({});
 const onGeneralChannel = async () => {
   const success = await generaChannelStore.getGeneralChannel();
   if (success) {
-    channelParticipantStore.getParticipants(generaChannelStore.generalChannel?.id,);
+    channelParticipantStore.getParticipants(generaChannelStore.generalChannel?.id);
     currentChannel.value = generaChannelStore.generalChannel || {}
-    messageStore.getMessages(currentChannel.value?.id)
+    
+  }
+}
 
+const onDirectChannel = async (participant) => {
+  const success = await directChannelStore.getChannel(participant.id)
+  if (success) {
+    currentChannel.value = directChannelStore.directChannel || {};
+    const channelIndex = channelStore.channels?.data?.findIndex(c => c.id === directChannelStore.directChannel?.id);
+    if (channelIndex) return;
+    channelStore.channels.data.unshift(directChannelStore.directChannel);
   }
 }
 const loadMore = async () => {
@@ -29,19 +42,28 @@ const loadMore = async () => {
     );
 }
 
+const onSelectChannel = (channel) => {
+  currentChannel.value = channel;
+}
+watch(currentChannel, (channel) => {
+  messageStore.getMessages(channel?.id)
+})
 onMounted(() => {
-  onGeneralChannel()
-    ;
+  onGeneralChannel();
+  channelStore.getChannels();
 })
 </script>
 <template>
       <div class="flex h-screen overflow-hidden rounded-lg shadow-lg">
         <ChatGroupSection
           @on-general-channel="onGeneralChannel"
+          :channels="channelStore.channels"
+          @onSelectChannel="onSelectChannel"
         />
         <ChatMainSection :channel="currentChannel"/>
         <ChatMembersSection 
           @load-more="loadMore"
+          @onPrivateChat="onDirectChannel"
           :participants="channelParticipantStore?.participants || {}"
           :isFetching="channelParticipantStore.isFetching"
           :hasMore="channelParticipantStore.participants?.hasMore"

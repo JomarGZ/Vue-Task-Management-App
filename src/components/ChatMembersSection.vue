@@ -3,6 +3,7 @@ import { Icon } from '@iconify/vue';
 import ChatMemberItem from './ChatMemberItem.vue';
 import { ref, watch } from 'vue';
 import debounce from 'lodash.debounce';
+import { useAuth } from '@/stores/auth';
 defineProps({
     participants: {
         type: Object,
@@ -22,7 +23,9 @@ defineProps({
     }
 })
 const query = ref('');
-const emit = defineEmits(['load-more', 'on-search']);
+
+const {authId} = useAuth();
+const emit = defineEmits(['load-more', 'on-search', 'onPrivateChat']);
 const searchDebounce = debounce((query) => {
     emit('on-search', {query : query})
 }, 300);
@@ -50,14 +53,15 @@ watch(query, searchDebounce);
                     <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                     Online — 5
                 </h3>
-                <ul  
-                    >
+                <ul>
                     <ChatMemberItem  
                         v-for="participant in participants.data"
                         :key="participant?.id"
                         :position="participant?.position"
+                        :isAuth="authId === participant.id"
                         :name="participant?.name"
                         :avatar="participant.avatar?.['thumb-60']"
+                        @onPrivateChat="$emit('onPrivateChat', participant)"
                     />
                     <li v-if="isFetching" class="flex items-center justify-center">
                         <Icon icon="eos-icons:three-dots-loading" width="100%" height="40" />
