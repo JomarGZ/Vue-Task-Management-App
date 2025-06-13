@@ -51,6 +51,10 @@ const props = defineProps({
     isActionLoaded: {
         type: Boolean,
         default: false
+    },
+    likes_by: {
+        type: Array,
+        default: () => ([])
     }
 });
 
@@ -104,6 +108,7 @@ const onLikeReply = (reply) => {
                         :isActionLoaded="isActionLoaded"
                         :like_count="like_count"
                         :reply_count="reply_count"
+                        :likes_by="likes_by"
                         :is_liked="is_liked"
                         @on-reply="$emit('on-reply')"
                         @On-like="$emit('on-like')"
@@ -145,6 +150,7 @@ const onLikeReply = (reply) => {
                         :isActionLoaded="isActionLoaded"
                         :like_count="like_count"
                         :reply_count="reply_count"
+                        :likes_by="likes_by"
                         :is_liked="is_liked"
                         @on-reply="$emit('on-reply')"
                         @On-like="$emit('on-like')"

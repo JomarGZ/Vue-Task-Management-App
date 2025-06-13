@@ -137,6 +137,7 @@ const getReplies = async (id) => {
                 :avatar="m.user?.avatar?.['thumb-60']"
                 :created_at="m.created_at"
                 :isActionLoaded="messageStore.isActionLoading"
+                :likes_by="m.likes_by"
                 :content="m.content"
                 :like_count="m.reaction_count"
                 :replies="replyStore.replies[m.id]"
