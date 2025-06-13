@@ -1,6 +1,5 @@
 <script setup>
 import { Icon } from '@iconify/vue';
-import ChatGroupChannelItem from './ChatGroupChannelItem.vue';
 import ChannelList from './ChannelList.vue';
 defineProps({
     channels: {
