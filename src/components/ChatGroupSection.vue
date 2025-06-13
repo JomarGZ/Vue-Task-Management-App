@@ -1,9 +1,8 @@
 <script setup>
 import { Icon } from '@iconify/vue';
-import ChatDirectChannelItem from './ChatDirectChannelItem.vue';
-import { computed } from 'vue';
 import ChatGroupChannelItem from './ChatGroupChannelItem.vue';
-const props = defineProps({
+import ChannelList from './ChannelList.vue';
+defineProps({
     channels: {
         type: Object,
         default: () => ({
@@ -11,11 +10,17 @@ const props = defineProps({
             links: {},
             metta: {}
         })
+    },
+    isFetching: {
+        type: Boolean,
+        default: false
+    },
+    error: {
+        type: Boolean,
+        default: false
     }
 })
 defineEmits(['on-general-channel', 'onSelectChannel'])
-const directChannels = computed(() => props.channels.data.filter(c => c.is_direct));
-const groupChannels = computed(() => props.channels.data.filter(c => !c.is_direct));
 </script>
 <template>
     <div class="w-20 md:w-64 bg-gray-50 border-r border-gray-200 flex flex-col ">
@@ -27,28 +32,20 @@ const groupChannels = computed(() => props.channels.data.filter(c => !c.is_direc
                 </button>
             </div>
         </div>
-        
         <div class="flex-1 p-2">
+            <div class="flex items-center justify-between px-2">
+                <P class="text-lg text-gray-700 font-medium text-center">Team chat</P>
+                <button class="hover:bg-sky-200 rounded-lg cursor-pointer p-1" title="Create team chat channel"><Icon icon="fluent-color:chat-add-16" width="30" height="30" /></button>
+            </div>
+            
             <nav>
                 <ul class="space-y-1">
-                    <template v-if="directChannels.length > 0">
-                        <li class="font-bold text-sm text-gray-700 py-2 border-b border-gray-200 ml-2">Direct Messages</li>
-                        <ChatDirectChannelItem
-                            v-for="channel in directChannels"
-                            @onSelectChannel="$emit('onSelectChannel', channel)"
-                            :key="channel.id"
-                            :recipient="channel.recipient"
-                        />
-                    </template>
-                    <template v-if="groupChannels.length > 0">
-                        <li class="font-bold text-sm text-gray-700 py-2 border-y border-gray-200 ml-2">Team Messages</li>
-                           <ChatGroupChannelItem
-                                v-for="channel in groupChannels"
-                                :key="channel.id"
-                                @onSelectChannel="$emit('onSelectChannel', channel)"
-                                :name="channel.name"
-                           />
-                    </template>
+                   <ChannelList
+                        :channels="channels"
+                        :isFetching="isFetching"
+                        :error="error"
+                        @selectChannel="$emit('onSelectChannel', $event)"
+                    />
                 </ul>
             </nav>
         </div>
