@@ -1,6 +1,6 @@
 <template>
     <div :class="`relative shrink-0 ${sizesConfig[size]?.container} rounded-full flex items-center justify-center`">
-        <img v-if="avatar" :src="avatar" alt="User" class="h-9 w-9 rounded-full">
+        <img v-if="avatar" :src="avatar" alt="User" :class="`${sizesConfig[size].avatarSize} rounded-full`">
         <div
             v-else 
             class="text-white flex items-center justify-center rounded-full"

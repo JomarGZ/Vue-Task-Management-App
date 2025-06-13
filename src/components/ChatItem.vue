@@ -134,14 +134,20 @@ const onLikeReply = (reply) => {
                 </div>
                 
                 <!-- Reply List -->
-                <ChatReplies :showReplies="showReplies" :replies="replies"/>
+                <ChatReplies 
+                    :showReplies="showReplies" 
+                    :replies="replies" 
+                    @on-like="onLikeReply" 
+                    :isActionLoaded="messageReply.isActionLoaded"
+                />
                 <div class="flex items-center mt-2">
                     <ChatMessageReaction
+                        :isActionLoaded="isActionLoaded"
                         :like_count="like_count"
                         :reply_count="reply_count"
                         :is_liked="is_liked"
                         @on-reply="$emit('on-reply')"
-
+                        @On-like="$emit('on-like')"
                     />
                     <button v-if="reply_count > 0" 
                             @click="onShowReplies"

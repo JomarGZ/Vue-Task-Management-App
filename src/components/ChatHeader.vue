@@ -17,7 +17,7 @@ defineProps({
 <template>
     <template v-if="type === 'direct'">
         <div  class="flex flex-col items-center justify-center space-y-2 ">
-            <SimpleAvatar size="lg" :name="channel.recipient?.name" :avatar="channel.recipient?.avatar?.['thumb-60']"/>
+            <SimpleAvatar size="lg" :name="channel.recipient?.name" :avatar="channel.recipient?.avatar?.['thumb-200']"/>
             <p class="text-xl font-bold capitalize">{{ channel.recipient?.name }}</p>
             <p class="text-sm font-serif capitalize">{{ channel.recipient?.position }}</p>
         </div>
