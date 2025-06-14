@@ -1,6 +1,9 @@
 <script setup>
 import { Icon } from '@iconify/vue';
 import ChannelList from './ChannelList.vue';
+import ChatGroupChannelForm from './ChatGroupChannelForm.vue';
+import { ref } from 'vue';
+import { useChannel } from '@/stores/channelStore';
 defineProps({
     channels: {
         type: Object,
@@ -19,7 +22,13 @@ defineProps({
         default: false
     }
 })
+const isModalShow = ref(false)
 defineEmits(['on-general-channel', 'onSelectChannel'])
+const channelStore = useChannel();
+const handleAddChannel = async (values) => {
+   const success = await channelStore.storeChannel(values)
+   if (success) isModalShow.value = false;
+}
 </script>
 <template>
     <div class="w-20 md:w-64 bg-gray-50 border-r border-gray-200 flex flex-col ">
@@ -33,8 +42,13 @@ defineEmits(['on-general-channel', 'onSelectChannel'])
         </div>
         <div class="flex-1 p-2">
             <div class="flex items-center justify-between px-2">
-                <P class="text-lg text-gray-700 font-medium text-center">Team chat</P>
-                <button class="hover:bg-sky-200 rounded-lg cursor-pointer p-1" title="Create team chat channel"><Icon icon="fluent-color:chat-add-16" width="30" height="30" /></button>
+                <p class="text-lg text-gray-700 font-medium text-center">Team chat</p>
+                <ChatGroupChannelForm
+                    :isModalShow="isModalShow"
+                    @onSubmit="handleAddChannel"
+                    @on-modal-show="isModalShow = true"
+                    @on-modal-close="isModalShow = false"
+                />
             </div>
             
             <nav>

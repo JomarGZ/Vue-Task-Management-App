@@ -10,10 +10,41 @@ export const useChannelParticipant = defineStore('channel-participant', () => {
         meta: {},
         hasMore: false
     });
+    const dropdownParticipants = ref([]);
 
     const resetErrorState = () => {
         error.value = null;
     }
+
+    const removeSelectedItemOnTheList = (users) => {
+        if (!users) return;
+        const idsToRemoveSet = new Set(users)
+        dropdownParticipants.value = dropdownParticipants.value.filter(u => !idsToRemoveSet.has(u.id));
+    }
+
+    const searchParticipants = async (query, ParticipantIds = []) => {
+        if (isFetching.value) return;
+        isFetching.value = true;
+
+        resetErrorState();
+
+        try {
+            const params = new URLSearchParams({
+                query: query
+            })
+
+            if (ParticipantIds) params.append('participant_ids', ParticipantIds);
+            const response = await window.axios.get(`api/v1/chat/participants/available-list?${params}`)
+            dropdownParticipants.value = response.data?.data || []
+        } catch (e) {
+            console.error('Failed to fetch participants.', e);
+            error.value = e?.message || 'There is an error fetching participants. Please try again later';
+            throw e;
+        } finally {
+            isFetching.value = false
+        }
+    }
+
     const getParticipants = async (channelId, cursor = null, searchQuery = '') => {
         if (isFetching.value) return;
         isFetching.value = true;
@@ -47,6 +78,9 @@ export const useChannelParticipant = defineStore('channel-participant', () => {
     }
     return {
         getParticipants,
+        searchParticipants,
+        dropdownParticipants,
+        removeSelectedItemOnTheList,
         error,
         isFetching,
         participants

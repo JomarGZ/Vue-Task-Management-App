@@ -12,7 +12,7 @@
         >
             {{ getInitials(name) }}
         </div>
-        <span :class="`absolute bottom-0 right-0 block ${sizesConfig[size]?.onlineIndicator} rounded-full bg-green-500 border-2 border-white`"></span>
+        <span v-if="size !== 'xs'" :class="`absolute bottom-0 right-0 block ${sizesConfig[size]?.onlineIndicator} rounded-full bg-green-500 border-2 border-white`"></span>
     </div>
 </template>
 <script setup>
@@ -31,11 +31,17 @@ const props = defineProps({
     size: {
         type: String,
         default: 'sm',
-        validator: (value) => ['sm', 'md', 'lg'].includes(value)
+        validator: (value) => ['xs', 'sm', 'md', 'lg'].includes(value)
     }
 })
 
 const sizesConfig = {
+    xs: {
+        container: 'h-6 w-6',
+        avatarSize: 'h-5 w-5',
+        onlineIndicator: 'h-3 w-3',
+        fontSize: 'text-xs'
+    },
     sm: {
         container: 'h-10 w-10',
         avatarSize: 'h-9 w-9',

@@ -29,9 +29,6 @@ const onDirectChannel = async (participant) => {
   const success = await directChannelStore.getChannel(participant.id)
   if (success) {
     currentChannel.value = directChannelStore.directChannel || {};
-    const channelIndex = channelStore.channels?.data?.findIndex(c => c.id === directChannelStore.directChannel?.id);
-    if (channelIndex) return;
-    channelStore.channels.data.unshift(directChannelStore.directChannel);
   }
 }
 const loadMore = async () => {
