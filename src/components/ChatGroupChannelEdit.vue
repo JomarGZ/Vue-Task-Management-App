@@ -15,6 +15,10 @@ const props = defineProps({
     channelToEdit: {
         type: Object,
         required: true
+    },
+    updatedChannel: {
+        type: Object,
+        default : () => ({})
     }
 })
 const emit = defineEmits(['emit-submission', 'onModalShow', 'onModalClose', 'remove-participant'])
@@ -23,7 +27,15 @@ const onEmitSubmit = (data) => {
 }
 
 const currentStep = ref('form') 
-const participants = computed(() => props.channelToEdit && props.channelToEdit?.participants?.length > 0 ? props.channelToEdit?.participants : []);
+const participants = computed(() => {
+  return [
+    ...(props.channelToEdit?.participants || []),
+    ...(props.updatedChannel?.participants || [])
+  ].reduce((acc, participant) => {
+    acc[participant.id] = participant;
+    return acc;
+  }, {});
+});
 
 const goToParticipants = () => currentStep.value = 'participants'
 const goToForm = () => currentStep.value = 'form'
@@ -71,7 +83,7 @@ const goToForm = () => currentStep.value = 'form'
           class="text-blue-600 cursor-pointer hover:text-blue-800 font-medium flex items-center"
         >
           <Icon icon="mdi:account-group" class="mr-2" />
-          Manage participants ({{ participants.length }})
+          Manage participants
         </button>
       </div>
     </div>

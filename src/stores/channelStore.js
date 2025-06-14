@@ -85,7 +85,10 @@ export const useChannel = defineStore("channel", () => {
                 channels.data[channeIndex] = response.data?.data || {};
             }
             showToast('Channel updated successfully');
-            return true;
+            return {
+                success: true,
+                channel: channels.data[channeIndex]
+            };
         } catch(e) {
             console.error('Failed to update channel.', e);
             error.value = e?.message || 'There is an error updating channel.'

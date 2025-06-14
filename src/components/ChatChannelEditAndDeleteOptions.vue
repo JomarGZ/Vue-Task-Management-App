@@ -1,23 +1,27 @@
 <script setup>
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { Icon } from '@iconify/vue';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import ChatGroupChannelEdit from './ChatGroupChannelEdit.vue'
 import { useChannel } from '@/stores/channelStore';
-import { useChannelParticipant } from '@/stores/channelParticipantStore';
 const props = defineProps({
     channel: {
         type: Object,
         required: true
     }
 })
-defineEmits(['remove-participant', 'delete-channel'])
+const emit = defineEmits(['remove-participant', 'delete-channel'])
 const channelStore = useChannel();
+
 const isModalShow = ref(false);
+const updatedChannel = ref({});
+
 const handleUpdate = async (payload) => {
-    const success = await channelStore.updateChannel(props.channel?.id, payload)
-    if (success) {
+   
+    const data = await channelStore.updateChannel(props.channel?.id, payload)
+    if (data.success) {
         isModalShow.value = false
+        updatedChannel.value = data.channel
     }
 }
 </script>
@@ -67,7 +71,8 @@ const handleUpdate = async (payload) => {
         </Menu>
         <div>
             <ChatGroupChannelEdit 
-                 @remove-participant="(user) => $emit('remove-participant', user)"
+                @remove-participant="(user) => $emit('remove-participant', user)"
+                :updatedChannel="updatedChannel"
                 :isModalShow="isModalShow"
                 :channelToEdit="channel"
                 @emit-submission="handleUpdate"
