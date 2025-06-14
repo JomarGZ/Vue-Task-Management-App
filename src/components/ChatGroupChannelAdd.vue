@@ -18,6 +18,7 @@ const onEmitSubmit = (data) => {
 </script>
 
 <template>
+    <div>
     <button type="button" @click="$emit('onModalShow')" class="hover:bg-sky-200 rounded-lg cursor-pointer p-1" title="Create team chat channel"><Icon icon="fluent-color:chat-add-16" width="30" height="30" /></button>
     <teleport to='body'>
         <transition
@@ -49,4 +50,5 @@ const onEmitSubmit = (data) => {
         </div>
     </transition>
     </teleport>
+    </div>
 </template>

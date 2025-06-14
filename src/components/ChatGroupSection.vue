@@ -1,7 +1,7 @@
 <script setup>
 import { Icon } from '@iconify/vue';
 import ChannelList from './ChannelList.vue';
-import ChatGroupChannelAddForm from './ChatGroupChannelAddForm.vue';
+import ChatGroupChannelAdd from './ChatGroupChannelAdd.vue';
 import { ref } from 'vue';
 import { useChannel } from '@/stores/channelStore';
 defineProps({
@@ -43,7 +43,7 @@ const handleAddChannel = async (values) => {
         <div class="flex-1 p-2">
             <div class="flex items-center justify-between px-2">
                 <p class="text-lg text-gray-700 font-medium text-center">Team chat</p>
-                <ChatGroupChannelAddForm
+                <ChatGroupChannelAdd
                     :isModalShow="isModalShow"
                     @emit-submission="handleAddChannel"
                     @on-modal-show="isModalShow = true"
