@@ -3,8 +3,21 @@ import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 import { Icon } from '@iconify/vue';
 import { ref } from 'vue';
 import ChatGroupChannelEdit from './ChatGroupChannelEdit.vue'
+import { useChannel } from '@/stores/channelStore';
+const props = defineProps({
+    channel: {
+        type: Object,
+        required: true
+    }
+})
+const channelStore = useChannel();
 const isModalShow = ref(false);
-
+const handleUpdate = async (payload) => {
+    const success = await channelStore.updateChannel(props.channel?.id, payload)
+    if (success) {
+        isModalShow.value = false
+    }
+}
 </script>
 <template>
      <Menu as="div" class="relative">
@@ -51,7 +64,8 @@ const isModalShow = ref(false);
         <div>
             <ChatGroupChannelEdit 
                 :isModalShow="isModalShow"
-                @emit-submission="console.log('trigger')"
+                :channelToEdit="channel"
+                @emit-submission="handleUpdate"
                 @onModalClose="isModalShow = false"
             />
         </div>

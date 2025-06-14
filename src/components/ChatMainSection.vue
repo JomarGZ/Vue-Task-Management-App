@@ -109,8 +109,8 @@ const getReplies = async (id) => {
                     <!-- <p class="text-xs text-gray-500">Active now: 5 members</p> -->
                 </div>
             </div>
-            <div class="flex space-x-4">
-                <ChatChannelEditAndDeleteOptions/>
+            <div v-if="channel.type !== 'general'" class="flex space-x-4">
+                <ChatChannelEditAndDeleteOptions :channel="channel"/>
             </div>
         </div>
         <div 

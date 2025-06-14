@@ -17,6 +17,14 @@ const props = defineProps({
     isActionLoading: {
         type: Boolean,
         default: false
+    },
+    isEditMode: {
+        type: Boolean,
+        default: false,
+    },
+    channelToEdit: {
+        type: Object,
+        default: () => ({})
     }
 })
 const schema = z.object({
@@ -65,6 +73,18 @@ const resetOnCloseModal = () => {
     resetForm()
 }
 
+const prefilledForm = (data) => {
+    if(!data || !props.isEditMode) return;
+    console.log(data)
+    resetForm({
+        values: {
+            name: data?.name || '',
+            description: data?.description || ''
+        }
+    })
+
+}
+watch(() => props.channelToEdit, prefilledForm, {immediate: true})
 watch(userQuery, debounceUserSearch);
 watch(() => props.isModalShow, (bool) => {
     if (!bool) {
@@ -150,7 +170,7 @@ const onSumbit = handleSubmit((values) => {
                 class="px-4 py-2 cursor-pointer flex items-center justify-center gap-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
             >
                 <span v-if="isActiondisabled"><Icon icon="eos-icons:loading" width="24" height="24" /></span>
-                Create Channel
+                <span>{{ isEditMode ? 'Update Channel' : 'Create Channel' }}</span>
             </button>
         </div>
     </form>

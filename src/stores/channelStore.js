@@ -72,12 +72,36 @@ export const useChannel = defineStore("channel", () => {
             isActionLoading.value = false
         }
     }
+    const updateChannel = async (channelId, payload) => {
+        if (isActionLoading.value) return;
+        isActionLoading.value = true;
+        resetErrorState();
+        try {
+            if (!channelId) {
+                throw new Error(`Channel ID is required to update the channel. Recieved: ${channelId}`)
+            }
+            const response = await window.axios.put(`api/v1/chat/channels/${channelId}`, payload);
+            const channeIndex = channels.data.findIndex(c => c.id === channelId);
+            if (channeIndex !== -1) {
+                channels.data[channeIndex] = response.data?.data || {};
+            }
+            showToast('Channel updated successfully');
+            return true;
+        } catch(e) {
+            console.error('Failed to update channel.', e);
+            error.value = e?.message || 'There is an error updating channel.'
+            throw e;
+        } finally {
+            isActionLoading.value = false
+        }
+    }
 
     return {
         getChannels,
         getChannel,
         isFetching,
         storeChannel,
+        updateChannel,
         channels,
         error
     }
