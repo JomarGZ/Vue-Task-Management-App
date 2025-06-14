@@ -17,6 +17,11 @@ const navLinks = [
         to: {name: 'members.index'},
         icon: 'tdesign:member'
     },
+    {
+        name: 'Chats',
+        to: {name: 'chats.index'},
+        icon: 'uiw:message'
+    },
 ]
 </script>
 <template>
