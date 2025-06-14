@@ -4,12 +4,14 @@ import { Icon } from '@iconify/vue';
 import { ref } from 'vue';
 import ChatGroupChannelEdit from './ChatGroupChannelEdit.vue'
 import { useChannel } from '@/stores/channelStore';
+import { useChannelParticipant } from '@/stores/channelParticipantStore';
 const props = defineProps({
     channel: {
         type: Object,
         required: true
     }
 })
+defineEmits(['remove-participant', 'delete-channel'])
 const channelStore = useChannel();
 const isModalShow = ref(false);
 const handleUpdate = async (payload) => {
@@ -48,6 +50,8 @@ const handleUpdate = async (payload) => {
                 </MenuItem>
                 <MenuItem v-slot="{ active }">
                 <button
+                    type="button"
+                    @click="$emit('delete-channel')"
                     :class="[
                     active ? 'bg-gray-100' : '',
                     'group flex w-full items-center text-nowrap cursor-pointer text-gray-900 rounded-md px-2 py-2 text-sm'
@@ -63,6 +67,7 @@ const handleUpdate = async (payload) => {
         </Menu>
         <div>
             <ChatGroupChannelEdit 
+                 @remove-participant="(user) => $emit('remove-participant', user)"
                 :isModalShow="isModalShow"
                 :channelToEdit="channel"
                 @emit-submission="handleUpdate"

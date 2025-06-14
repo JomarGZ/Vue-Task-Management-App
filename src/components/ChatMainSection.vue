@@ -19,6 +19,7 @@ const props = defineProps({
     }
 })
 
+defineEmits(['remove-participant']);
 const auth = useAuth();
 const generalMessageStore = useGeneralMessage();
 const directMessageStore = useDirectMessage();
@@ -110,7 +111,11 @@ const getReplies = async (id) => {
                 </div>
             </div>
             <div v-if="channel.type !== 'general'" class="flex space-x-4">
-                <ChatChannelEditAndDeleteOptions :channel="channel"/>
+                <ChatChannelEditAndDeleteOptions 
+                    :channel="channel" 
+                    @remove-participant="(user) => $emit('remove-participant', user)"
+                    @delete-channel="$emit('delete-channel', channel.id)"
+                />
             </div>
         </div>
         <div 

@@ -1,8 +1,9 @@
 <script setup>
 import { Icon } from '@iconify/vue';
 import ChatChannelForm from './ChatChannelForm.vue';
-import { ref } from 'vue';
-defineProps({
+import { computed, ref } from 'vue';
+import SimpleAvatar from './SimpleAvatar.vue';
+const props = defineProps({
     isModalShow: {
         type: Boolean,
         default: false
@@ -16,24 +17,16 @@ defineProps({
         required: true
     }
 })
-const emit = defineEmits(['emit-submission', 'onModalShow', 'onModalClose'])
+const emit = defineEmits(['emit-submission', 'onModalShow', 'onModalClose', 'remove-participant'])
 const onEmitSubmit = (data) => {
     emit('emit-submission', data)
 }
 
-const currentStep = ref('form') // 'form' or 'participants'
-const participants = ref([
-  { id: 1, name: 'John Doe', email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
-])
-
-const removeParticipant = (id) => {
-  participants.value = participants.value.filter(p => p.id !== id)
-}
+const currentStep = ref('form') 
+const participants = computed(() => props.channelToEdit && props.channelToEdit?.participants?.length > 0 ? props.channelToEdit?.participants : []);
 
 const goToParticipants = () => currentStep.value = 'participants'
 const goToForm = () => currentStep.value = 'form'
-
 </script>
 
 <template>
@@ -85,23 +78,27 @@ const goToForm = () => currentStep.value = 'form'
 
     <!-- Participants Step -->
     <div v-if="currentStep === 'participants'" class="mt-4">
-      <ul class="divide-y divide-gray-200">
+      <ul class="divide-y overflow-y-auto max-h-56 divide-gray-200">
         <li 
           v-for="participant in participants" 
           :key="participant.id"
           class="py-3 flex justify-between items-center"
         >
-          <div>
-            <p class="font-medium">{{ participant.name }}</p>
-            <p class="text-sm text-gray-500">{{ participant.email }}</p>
-          </div>
-          <button
-            @click="removeParticipant(participant.id)"
-            class="text-red-500 hover:text-red-700 p-1"
-            title="Remove participant"
-          >
-            <Icon icon="mdi:trash-can-outline" width="20" height="20" />
-          </button>
+            <div class="flex items-center justify-start">
+                <SimpleAvatar :name="participant.name" :avatar="participant.avatar?.['thumb-60']" class="mr-4"/>
+                <div>
+                    <p class="font-medium capitalize">{{ participant.name }}</p>
+                    <p class="text-sm text-gray-500 capitalize">{{ participant.position }}</p>
+                </div>
+            </div>
+            <button
+                @click="$emit('remove-participant', participant)"
+                type="button"
+                class="text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded-lg cursor-pointer"
+                title="Remove participant"
+            >
+                <Icon icon="mdi:trash-can-outline" width="20" height="20" />
+            </button>
         </li>
       </ul>
       

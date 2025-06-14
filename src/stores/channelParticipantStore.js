@@ -1,3 +1,4 @@
+import { useSweetAlert } from "@/composables/useSweetAlert2";
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
 

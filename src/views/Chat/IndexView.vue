@@ -39,6 +39,19 @@ const loadMore = async () => {
     );
 }
 
+const removeChannelParticipant = async (user) => {
+    const success = await channelStore.removeChannelParticipant(currentChannel.value?.id, user?.id);
+    if (success) {
+      console.log(currentChannel.value.participants)
+      currentChannel.value.participants = currentChannel.value.participants?.filter(p => p.id !== user?.id);
+    } 
+}
+
+const deleteChannel = async (channelId) => {
+  const success = await channelStore.deleteChannel(channelId)
+  if (success) onGeneralChannel();
+}
+
 const onSelectChannel = (channel) => {
   currentChannel.value = channel;
 }
@@ -57,7 +70,11 @@ onMounted(() => {
           :channels="channelStore.channels"
           @onSelectChannel="onSelectChannel"
         />
-        <ChatMainSection :channel="currentChannel"/>
+        <ChatMainSection 
+          :channel="currentChannel" 
+          @remove-participant="removeChannelParticipant"
+          @delete-channel="deleteChannel"
+        />
         <ChatMembersSection 
           @load-more="loadMore"
           @onPrivateChat="onDirectChannel"

@@ -44,8 +44,7 @@ export const useChannel = defineStore("channel", () => {
             if (!channelId) {
                 throw new Error(`Channel ID is required to get channel. Recieved ${channelId}`)
             }
-            const response = await window.axios.get(`api/v1/chat/channels/${channelId}`);
-            console.log(response);
+            await window.axios.get(`api/v1/chat/channels/${channelId}`);
             return true
         } catch(e) {
             console.error('Failed to fetch channel', e)
@@ -95,10 +94,53 @@ export const useChannel = defineStore("channel", () => {
             isActionLoading.value = false
         }
     }
+    const deleteChannel = async (channelId) => {
+        if (isActionLoading.value) return;
+        isActionLoading.value = true;
+        resetErrorState();
+        try {
+            await window.axios.delete(`api/v1/chat/channels/${channelId}`);
 
+            showToast('Channel delete successfully');
+            return true;
+        } catch(e) {
+            console.error('Failed to delete channel.', e);
+            error.value = e?.message || 'There is an error deleting channel.';
+            throw e;
+        } finally {
+            isActionLoading.value = false
+        }
+    }
+     const removeChannelParticipant = async (channelId, participantId) => {
+        if (isActionLoading.value) return;
+        isActionLoading.value = true;
+
+        resetErrorState();
+        try {
+            if (!channelId) {
+                throw new Error(`Channel ID is required to remove participant. Recieved: ${channelId}`);
+            }
+            if (!participantId) {
+                throw new Error(`User ID is required to remove participant. Recieved: ${participantId}`);
+            }
+            await window.axios.delete(`api/v1/chat/channels/${channelId}/participants/${participantId}`);
+            showToast('Participant removed successfully');
+            return true;
+        } catch(e) {
+            console.error('Failed to remove participant.', e);
+
+            error.value = e?.message || 'There is an error removing participant.';
+
+            throw e;
+        } finally {
+            isActionLoading.value = false
+        }
+    }
     return {
         getChannels,
         getChannel,
+        removeChannelParticipant,
+        deleteChannel,
         isFetching,
         storeChannel,
         updateChannel,
