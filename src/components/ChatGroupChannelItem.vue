@@ -8,7 +8,7 @@ defineProps({
     },
     unreadCount: {
         type: Number,
-        default: 100
+        default: 0
     }
 });
 

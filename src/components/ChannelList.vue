@@ -34,6 +34,7 @@ defineEmits(['selectChannel']);
           v-for="channel in channels.data"
           :key="channel.id"
           @click="$emit('selectChannel', channel)"
+          :unread-count="channel.unread_count"
           :name="channel.name"
         />
       </template>
