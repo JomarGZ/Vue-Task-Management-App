@@ -42,7 +42,6 @@ const loadMore = async () => {
 const removeChannelParticipant = async (user) => {
     const success = await channelStore.removeChannelParticipant(currentChannel.value?.id, user?.id);
     if (success) {
-      console.log(currentChannel.value.participants)
       currentChannel.value.participants = currentChannel.value.participants?.filter(p => p.id !== user?.id);
     } 
 }

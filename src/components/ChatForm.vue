@@ -33,6 +33,12 @@ const channelHandler = {
         replyMode: props.replyMode,
         replyTo: props.replyTo,
         type: 'direct'
+    }),
+    group: (props) => ({
+        channelId: props.channel?.id,
+        replyMode: props.replyMode,
+        replyTo: props.replyTo,
+        type: 'group'
     })
 }
 const emit = defineEmits(['submit-message', 'cancel-reply'])

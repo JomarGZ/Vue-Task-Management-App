@@ -11,6 +11,7 @@ import { useMessageReply } from '@/stores/messageReplyStore';
 import { useDirectMessage } from '@/stores/directMessageStore';
 import ChatHeader from './ChatHeader.vue';
 import ChatChannelEditAndDeleteOptions from './ChatChannelEditAndDeleteOptions.vue';
+import { useGroupMessage } from '@/stores/groupMessageStore';
 
 const props = defineProps({
     channel: {
@@ -23,6 +24,7 @@ defineEmits(['remove-participant']);
 const auth = useAuth();
 const generalMessageStore = useGeneralMessage();
 const directMessageStore = useDirectMessage();
+const groupMessageStore = useGroupMessage();
 const replyStore = useMessageReply();
 const messageStore = useMessage();
 const isActionLoaded = ref(false);
@@ -41,8 +43,28 @@ const channelHandler = {
             isActionLoaded.value = false
         }
     },
-    group: (values) => console.log('group message', values),
-    direct:(values) => directMessageStore.storeMessage(values.content, values.recipientId, values.replyTo?.id),
+    group: (values) => {
+        if (!values.channelId) {
+            console.error('Channel ID is required for group messages');
+            throw new Error('Invalid channel: Channel ID missing');
+        }
+        return groupMessageStore.storeMessage(
+            values.content, 
+            values.channelId, 
+            values.replyTo?.id
+        );
+    },
+    direct: (values) => {
+        if (!values.recipientId) {
+            console.error('Recipient ID is required for direct messages');
+            throw new Error('Invalid recipient: Recipient ID missing');
+        }
+        return directMessageStore.storeMessage(
+            values.content, 
+            values.recipientId, 
+            values.replyTo?.id
+        );
+    }
 }
 const scrollToBottom = () => {
   nextTick(() => {
@@ -52,16 +74,43 @@ const scrollToBottom = () => {
   });
 };
 const onMessageSend = async (values) => {
-    const handler = channelHandler[props.channel.type] || (() => console.log('Unknown type'));
-    const response = await handler(values);
-    if (values.replyTo?.id) {
-        replyStore.appendReply(values.replyTo.id, response.message);
-    } else {
-        messageStore.appendMessage(response.message);
-        await nextTick();
-        scrollToBottom();
+    try {
+        if (!values?.content) {
+            throw new Error('Message content is required');
+        }
+
+        if (!props.channel?.type) {
+            throw new Error('Channel type is missing');
+        }
+
+        const handler = channelHandler[props.channel.type];
+        if (!handler) {
+            throw new Error(`Unsupported channel type: ${props.channel.type}`);
+        }
+
+        const response = await handler(values);
+        if (!response?.message) {
+            throw new Error('Invalid response from message handler');
+        }
+
+        if (values.replyTo?.id) {
+            if (!replyStore) {
+                throw new Error('Reply store is not available');
+            }
+            replyStore.appendReply(values.replyTo.id, response.message);
+        } else {
+            if (!messageStore) {
+                throw new Error('Message store is not available');
+            }
+            messageStore.appendMessage(response.message);
+            await nextTick();
+            scrollToBottom();
+        }
+
+    } catch (error) {
+        console.error('Failed to send message:', error);
     }
-}
+};
 const onReplyMode = (message) => {
     if (!message) return;
     isReplyMode.value = true
