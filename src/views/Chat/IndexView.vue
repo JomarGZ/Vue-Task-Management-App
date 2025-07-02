@@ -86,7 +86,6 @@ watch(() => props.channelId, async (channelId) => {
   try {
     if (channelId) {
       const response = await window.axios.get(`api/v1/chat/channels/${channelId}`);
-      console.log(response);
       currentChannel.value = response.data.data;
     }
   } catch (err) {
