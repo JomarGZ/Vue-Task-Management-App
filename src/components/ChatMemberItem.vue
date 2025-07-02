@@ -21,7 +21,7 @@ defineProps({
     },
     unreadCount: {
         type: Number,
-        default: 10
+        default: 0
     },
     isOnline: {
         type: Boolean,
@@ -53,7 +53,6 @@ defineEmits(['onPrivateChat']);
         <div class="ml-auto flex items-center">
             <p v-if="isAuth" class="text-xs bg-gray-200 py-0.5 px-1.5 rounded-xl text-gray-500 font-semibold">Me</p>
             <template v-else>
-                <!-- Single unread count badge next to chat button -->
                 <span v-if="unreadCount > 0" 
                       class="mr-2 w-5 h-5 flex items-center justify-center bg-red-500 text-white text-xs rounded-full">
                     {{ unreadCount > 9 ? '9+' : unreadCount }}
