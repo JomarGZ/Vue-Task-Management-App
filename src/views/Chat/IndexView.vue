@@ -8,20 +8,35 @@ import { useDirectChannel } from '@/stores/directChannelStore';
 import { useGeneralChannel } from '@/stores/generalChannelStore';
 import { useMessage } from '@/stores/messageStore';
 import { onMounted, ref, watch } from 'vue';
-
+import { useRouter } from 'vue-router';
+const props = defineProps({
+  channelId: {
+    type: [String, Number],
+    default: null
+  }
+})
 const generaChannelStore = useGeneralChannel();
 const directChannelStore = useDirectChannel();
 const channelParticipantStore = useChannelParticipant();
 const channelStore = useChannel();
 const messageStore = useMessage();
+const router = useRouter();
 
 const currentChannel = ref({});
 const onGeneralChannel = async () => {
-  const success = await generaChannelStore.getGeneralChannel();
-  if (success) {
-    channelParticipantStore.getParticipants(generaChannelStore.generalChannel?.id);
-    currentChannel.value = generaChannelStore.generalChannel || {}
-    
+  try {
+    const success = await generaChannelStore.getGeneralChannel();
+    if (success) {
+      channelParticipantStore.getParticipants(generaChannelStore.generalChannel?.id);
+      currentChannel.value = generaChannelStore.generalChannel || {};
+      
+      await router.push({ 
+        name: 'chats.index',
+        params: { channelId: generaChannelStore.generalChannel.id } 
+      });
+    }
+  } catch (error) {
+    console.error('Error switching to general channel:', error);
   }
 }
 
@@ -29,6 +44,10 @@ const onDirectChannel = async (participant) => {
   const success = await directChannelStore.getChannel(participant.id)
   if (success) {
     currentChannel.value = directChannelStore.directChannel || {};
+    router.push({ 
+      name: 'chats.index',
+      params: { channelId: currentChannel.value.id }
+    });
   }
 }
 const loadMore = async () => {
@@ -51,14 +70,34 @@ const deleteChannel = async (channelId) => {
   if (success) onGeneralChannel();
 }
 
-const onSelectChannel = (channel) => {
-  currentChannel.value = channel;
+const initializeChannel = async () => {
+  if(!props.channelId) {
+    onGeneralChannel();
+  }
 }
-watch(currentChannel, (channel) => {
-  messageStore.getMessages(channel?.id)
-})
+const onSelectGroupChannel = (channel) => {
+  currentChannel.value = channel;
+  router.push({ 
+    name: 'chats.index',
+    params: { channelId: channel.id }
+  });
+}
+watch(() => props.channelId, async (channelId) => {
+  try {
+    if (channelId) {
+      const response = await window.axios.get(`api/v1/chat/channels/${channelId}`);
+      console.log(response);
+      currentChannel.value = response.data.data;
+    }
+  } catch (err) {
+    console.error('Error fetching channel:', err);
+  }
+  messageStore.getMessages(channelId)
+  channelParticipantStore.getParticipants(channelId);
+}, { immediate: true });
+
 onMounted(() => {
-  onGeneralChannel();
+  initializeChannel();
   channelStore.getChannels();
 })
 </script>
@@ -67,7 +106,7 @@ onMounted(() => {
         <ChatGroupSection
           @on-general-channel="onGeneralChannel"
           :channels="channelStore.channels"
-          @onSelectChannel="onSelectChannel"
+          @onSelectChannel="onSelectGroupChannel"
         />
         <ChatMainSection 
           :channel="currentChannel" 

@@ -50,7 +50,6 @@ export const useChannelParticipant = defineStore('channel-participant', () => {
         if (isFetching.value) return;
         isFetching.value = true;
         resetErrorState();
-
         try {
             if (!channelId) {
                 throw new Error(`Channel ID is required to get the participants. Recieved: ${channelId}`)
