@@ -9,7 +9,7 @@ import { useDirectChannel } from '@/stores/directChannelStore';
 import { useGeneralChannel } from '@/stores/generalChannelStore';
 import { useMessageReply } from '@/stores/messageReplyStore';
 import { useMessage } from '@/stores/messageStore';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 const props = defineProps({
   channelId: {
@@ -85,6 +85,50 @@ const onSelectGroupChannel = (channel) => {
     params: { channelId: channel.id }
   });
 }
+
+let directListener = null;
+let groupListener = null;
+let lastGroupChannelId = null;
+
+function subscribeToEchoChannels(channelId) {
+  if (directListener) {
+    window.Echo.private(`direct.${auth.authId}`).stopListening('.message.sent');
+    directListener = null;
+  }
+  if (groupListener && lastGroupChannelId) {
+    window.Echo.private(`user.${auth.authId}.channel.${lastGroupChannelId}`).stopListening('.message.sent');
+    groupListener = null;
+    lastGroupChannelId = null;
+  }
+
+  // Subscribe to direct channel
+  directListener = window.Echo.private(`direct.${auth.authId}`)
+    .listen('.message.sent', (data) => {
+      if (!data || !data.message) return;
+      if (parseInt(data?.channel?.id) !== parseInt(channelId)) return;
+      if (data.message.parent_id) {
+        replyStore.appendReply(data.message.parent_id, data.message);
+      } else {
+        messageStore.appendMessage(data.message);
+      }
+    });
+
+  // Subscribe to group/general channel
+  if (channelId) {
+    lastGroupChannelId = channelId;
+    groupListener = window.Echo.private(`user.${auth.authId}.channel.${channelId}`)
+      .listen('.message.sent', (data) => {
+        if (!data || !data.message) return;
+        if (parseInt(data?.channel?.id) !== parseInt(channelId)) return;
+        if (data.message.parent_id) {
+          replyStore.appendReply(data.message.parent_id, data.message);
+        } else {
+          messageStore.appendMessage(data.message);
+        }
+      });
+  }
+}
+
 watch(() => props.channelId, async (channelId) => {
   try {
     if (channelId) {
@@ -97,34 +141,24 @@ watch(() => props.channelId, async (channelId) => {
   if (!channelId) return;
   messageStore.getMessages(channelId)
   channelParticipantStore.getParticipants(channelId);
+
+  // (Re)subscribe to Echo channels
+  subscribeToEchoChannels(channelId);
 }, { immediate: true });
 
+onBeforeUnmount(() => {
+  if (directListener) {
+    window.Echo.private(`direct.${auth.authId}`).stopListening('.message.sent');
+  }
+  if (groupListener && lastGroupChannelId) {
+    window.Echo.private(`user.${auth.authId}.channel.${lastGroupChannelId}`).stopListening('.message.sent');
+  }
+});
+
 onMounted(() => {
-  window.Echo.private(`direct.${auth.authId}`)
-    .listen('.message.sent', (data) => {
-      if (!data || !data.message) return;
-
-      if (parseInt(data?.channel?.id) !== parseInt(props.channelId)) return;
-    if (data.message.parent_id) {
-        replyStore.appendReply(data.message.parent_id, data.message);
-    } else {
-        messageStore.appendMessage(data.message);
-    }
-
-    });
   initializeChannel();
   channelStore.getChannels();
-})
-
-if (!props.channelId) {
-  console.log('[DEBUG] No channel ID provided, skipping group message listener');
-  window.Echo.private(`user.${auth.authId}.channel.${props.channelId}`)
-    .listen('.message.sent', (data) => {
-       console.log('[DEBUG] Message received from group:', data);
-
-    });
-}
-
+});
 </script>
 <template>
       <div class="flex h-screen overflow-hidden rounded-lg shadow-lg">
