@@ -5,6 +5,7 @@ import { reactive, ref } from "vue";
 export const useChannel = defineStore("channel", () => {
     const isFetching = ref(false);
     const isActionLoading = ref(false);
+    const generalChannelUnreadCount = ref(0);
     const error = ref(null);
     const channels = reactive({
         data: [],
@@ -24,6 +25,7 @@ export const useChannel = defineStore("channel", () => {
             if(cursor) params.append('cursor', cursor);
             const response = await window.axios.get(`api/v1/chat/channels?${params}`);
             const data = response.data || {};
+            generalChannelUnreadCount.value = data.general_channel.unread_messages_count || 0;
             channels.data = cursor ? [...channels.data, ...(data.data || [])] : data.data || [];
             channels.links = data.links;
             channels.meta = data.meta;
@@ -144,6 +146,7 @@ export const useChannel = defineStore("channel", () => {
         getChannel,
         removeChannelParticipant,
         deleteChannel,
+        generalChannelUnreadCount,
         isFetching,
         storeChannel,
         updateChannel,

@@ -165,6 +165,7 @@ onMounted(() => {
         <ChatGroupSection
           @on-general-channel="onGeneralChannel"
           :channels="channelStore.channels"
+          :generalUnreadCount="channelStore.generalChannelUnreadCount"
           @onSelectChannel="onSelectGroupChannel"
         />
         <ChatMainSection 

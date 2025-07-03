@@ -59,8 +59,8 @@ watch(query, searchDebounce);
                         :key="participant?.id"
                         :position="participant?.position"
                         :isAuth="authId === participant.id"
-                        :unreadCount="participant?.direct_channel?.[0]?.unread_count ?? 0"
-                        :name="participant?.name"
+                        :unreadCount="participant?.unread_count ?? 0"
+                        :name="participant?.name"   
                         :avatar="participant.avatar?.['thumb-60']"
                         @onPrivateChat="$emit('onPrivateChat', participant)"
                     />

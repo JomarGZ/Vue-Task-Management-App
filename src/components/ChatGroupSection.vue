@@ -17,6 +17,10 @@ defineProps({
         type: Boolean,
         default: false
     },
+    generalUnreadCount: {
+        type: Number,
+        default: 0
+    },
     error: {
         type: Boolean,
         default: false
@@ -33,10 +37,22 @@ const handleAddChannel = async (values) => {
 <template>
     <div class="w-20 md:w-64 bg-gray-50 border-r border-gray-200 flex flex-col ">
         <div class="p-4 border-b border-gray-200 flex justify-center items-center">
-            <div class="ml-3">
-                <button type="button" @click="$emit('on-general-channel')" class="text-lg flex justify-center items-center cursor-pointer hover:bg-sky-100 py-1 px-2 rounded-lg font-semibold">
+            <div class="ml-3 relative">
+                <button 
+                    type="button" 
+                    @click="$emit('on-general-channel')" 
+                    class="text-lg flex justify-center items-center cursor-pointer hover:bg-sky-100 py-1 px-2 rounded-lg font-semibold"
+                >
                     <Icon icon="fluent-color:people-chat-48" width="48" height="48" />
                     <span>General Chat</span>
+                    
+                    <!-- Unread count badge -->
+                    <span 
+                        v-if="generalUnreadCount > 0"
+                        class="absolute -top-2 -right-2 flex items-center justify-center h-6 w-6 rounded-full bg-red-500 text-white text-xs font-bold"
+                    >
+                        {{ generalUnreadCount > 9 ? '9+' : generalUnreadCount }}
+                    </span>
                 </button>
             </div>
         </div>
