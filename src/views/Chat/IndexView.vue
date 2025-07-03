@@ -100,24 +100,22 @@ watch(() => props.channelId, async (channelId) => {
 }, { immediate: true });
 
 onMounted(() => {
-  initializeChannel();
-  channelStore.getChannels();
-})
-// For direct messages
-window.Echo.private(`direct.${auth.authId}`)
+  window.Echo.private(`direct.${auth.authId}`)
     .listen('.message.sent', (data) => {
-    if (!data || !data.message) return;
-    if (parseInt(data.message.channel_id) !== parseInt(props.channelId)) return;
+      if (!data || !data.message) return;
+
+      if (parseInt(data?.channel?.id) !== parseInt(props.channelId)) return;
     if (data.message.parent_id) {
-      console.log('[DEBUG] Reply message received:', data);
         replyStore.appendReply(data.message.parent_id, data.message);
     } else {
         messageStore.appendMessage(data.message);
-      console.log('[DEBUG] Reply message received:', data);
-
     }
 
     });
+  initializeChannel();
+  channelStore.getChannels();
+})
+
 if (!props.channelId) {
   console.log('[DEBUG] No channel ID provided, skipping group message listener');
   window.Echo.private(`user.${auth.authId}.channel.${props.channelId}`)
