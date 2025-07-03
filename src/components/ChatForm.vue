@@ -52,7 +52,6 @@ const {handleSubmit, isSubmitting, resetForm} = useForm({
 const isDisabled = computed(() => props.isLoading || isSubmitting.value);
 const onSubmit = handleSubmit((value) => {
     const handler =  channelHandler[props.channel.type];
-    console.log(props.channel);
     const messageData = {
         ...handler(props), 
         content: value.content,
