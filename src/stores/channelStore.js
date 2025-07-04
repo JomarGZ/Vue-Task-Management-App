@@ -28,6 +28,15 @@ export const useChannel = defineStore("channel", () => {
             }
         }
     }
+
+    const newUnreadCount = (channelId, count) => {
+        if (!channelId || !count) return;
+        const channelIndex = channels.data.findIndex(c => c.id === parseInt(channelId));
+        if (channelIndex !== -1) {
+            channels.data[channelIndex].unread_count = count;
+        }
+    }
+
     const onReadGroupChannel = (channelId) => {
         if (channelId && parseInt(channelId) === generalChannel.id) {
             generalChannel.unread_messages_count = 0;
@@ -163,6 +172,7 @@ export const useChannel = defineStore("channel", () => {
         getChannels,
         getChannel,
         removeChannelParticipant,
+        newUnreadCount,
         deleteChannel,
         generalChannel,
         onReadGroupChannel,
