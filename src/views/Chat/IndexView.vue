@@ -32,7 +32,6 @@ const onGeneralChannel = async () => {
     if (success) {
       channelParticipantStore.getParticipants(generaChannelStore.generalChannel?.id);
       currentChannel.value = generaChannelStore.generalChannel || {};
-      
       await router.push({ 
         name: 'chats.index',
         params: { channelId: generaChannelStore.generalChannel.id } 
@@ -47,6 +46,7 @@ const onDirectChannel = async (participant) => {
   const success = await directChannelStore.getChannel(participant.id)
   if (success) {
     currentChannel.value = directChannelStore.directChannel || {};
+    channelParticipantStore.resetReadMessagesCount(participant.id);
     router.push({ 
       name: 'chats.index',
       params: { channelId: currentChannel.value.id }
@@ -111,6 +111,7 @@ function subscribeToEchoChannels(channelId) {
       } else {
         messageStore.appendMessage(data.message);
       }
+    
     });
 
   // Subscribe to group/general channel

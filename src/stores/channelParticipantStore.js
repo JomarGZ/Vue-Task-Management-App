@@ -1,4 +1,3 @@
-import { useSweetAlert } from "@/composables/useSweetAlert2";
 import { defineStore } from "pinia";
 import { reactive, ref } from "vue";
 
@@ -15,6 +14,13 @@ export const useChannelParticipant = defineStore('channel-participant', () => {
 
     const resetErrorState = () => {
         error.value = null;
+    }
+    const resetReadMessagesCount = (participantId) => {
+        if (!participantId) return;
+        const participantIndex = participants.data.findIndex(p => p.id === parseInt(participantId));
+        if (participantIndex !== -1) {
+            participants.data[participantIndex].unread_count = 0;
+        }
     }
 
     const removeSelectedItemOnTheList = (users) => {
@@ -81,6 +87,7 @@ export const useChannelParticipant = defineStore('channel-participant', () => {
         searchParticipants,
         dropdownParticipants,
         removeSelectedItemOnTheList,
+        resetReadMessagesCount,
         error,
         isFetching,
         participants
