@@ -5,7 +5,10 @@ import { reactive, ref } from "vue";
 export const useChannel = defineStore("channel", () => {
     const isFetching = ref(false);
     const isActionLoading = ref(false);
-    const generalChannelUnreadCount = ref(0);
+    const generalChannel = reactive({
+        unread_messages_count: 0,
+        id: null
+    });
     const error = ref(null);
     const channels = reactive({
         data: [],
@@ -16,6 +19,20 @@ export const useChannel = defineStore("channel", () => {
     const resetErrorState = () => {
         error.value = null
     }
+
+    const onReadChannel = (channelId) => {
+        if (channelId) {
+            const channelIndex = channels.data.findIndex(c => c.id === parseInt(channelId));
+            if (channelIndex !== -1) {
+                channels.data[channelIndex].unread_count = 0;
+            }
+        }
+    }
+    const onReadGroupChannel = (channelId) => {
+        if (channelId && parseInt(channelId) === generalChannel.id) {
+            generalChannel.unread_messages_count = 0;
+        }
+    }
     const getChannels = async (cursor = null) => {
         if (isFetching.value) return;
         isFetching.value = true;
@@ -25,7 +42,8 @@ export const useChannel = defineStore("channel", () => {
             if(cursor) params.append('cursor', cursor);
             const response = await window.axios.get(`api/v1/chat/channels?${params}`);
             const data = response.data || {};
-            generalChannelUnreadCount.value = data.general_channel.unread_messages_count || 0;
+            generalChannel.unread_messages_count = data.general_channel.unread_messages_count || 0;
+            generalChannel.id = data.general_channel.id || null;
             channels.data = cursor ? [...channels.data, ...(data.data || [])] : data.data || [];
             channels.links = data.links;
             channels.meta = data.meta;
@@ -146,7 +164,9 @@ export const useChannel = defineStore("channel", () => {
         getChannel,
         removeChannelParticipant,
         deleteChannel,
-        generalChannelUnreadCount,
+        generalChannel,
+        onReadGroupChannel,
+        onReadChannel,
         isFetching,
         storeChannel,
         updateChannel,

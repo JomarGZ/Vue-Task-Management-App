@@ -125,6 +125,7 @@ function subscribeToEchoChannels(channelId) {
         } else {
           messageStore.appendMessage(data.message);
         }
+        channelStore.onReadChannel(channelId);
       });
   }
 }
@@ -141,7 +142,8 @@ watch(() => props.channelId, async (channelId) => {
   if (!channelId) return;
   messageStore.getMessages(channelId)
   channelParticipantStore.getParticipants(channelId);
-
+  channelStore.onReadChannel(channelId);
+  channelStore.onReadGroupChannel(channelId);
   // (Re)subscribe to Echo channels
   subscribeToEchoChannels(channelId);
 }, { immediate: true });
@@ -165,7 +167,7 @@ onMounted(() => {
         <ChatGroupSection
           @on-general-channel="onGeneralChannel"
           :channels="channelStore.channels"
-          :generalUnreadCount="channelStore.generalChannelUnreadCount"
+          :generalUnreadCount="channelStore.generalChannel.unread_messages_count"
           @onSelectChannel="onSelectGroupChannel"
         />
         <ChatMainSection 
