@@ -11,6 +11,8 @@ import { useMessageReply } from "@/stores/messageReplyStore";
 import { useMessage } from "@/stores/messageStore";
 import { onMounted, ref, watch, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
+
+// --- Props & Stores ---
 const props = defineProps({
   channelId: {
     type: [String, Number],
@@ -26,17 +28,18 @@ const replyStore = useMessageReply();
 const router = useRouter();
 const auth = useAuth();
 const currentChannel = ref({});
+
+// --- Channel Navigation ---
 const onGeneralChannel = async () => {
   try {
     const success = await generaChannelStore.getGeneralChannel();
     if (success) {
-      channelParticipantStore.getParticipants(
-        generaChannelStore.generalChannel?.id,
-      );
+      const generalId = generaChannelStore.generalChannel?.id;
+      await channelParticipantStore.getParticipants(generalId);
       currentChannel.value = generaChannelStore.generalChannel || {};
       await router.push({
         name: "chats.index",
-        params: { channelId: generaChannelStore.generalChannel.id },
+        params: { channelId: generalId },
       });
     }
   } catch (error) {
@@ -49,12 +52,22 @@ const onDirectChannel = async (participant) => {
   if (success) {
     currentChannel.value = directChannelStore.directChannel || {};
     channelParticipantStore.resetReadMessagesCount(participant.id);
-    router.push({
+    await router.push({
       name: "chats.index",
       params: { channelId: currentChannel.value.id },
     });
   }
 };
+
+const onSelectGroupChannel = (channel) => {
+  currentChannel.value = channel;
+  router.push({
+    name: "chats.index",
+    params: { channelId: channel.id },
+  });
+};
+
+// --- Channel Actions ---
 const loadMore = async () => {
   if (!currentChannel.value) return;
   await channelParticipantStore.getParticipants(
@@ -69,8 +82,9 @@ const removeChannelParticipant = async (user) => {
     user?.id,
   );
   if (success) {
-    currentChannel.value.participants =
-      currentChannel.value.participants?.filter((p) => p.id !== user?.id);
+    currentChannel.value.participants = currentChannel.value.participants?.filter(
+      (p) => p.id !== user?.id
+    );
   }
 };
 
@@ -84,53 +98,54 @@ const initializeChannel = async () => {
     onGeneralChannel();
   }
 };
-const onSelectGroupChannel = (channel) => {
-  currentChannel.value = channel;
-  router.push({
-    name: "chats.index",
-    params: { channelId: channel.id },
-  });
-};
 
+// --- Echo Channel Subscription Management ---
 let directListener = null;
 let groupListener = null;
 let lastGroupChannelId = null;
 
+/**
+ * Subscribe to Echo channels for real-time updates.
+ * Cleans up previous listeners before subscribing to new ones.
+ */
 function subscribeToEchoChannels(channelId) {
+  // Clean up previous listeners
   if (directListener) {
     window.Echo.private(`direct.${auth.authId}`).stopListening(".message.sent");
     directListener = null;
   }
   if (groupListener && lastGroupChannelId) {
     window.Echo.private(
-      `user.${auth.authId}.channel.${lastGroupChannelId}`,
+      `user.${auth.authId}.channel.${lastGroupChannelId}`
     ).stopListening(".message.sent");
     groupListener = null;
     lastGroupChannelId = null;
   }
 
+  // Listen for direct messages
   directListener = window.Echo.private(`direct.${auth.authId}`).listen(
     ".message.sent",
     (data) => {
-      if (!data || !data.message);
+      if (!data || !data.message) return;
       if (parseInt(data?.channel?.id) !== parseInt(channelId)) {
         channelParticipantStore.getParticipants(channelId);
-      } else {
-        if (data.message.parent_id) {
-          replyStore.appendReply(data.message.parent_id, data.message);
-        } else {
-          messageStore.appendMessage(data.message);
-        }
+        return;
       }
-    },
+      if (data.message.parent_id) {
+        replyStore.appendReply(data.message.parent_id, data.message);
+      } else {
+        messageStore.appendMessage(data.message);
+      }
+    }
   );
 
-  // Subscribe to group/general channel
+  // Listen for group/general channel messages
   if (channelId) {
     lastGroupChannelId = channelId;
     groupListener = window.Echo.private(
-      `user.${auth.authId}.channel.${channelId}`,
+      `user.${auth.authId}.channel.${channelId}`
     ).listen(".message.sent", (data) => {
+      console.log('Received message in group channel:', data);
       if (!data || !data.message) return;
       if (parseInt(data?.channel?.id) !== parseInt(channelId)) return;
       if (data.message.parent_id) {
@@ -141,23 +156,33 @@ function subscribeToEchoChannels(channelId) {
       channelStore.onReadChannel(channelId);
     });
   }
+  if(channelStore.generalChannel.id) {
+     window.Echo.private(`user.${auth.authId}.channel.${channelStore.generalChannel.id}`).listen(
+      ".message.sent",
+      () => {
+        channelStore.getChannels();
+      }
+    );
+  }
+  // Listen for updates on all channels for unread counts, etc.
   channelStore.channels.data.forEach((channel) => {
     window.Echo.private(`user.${auth.authId}.channel.${channel.id}`).listen(
       ".message.sent",
-      (data) => {
+      () => {
         channelStore.getChannels();
-      },
+      }
     );
   });
 }
 
+// --- Watchers & Lifecycle ---
 watch(
   () => props.channelId,
   async (channelId) => {
     try {
       if (channelId) {
         const response = await window.axios.get(
-          `api/v1/chat/channels/${channelId}`,
+          `api/v1/chat/channels/${channelId}`
         );
         currentChannel.value = response.data.data;
       }
@@ -169,11 +194,9 @@ watch(
     channelParticipantStore.getParticipants(channelId);
     channelStore.onReadChannel(channelId);
     channelStore.onReadGroupChannel(channelId);
-    console.log("channelId", channelId);
-    // (Re)subscribe to Echo channels
     subscribeToEchoChannels(channelId);
   },
-  { immediate: true },
+  { immediate: true }
 );
 
 onBeforeUnmount(() => {
@@ -182,7 +205,7 @@ onBeforeUnmount(() => {
   }
   if (groupListener && lastGroupChannelId) {
     window.Echo.private(
-      `user.${auth.authId}.channel.${lastGroupChannelId}`,
+      `user.${auth.authId}.channel.${lastGroupChannelId}`
     ).stopListening(".message.sent");
   }
 });
@@ -192,6 +215,7 @@ onMounted(() => {
   channelStore.getChannels();
 });
 </script>
+
 <template>
   <div class="flex h-screen overflow-hidden rounded-lg shadow-lg">
     <ChatGroupSection
@@ -216,7 +240,7 @@ onMounted(() => {
           channelParticipantStore.getParticipants(
             currentChannel.id,
             null,
-            query.query,
+            query.query
           )
       "
     />
