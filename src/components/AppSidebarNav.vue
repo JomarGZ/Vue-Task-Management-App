@@ -17,27 +17,31 @@ const navLinks = [
         to: {name: 'members.index'},
         icon: 'tdesign:member'
     },
+    {
+        name: 'Chats',
+        to: {name: 'chats.index'},
+        icon: 'uiw:message'
+    },
 ]
 </script>
 <template>
     <div class="bg-gray-50 row-span-2 px-2 flex flex-col items-center py-4 space-y-6 mt-16">
         <div v-for="link in navLinks" :key="link.name" class="relative group">
-            <router-link 
-                :to="link.to"
-                active-class="bg-blue-600 text-white"
-                exact-active-class="bg-blue-600 text-white"
-                class="p-2 rounded-lg hover:bg-blue-600 transition-colors inline-flex"
-            >
-                <Icon 
-                :icon="link.icon" 
-                width="20" 
-                height="20" 
-                :class="{
-                    'text-gray-100': $route.name === link.to.name,
-                    'text-gray-600 group-hover:text-gray-100': $route.name !== link.to.name
-                }"
-                />
-            </router-link>
+                <router-link 
+                    :to="link.to"
+                    active-class="bg-blue-600 text-white"
+                    class="p-2 rounded-lg hover:bg-blue-600 transition-colors inline-flex"
+                >
+                    <Icon 
+                    :icon="link.icon" 
+                    width="20" 
+                    height="20" 
+                    :class="{
+                        'text-gray-100': $route.name === link.to.name,
+                        'text-gray-600 group-hover:text-gray-100': $route.name !== link.to.name
+                    }"
+                    />
+                </router-link>
       
             <div 
                 v-if="$route.name !== link.to.name"

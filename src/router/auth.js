@@ -28,6 +28,12 @@ export default {
         name: 'profile.index',
         component: () => import('@/views/Auth/ProfileView.vue'),
     },
+    {
+      path: '/chats/:channelId?',
+      name: 'chats.index',
+      component: () => import('@/views/Chat/IndexView.vue'),
+      props: true  
+    },
     ...projectRoutes,
     ...taskRoutes,
     ...memberRoutes,

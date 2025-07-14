@@ -1,8 +1,9 @@
 <script setup>
 import { useProjectTaskStore } from '@/stores/projectTaskStore';
 import { Icon } from '@iconify/vue'
-import { computed, ref, watch } from 'vue';
+import { computed, watch } from 'vue';
 import UserAvatar from './UserAvatar.vue';
+import AppParticipantTag from './AppParticipantTag.vue';
 const props = defineProps({
     show: {
         type: Boolean,
@@ -85,13 +86,13 @@ const emitSubmit = () => {
                             <!-- Selected Members Tags -->
                             <div class="flex flex-wrap gap-2 mb-2 min-w-0">
                                 <template v-if="projectTaskStore.selectedTaskAssignees?.length > 0">
-                                    <span v-for="selected in projectTaskStore.selectedTaskAssignees" :key="selected.id" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                       <user-avatar :name="selected.name" :avatar="selected.avatar?.['thumb-60']"/>
-                                        <p class="capitalize">{{ selected.name }}</p>
-                                        <button @click="projectTaskStore.onRemoveSelectedTaskAssignee(selected)"  class="ml-1.5 inline-flex text-blue-500 cursor-pointer hover:text-blue-700">
-                                            &times;
-                                        </button>
-                                    </span>
+                                   <AppParticipantTag
+                                        v-for="s in projectTaskStore.selectedTaskAssignees"
+                                        :key="s.id"
+                                        :name="s.name"
+                                        :avatar="s.avatar?.['thumb-60']"
+                                        @remove-selected-user-tag="projectTaskStore.onRemoveSelectedTaskAssignee(s)"
+                                   />
                                 </template>
                             </div>
                                 <!-- Member Search -->
